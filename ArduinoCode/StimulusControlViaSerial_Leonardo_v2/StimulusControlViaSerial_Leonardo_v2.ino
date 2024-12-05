@@ -433,7 +433,7 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps) {
   stopTimer3Interrupt();  // stop white noise
   delay(updateTime);
   
-  Serial.println(-1);
+  Serial.println("-1");
   OCR1A = TopLumi / 2;
   PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW
 }
