@@ -36,8 +36,12 @@ volatile int frozenWhiteNoiseTableSize;
 
 void setup() {
   pinMode(9, OUTPUT);      // Pin 9 controlled by Timer1 (Channel A)
-  pinMode(4, OUTPUT);      // Pin 4 indicator pin
+  pinMode(4, OUTPUT);      // Pin 4 indicator pin, e.g. for sinewave cycles
+  pinMode(5, OUTPUT);      // Pin 5 stim ON or OFF pin 
+
   PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW by changing register directly
+  PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
+
 
   Serial.begin(115200);
 
@@ -246,6 +250,7 @@ void outputSinewave(float sinewaveFrequency, long duration) {
 
 
   long startTime = millis();  // Record the start time
+  PORTC |= (1 << PORTC6);
   // set timer3 interrupt callback function to play the sinewave
   setTimer3Callback(sinewaveInterrupt);
 
@@ -255,6 +260,8 @@ void outputSinewave(float sinewaveFrequency, long duration) {
   }
 
   stopTimer3Interrupt();  // finish playing sinewave
+  PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW by changing register directly
+  PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
 
   OCR1A = TopLumi / 2;
@@ -317,6 +324,7 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
 
   long startTime = millis();  // Record the start time
   // set timer3 interrupt callback function to play the sinewave
+  PORTC |= (1 << PORTC6);  // Stim on pin 5
   setTimer3Callback(sinewaveEnvelopeInterrupt);
 
   // Loop until the specified duration has elapsed
@@ -324,9 +332,10 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
     delayMicroseconds(1);  //wait for time to end
   }
   stopTimer3Interrupt();  // finish playing sinewave
+  PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW by changing register directly
+  PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
   OCR1A = TopLumi / 2;
-  PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW
 }
 
 
@@ -373,6 +382,8 @@ void whiteNoise(long updateTime, long duration) {
   delay(5000);
 
   long startTime = millis();  // Record the start time
+  PORTC |= (1 << PORTC6);  // Stim on pin 5
+
   // set timer3 interrupt callback function to play the sinewave
   setTimer3Callback(whiteNoiseInterrupt);
 
@@ -383,9 +394,10 @@ void whiteNoise(long updateTime, long duration) {
 
   stopTimer3Interrupt();  // stop white noise
   delay(updateTime);
+  PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW by changing register directly
+  PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
   OCR1A = TopLumi / 2;
-  PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW
 }
 
 // whitenoise interrupt function
@@ -423,6 +435,7 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps) {
 
   long startTime = millis();  // Record the start time
   // set timer3 interrupt callback function to play the sinewave
+  PORTC |= (1 << PORTC6);  // Stim on pin 5
   setTimer3Callback(frozenWhiteNoiseInterrupt);
 
   // Loop until the specified duration has elapsed
@@ -432,10 +445,10 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps) {
 
   stopTimer3Interrupt();  // stop white noise
   delay(updateTime);
-  
+  PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW by changing register directly
+  PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
   OCR1A = TopLumi / 2;
-  PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW
 }
 
 // whitenoise interrupt function
@@ -462,6 +475,7 @@ void FlickerLED(float flickerFreq, long duration) {
   configureTimer3Interrupt(updateFrequency);
 
   long startTime = millis();  // Record the start time
+  PORTC |= (1 << PORTC6);  // Stim on pin 5
   setTimer3Callback(SquareWaveFlickerInterrupt);
 
   // Loop until the specified duration has elapsed
@@ -470,10 +484,10 @@ void FlickerLED(float flickerFreq, long duration) {
   }
 
   stopTimer3Interrupt();  // stop flicker
-
+  PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW by changing register directly
+  PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
   OCR1A = TopLumi / 2;
-  PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW
 }
 
 // square wave flicker interrupt function
