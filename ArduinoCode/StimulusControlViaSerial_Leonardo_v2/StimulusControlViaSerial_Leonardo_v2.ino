@@ -377,9 +377,6 @@ void whiteNoise(long updateTime, long duration) {
 
   Serial.print("TOP: ");
   Serial.println(TopLumi);
-  
-  OCR1A = 0; // set stimulus to off for start of whitenoise
-  delay(5000);
 
   long startTime = millis();  // Record the start time
   PORTC |= (1 << PORTC6);  // Stim on pin 5
@@ -430,9 +427,6 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps) {
   Serial.print("TOP: ");
   Serial.println(TopLumi);
   
-  OCR1A = 0; // set stimulus to off for start of whitenoise
-  delay(5000);
-
   long startTime = millis();  // Record the start time
   // set timer3 interrupt callback function to play the sinewave
   PORTC |= (1 << PORTC6);  // Stim on pin 5
