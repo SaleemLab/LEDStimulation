@@ -272,12 +272,16 @@ void sinewaveInterrupt() {
   static int tableIndex = 0;  // Start at the beginning of the sine wave table
   // Update PWM duty cycle with the next sine wave value
   OCR1A = sineWaveTable[tableIndex];
-  if (tableIndex == 0) {
-    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
-  }
+  //if (tableIndex == 0) {
+  //  PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
+  //}
 
   // Update the table index (wrap around if necessary)
-  tableIndex = (tableIndex + stepSize) % TABLE_SIZE;
+  tableIndex = tableIndex + stepSize;
+  if (tableIndex >= TABLE_SIZE) {
+    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if sine wave cycle finished
+  }
+  tableIndex = tableIndex % TABLE_SIZE;
 }
 
 
@@ -348,12 +352,13 @@ void sinewaveEnvelopeInterrupt() {
 
   // Update PWM duty cycle with the next sine wave value
   OCR1A = TopLumi / 2 + (sineWaveTable[tableIndex] - TopLumi / 2) * contrastMult;
-  if (tableIndex == 0) {
-    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
+  
+  // Update the table index (wrap around if necessary)
+  tableIndex = tableIndex + stepSize;
+  if (tableIndex >= TABLE_SIZE) {
+    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if sine wave cycle finished
   }
-
-  // Update the table index (wrap around if necessary) for the sinewave carrier
-  tableIndex = (tableIndex + stepSize) % TABLE_SIZE;
+  tableIndex = tableIndex % TABLE_SIZE;
 
   // update counter for contrast envelope
   envCount = envCount + 1;
@@ -451,9 +456,11 @@ void frozenWhiteNoiseInterrupt() {
   static int tableIndex = 0;  // Start at the beginning of the sine wave table
   // Update PWM duty cycle with the frozen white noise value
   OCR1A = frozenWhiteNoiseTable[tableIndex];
-  if (tableIndex == 0) {
-    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
-  }
+  PIND = (1 << PIND4);  // alternate PIN 4 value indicator pin
+
+  //if (tableIndex == 0) {
+  //  PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
+  //}
   //Serial.print("ti: ");
   //Serial.println(tableIndex);
   Serial.println(frozenWhiteNoiseTable[tableIndex]);
