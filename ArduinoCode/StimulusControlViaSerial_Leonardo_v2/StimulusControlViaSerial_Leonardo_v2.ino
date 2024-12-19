@@ -17,6 +17,9 @@ String FirstChar;
 int sineWaveTable[TABLE_SIZE];
 // wavetable step size
 volatile int stepSize = 1;
+volatile int tableIndex = 0; //for sinewave table
+volatile int tableEnvIndex = 0; // for sinewave table contrast envelope
+volatile int envCount = 0;  // contrast envelope counter
 // contrast-envelope counter and contrast multiplier
 volatile int nEnvCounts = 1;
 volatile float contrastMult = 1;
@@ -241,6 +244,8 @@ void outputSinewave(float sinewaveFrequency, long duration) {
     }
   }
 
+  tableIndex = 0; // start at beginning of sinewave table
+
   // Recalculate the effective update interval based on the step size
   float updateInterval = baseUpdateInterval * stepSize;
   float updateFrequency = 1e6 / updateInterval;  // update frequency for timer3 interrupt
@@ -269,19 +274,20 @@ void outputSinewave(float sinewaveFrequency, long duration) {
 
 // sinewave interrupt function
 void sinewaveInterrupt() {
-  static int tableIndex = 0;  // Start at the beginning of the sine wave table
+  //static int tableIndex = 0;  // Start at the beginning of the sine wave table
   // Update PWM duty cycle with the next sine wave value
   OCR1A = sineWaveTable[tableIndex];
-  //if (tableIndex == 0) {
-  //  PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
-  //}
+  tableIndex = (tableIndex + stepSize) % TABLE_SIZE;
+  if (tableIndex == 0) {
+    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
+  }
 
   // Update the table index (wrap around if necessary)
-  tableIndex = tableIndex + stepSize;
-  if (tableIndex >= TABLE_SIZE) {
-    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if sine wave cycle finished
-  }
-  tableIndex = tableIndex % TABLE_SIZE;
+  //tableIndex = tableIndex + stepSize;
+  //if (tableIndex >= TABLE_SIZE) {
+  //  PORTD ^= (1 << PIND4);  // Toggle Pin 4 if sine wave cycle finished
+  //}
+ // tableIndex = tableIndex % TABLE_SIZE;
 }
 
 
@@ -309,6 +315,11 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
       break;  // Stop at the first valid (smallest) step size
     }
   }
+
+  tableIndex = 0; // start at beginning of sinewave table
+  tableEnvIndex = 0; // start at beginning of sinewave table
+  envCount = 0;  // contrast envelope counter
+
 
   // Recalculate the effective update interval based on the step size
   float updateInterval = baseUpdateInterval * stepSize;
@@ -346,19 +357,18 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
 
 // sinewave contrast envelope interrupt function
 void sinewaveEnvelopeInterrupt() {
-  static int tableIndex = 0;  // Start at the beginning of the sine wave table
-  static int tableEnvIndex = 0;
-  static int envCount = 0;  // contrast envelope counter
+  //static int tableIndex = 0;  // Start at the beginning of the sine wave table
+  //static int tableEnvIndex = 0;
+  //static int envCount = 0;  // contrast envelope counter
 
   // Update PWM duty cycle with the next sine wave value
   OCR1A = TopLumi / 2 + (sineWaveTable[tableIndex] - TopLumi / 2) * contrastMult;
   
   // Update the table index (wrap around if necessary)
-  tableIndex = tableIndex + stepSize;
-  if (tableIndex >= TABLE_SIZE) {
-    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if sine wave cycle finished
+  tableIndex = (tableIndex + stepSize) % TABLE_SIZE;
+  if (tableIndex == 0) {
+    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
   }
-  tableIndex = tableIndex % TABLE_SIZE;
 
   // update counter for contrast envelope
   envCount = envCount + 1;
