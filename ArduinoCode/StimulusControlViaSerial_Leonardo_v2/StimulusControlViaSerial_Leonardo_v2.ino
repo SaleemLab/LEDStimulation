@@ -135,22 +135,27 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
   {
     long stimulusDuration = atof(serialVals[1]);
     float frequency = atof(serialVals[2]);
-    Serial.println("Stim: Sinusoidal dimming");
-    Serial.print("Stim duration: ");
-    Serial.println(stimulusDuration);
-    Serial.print("Frequency: ");
-    Serial.println(frequency);
-
+    //Serial.println("Stim: Sinusoidal dimming");
+    //Serial.flush();
+    //Serial.print("Stim duration: ");
+    //Serial.println(stimulusDuration);
+    //Serial.flush();
+    //Serial.print("Frequency: ");
+    //Serial.println(frequency);
+    //Serial.flush();
+    
     outputSinewave(frequency, stimulusDuration);
   } else if (FirstChar == "wn")  // white noise
   {
     long stimulusDuration = atof(serialVals[1]);
     long updateTime = atof(serialVals[2]);
-    Serial.println("Stim: White noise");
-    Serial.print("Stim duration: ");
-    Serial.println(stimulusDuration);
-    Serial.print("Update time: ");
-    Serial.println(updateTime);
+    //Serial.println("Stim: White noise");
+    //Serial.print("Stim duration: ");
+   // Serial.println(stimulusDuration);
+    //Serial.flush();
+   // Serial.print("Update time: ");
+  // Serial.println(updateTime);
+  //  Serial.flush();
 
     whiteNoise(updateTime, stimulusDuration);
   } else if (FirstChar == "fwn")  // frozen white noise
@@ -158,11 +163,14 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     long stimulusDuration = atof(serialVals[1]);
     int updateTime = atof(serialVals[2]);
     int nReps = atof(serialVals[3]);
-    Serial.println("Stim: White noise");
-    Serial.print("Stim duration: ");
-    Serial.println(stimulusDuration);
-    Serial.print("Update time: ");
-    Serial.println(updateTime);
+    //Serial.println("Stim: White noise");
+    //Serial.flush();
+  //  Serial.print("Stim duration: ");
+  //  Serial.println(stimulusDuration);
+  //  Serial.flush();
+  //  Serial.print("Update time: ");
+ //   Serial.println(updateTime);
+  //  Serial.flush();
 
     frozenWhiteNoise(updateTime, stimulusDuration,nReps);
   } else if (FirstChar == "se")  // sinusoidal flicker with contrast envelope
@@ -170,23 +178,32 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     long stimulusDuration = atof(serialVals[1]);
     float frequency = atof(serialVals[2]);
     float envFrequency = atof(serialVals[3]);
-    Serial.println("Stim: Sinusoidal env");
-    Serial.print("Stim duration: ");
-    Serial.println(stimulusDuration);
-    Serial.print("Frequency: ");
-    Serial.println(frequency);
-    Serial.print("Envelope freq: ");
-    Serial.println(envFrequency);
+    //Serial.println("Stim: Sinusoidal env");
+    //Serial.flush();
+ //   Serial.print("Stim duration: ");
+//    Serial.println(stimulusDuration);
+ //   Serial.flush();
+ //   Serial.print("Frequency: ");
+ //   Serial.println(frequency);
+ //   Serial.flush();
+ //   Serial.print("Envelope freq: ");
+ //   Serial.println(envFrequency);
+ //   Serial.flush();
+
     SineContrastConv(stimulusDuration, frequency, envFrequency);
   } else if (FirstChar == "f")  // Square wave flicker
   {
     long stimulusDuration = atof(serialVals[1]);
     float FlickerFreq = atof(serialVals[2]);
-    Serial.println("Stim: Square Wave flicker");
-    Serial.print("Stim duration: ");
-    Serial.println(stimulusDuration);
-    Serial.print("Frequency: ");
-    Serial.println(FlickerFreq);
+//    Serial.println("Stim: Square Wave flicker");
+//    Serial.flush();
+ //   Serial.print("Stim duration: ");
+ //   Serial.println(stimulusDuration);
+ //   Serial.flush();
+ //   Serial.print("Frequency: ");
+ //   Serial.println(FlickerFreq);
+ //   Serial.flush();
+
     FlickerLED(FlickerFreq, stimulusDuration);
   } else if (FirstChar == "st")  // Set TopLuminance
   {
@@ -277,17 +294,17 @@ void sinewaveInterrupt() {
   //static int tableIndex = 0;  // Start at the beginning of the sine wave table
   // Update PWM duty cycle with the next sine wave value
   OCR1A = sineWaveTable[tableIndex];
-  tableIndex = (tableIndex + stepSize) % TABLE_SIZE;
-  if (tableIndex == 0) {
-    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
-  }
+ // tableIndex = (tableIndex + stepSize) % TABLE_SIZE;
+  //if (tableIndex == 0) {
+ //   PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
+ // }
 
   // Update the table index (wrap around if necessary)
-  //tableIndex = tableIndex + stepSize;
-  //if (tableIndex >= TABLE_SIZE) {
-  //  PORTD ^= (1 << PIND4);  // Toggle Pin 4 if sine wave cycle finished
-  //}
- // tableIndex = tableIndex % TABLE_SIZE;
+  tableIndex = tableIndex + stepSize;
+  if (tableIndex >= TABLE_SIZE) {
+    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if sine wave cycle finished
+  }
+  tableIndex = tableIndex % TABLE_SIZE;
 }
 
 
@@ -350,6 +367,7 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
   PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW by changing register directly
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
+  Serial.flush();
   OCR1A = TopLumi / 2;
 }
 
@@ -365,10 +383,16 @@ void sinewaveEnvelopeInterrupt() {
   OCR1A = TopLumi / 2 + (sineWaveTable[tableIndex] - TopLumi / 2) * contrastMult;
   
   // Update the table index (wrap around if necessary)
-  tableIndex = (tableIndex + stepSize) % TABLE_SIZE;
-  if (tableIndex == 0) {
-    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
+  //tableIndex = (tableIndex + stepSize) % TABLE_SIZE;
+  //if (tableIndex == 0) {
+  //  PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
+ // }
+
+   tableIndex = tableIndex + stepSize;
+  if (tableIndex >= TABLE_SIZE) {
+    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if sine wave cycle finished
   }
+  tableIndex = tableIndex % TABLE_SIZE;
 
   // update counter for contrast envelope
   envCount = envCount + 1;
@@ -409,6 +433,7 @@ void whiteNoise(long updateTime, long duration) {
   PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW by changing register directly
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
+  Serial.flush();
   OCR1A = TopLumi / 2;
 }
 
@@ -418,6 +443,7 @@ void whiteNoiseInterrupt() {
   OCR1A = randNumber;
   PIND = (1 << PIND4);  // alternate PIN 4 value indicator pin
   Serial.println(randNumber);
+  Serial.flush();
   randNumber = random(0, TopLumi);  // get a new random number ready
 }
 
@@ -457,6 +483,7 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps) {
   PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW by changing register directly
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
+  Serial.flush();
   OCR1A = TopLumi / 2;
 }
 
@@ -474,6 +501,7 @@ void frozenWhiteNoiseInterrupt() {
   //Serial.print("ti: ");
   //Serial.println(tableIndex);
   Serial.println(frozenWhiteNoiseTable[tableIndex]);
+  Serial.flush();
   // Update the table index (wrap around at actual white noise table size)
   tableIndex = (tableIndex + 1) % frozenWhiteNoiseTableSize;  //
 }
@@ -498,6 +526,7 @@ void FlickerLED(float flickerFreq, long duration) {
   PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW by changing register directly
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
+  Serial.flush();
   OCR1A = TopLumi / 2;
 }
 

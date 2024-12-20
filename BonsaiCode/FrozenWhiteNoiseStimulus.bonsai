@@ -207,7 +207,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Delay">
-                <rx:DueTime>PT30S</rx:DueTime>
+                <rx:DueTime>PT5M</rx:DueTime>
               </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
@@ -1702,7 +1702,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>FrozenWhiteNoise</Value>
+                <Value>FrozenWhiteNoise_GREEN</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="ExternalizedMapping">
@@ -1710,7 +1710,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>eddtest</Value>
+                <Value>M24077</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
@@ -1928,7 +1928,7 @@
         <Property Name="FileName" />
       </Expression>
       <Expression xsi:type="io:CsvReader">
-        <io:FileName>frozenWhiteNoiseCSV.csv</io:FileName>
+        <io:FileName>StimulusCSVFiles\frozenWhiteNoiseCSV.csv</io:FileName>
         <io:ListSeparator />
         <io:ScanPattern>%i,%i,%i</io:ScanPattern>
         <io:SkipRows>0</io:SkipRows>
