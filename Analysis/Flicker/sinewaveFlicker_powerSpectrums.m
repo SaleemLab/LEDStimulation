@@ -1,13 +1,10 @@
 Subject = 'M24077';
 Session = '20241219';
+AcquisitionsID = '2';
 BaseDir = 'Z:\ibn-vision\DATA\SUBJECTS';
 % kilosortDir = fullfile(BaseDir,Subject,'ephys',Session,'spike_sorting','probe0','sorters','kilosort3_merged');
 
-[ExpInfo, ephysDir, nidqDir, bonsaiDir] = getExpInfo(BaseDir, Subject, Session);
-
-SorterName = 'kilosort3_merged';
-units = createClusterTable_dec24(Subject, Session, BaseDir, SorterName);
-units = table2struct(units);
+[ExpInfo, ephysDir, nidqDir, bonsaiDir] = getExpInfo(BaseDir, Subject, Session,AcquisitionsID);
 
 
 % nidqDir = 'Z:\ibn-vision\DATA\SUBJECTS\M24019\ephys\20240718\nidq_processed';
@@ -36,6 +33,10 @@ NidqTime = (1:size(NidqBin,2))./niSampRate;
 clear NidqBin
 
 %% load units
+SorterName = 'kilosort3_merged';
+units = createClusterTable(ephysDir, SorterName);
+units = table2struct(units);
+
 
 
 
@@ -148,7 +149,6 @@ end
 
 % chronux analysis
 
-goodUnits = units([units.firing_rate]>10);
 
 params.Fs=1000;
 params.fpass = [0.5 100];
@@ -157,11 +157,11 @@ params.pad = 0;
 params.tapers = [2 4];
 params.err =[1 0.05];
     
-for iunit = 36%1:numel(goodUnits)
+for iunit = [6, 8]
     figure
 for ifreq = 1:numel(flickFreqs);
     
-     spikeTimes = goodUnits(iunit).spike_times*1000;
+     spikeTimes = units(iunit).spike_times*1000;
      % spikeTimes = cat(1,units.spike_times)*1000;
 
     tints = stat_intervalsCell{ifreq};
@@ -187,7 +187,6 @@ for ifreq = 1:numel(flickFreqs);
         stat_t(itrial).spike_times = p(1).trial(itrial).trialCentricSpikes/1000;
 
     end
-
 
 
     [S,f,R,Serr]=mtspectrumpt(stat_t,params);
