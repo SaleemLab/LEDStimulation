@@ -241,7 +241,7 @@ void generateSineWaveTable(long TOP) {
 
 void outputSinewave(float sinewaveFrequency, long duration) {
 
-  int tableIndex = 0;  // Start at the beginning of the sine wave table
+  tableIndex = 0;  // Start at the beginning of the sine wave table
 
   // first do some calculations to find the update interval and step size for Timer3 interrupts
   // Calculate the PWM cycle time in microseconds
@@ -260,8 +260,6 @@ void outputSinewave(float sinewaveFrequency, long duration) {
       break;  // Stop at the first valid (smallest) step size
     }
   }
-
-  tableIndex = 0; // start at beginning of sinewave table
 
   // Recalculate the effective update interval based on the step size
   float updateInterval = baseUpdateInterval * stepSize;
@@ -294,6 +292,9 @@ void sinewaveInterrupt() {
   //static int tableIndex = 0;  // Start at the beginning of the sine wave table
   // Update PWM duty cycle with the next sine wave value
   OCR1A = sineWaveTable[tableIndex];
+  //Serial.print(OCR1A);
+  //Serial.print(',');
+
  // tableIndex = (tableIndex + stepSize) % TABLE_SIZE;
   //if (tableIndex == 0) {
  //   PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
@@ -312,8 +313,6 @@ void sinewaveInterrupt() {
 
 /////////////////////////////////// SINE WAVE FLICKER WITH CONTRAST ENVELOPE //////////////////////////
 void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFreq) {
-
-  int tableIndex = 0;  // Start at the beginning of the sine wave table
 
   // first do some calculations to find the update interval and step size for Timer3 interrupts
   // Calculate the PWM cycle time in microseconds
@@ -573,6 +572,7 @@ void setDutyCycle(float dutyCyclePercentage, long TopLumi) {
 
   // Set OCR1A to control the duty cycle
   OCR1A = ocrValue;
+  Serial.println(OCR1A);
 }
 
 ////////////////////// TIMER 1 PWM FREQUENCY CONTROL //////////////////////////////
