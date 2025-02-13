@@ -217,6 +217,12 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
 
     setDutyCycle(DutyCyle, TopLumi);
 
+  } else if (FirstChar == "gc") // do gamma correction routine
+  {
+    float stepSize = atof(serialVals[1]);
+    float waitTime = atof(serialVals[2]);
+    int nReps = atoi(serialVals[3]);
+    cycleDutyCycles(stepSize, waitTime, nReps, TopLumi);
   } else  // not valid stimulus code
   {
     Serial.print(FirstChar);
@@ -572,7 +578,37 @@ void setDutyCycle(float dutyCyclePercentage, long TopLumi) {
 
   // Set OCR1A to control the duty cycle
   OCR1A = ocrValue;
-  Serial.println(OCR1A);
+  //Serial.println(OCR1A);
+}
+
+
+// Run through duty cycles to perform gamma correction
+void cycleDutyCycles(float stepSize, float waitTime, int nReps, long TopLumi){
+  float dutyCycle = 0;
+
+  for (int irep=0; irep<nReps; irep++)
+  {
+  while (dutyCycle<=1)
+  {
+    //Serial.println(dutyCycle);
+    long ocrValue = (long)(dutyCycle* TopLumi);
+    OCR1A = ocrValue;
+    delay(waitTime);
+    dutyCycle = dutyCycle+stepSize;
+  }
+   while (dutyCycle>=0)
+  {
+    long ocrValue = (long)(dutyCycle* TopLumi);
+    OCR1A = ocrValue;
+    delay(waitTime);
+    dutyCycle = dutyCycle-stepSize;
+  }
+  dutyCycle=0;
+  }
+  Serial.println("-1");
+  // Set pin 9 to 50% duty cycle as default
+  OCR1A = TopLumi / 2;
+    
 }
 
 ////////////////////// TIMER 1 PWM FREQUENCY CONTROL //////////////////////////////
