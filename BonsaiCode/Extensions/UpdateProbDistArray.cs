@@ -25,10 +25,10 @@ public class UpdateProbDistArray
             
             List<float[]> newProbDistArray = new List<float[]>(value.Item2);
 
-            for (int istim=0; istim<nStim; istim++)
-                {
-                    Console.WriteLine("thisDist" + istim + ": " + OriginalProbDistArray[0][istim]);
-                }
+          //  for (int istim=0; istim<nStim; istim++)
+           //     {
+           //         Console.WriteLine("targetDist" + istim + ": " + OriginalProbDistArray[0][istim]);
+             //   }
 
             // output 
             List<float[]> output = new List<float[]>();
@@ -38,7 +38,7 @@ public class UpdateProbDistArray
             {
                 float[] outputDist = new float[nStim];
 
-                float[] thisDist = OriginalProbDistArray[istate];
+                float[] targetDist = OriginalProbDistArray[istate];
                 int[] tempCounters = TrialCounters[istate];
                 var theseCounters = tempCounters.Select(x=>(float)x).ToArray();  // convert to float[]
             
@@ -59,14 +59,24 @@ public class UpdateProbDistArray
                 float[] diffArray = new float[nStim];
 
 
+
+
                 for (int istim=0; istim<nStim; istim++)
                 {
-                    diffArray[istim] = thisDist[istim]-normCounters[istim]; // if less than wanted then +ve, if more than wanted then -ve
-                    outputDist[istim] = thisDist[istim]+(diffArray[istim]*scalingFactor);
+                    diffArray[istim] = targetDist[istim]-normCounters[istim]; // if less than wanted then +ve, if more than wanted then -ve
+                    outputDist[istim] = targetDist[istim]+(diffArray[istim]*scalingFactor);
                     if (outputDist[istim]<0) {outputDist[istim]=0;};
-                    if (outputDist[istim]>=100) {outputDist[istim]=90;};
+                    //if (outputDist[istim]>=100) {outputDist[istim]=90;};
                     //newProbDistArray[istate][istim] = OriginalProbDistArray[istate][istim]+diffArray[istim];
                 }
+
+                //Console.WriteLine("diffArray:");                
+                //Console.WriteLine("[{0}]", string.Join(", ", diffArray));
+
+
+
+               // Console.WriteLine("temp output dist: ");
+                //Console.WriteLine("[{0}]", string.Join(", ", outputDist));
 
 
                // normalise arrays back to 100
@@ -74,10 +84,20 @@ public class UpdateProbDistArray
                 float temp_sum = outputDist.Sum();
                 float multFactor2 = 100f/temp_sum;
                 outputDist = outputDist.Select(r=> r * multFactor2).ToArray();
-                for (int istim=0; istim<nStim; istim++)
-                {Console.WriteLine("op: " + outputDist[istim]);};
+                //if (istate==0)
+                //{   
+                //    Console.WriteLine("output dist:");
+                //    Console.WriteLine("[{0}]", string.Join(", ", outputDist));
+               // }
+                //for (int istim=0; istim<nStim; istim++)
+                //{Console.WriteLine("op: " + outputDist[istim]);};
                 //float normSum = normDist.Sum();
                 //Console.WriteLine("sum check " + normSum)
+
+                if (outputDist.Any(float.IsNaN))
+                {
+                    outputDist = targetDist;
+                }
 
                 output.Add(outputDist);
             }
@@ -87,7 +107,7 @@ public class UpdateProbDistArray
 
                     
 
-                    //diffArray[istim] = normCounters[istim]-thisDist[istim];
+                    //diffArray[istim] = normCounters[istim]-targetDist[istim];
         
                     
        //             if (newProbDistArray[istate][istim]<0)
@@ -103,7 +123,7 @@ public class UpdateProbDistArray
              //       {
                         //Console.WriteLine("state: " + istate + ", stim: " + istim + ", diffArray: " + diffArray[istim]);
                         //Console.WriteLine("state: " + istate + ", stim: " + istim + ", trialCount: " + tempCounters[istim]);
-                        //Console.WriteLine("state: " + istate + ", stim: " + istim + ", thisDist: " + thisDist[istim]);
+                        //Console.WriteLine("state: " + istate + ", stim: " + istim + ", targetDist: " + targetDist[istim]);
             //        }
            //     }
 
@@ -112,10 +132,10 @@ public class UpdateProbDistArray
             // normalise arrays back to 100
          //   for (int istate=0; istate<nStates; istate++)
         //    {
-        //        float[] thisDist = newProbDistArray[istate];
-        //        float temp_sum = thisDist.Sum();
+        //        float[] targetDist = newProbDistArray[istate];
+        //        float temp_sum = targetDist.Sum();
         //        float multFactor = 100f/temp_sum;
-        //        float[] normDist = thisDist.Select(r=> r * multFactor).ToArray();
+        //        float[] normDist = targetDist.Select(r=> r * multFactor).ToArray();
         //        newProbDistArray[istate] = normDist;
                 //float normSum = normDist.Sum();
                 //Console.WriteLine("sum check " + normSum);

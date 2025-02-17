@@ -24,10 +24,16 @@ public class RandSampleFromIndexedDistribution
             int nStim = thisDistribution.Length;
             int iStim = 0;
 
-            for (int i=0; i<nStim; i++) // loop through speed pair
-            {
-                Console.WriteLine("thisDist" + i + ": " +thisDistribution[i]);
-            }
+            //Console.WriteLine("dist index: ");
+            //Console.WriteLine(distIndex);
+            //Console.WriteLine("sample dist: ");
+            //Console.WriteLine("[{0}]", string.Join(", ", thisDistribution));
+
+
+           //for (int i=0; i<nStim; i++) // loop through speed pair
+           // {
+            //    Console.WriteLine("thisDist" + i + ": " +thisDistribution[i]);
+            //}
 
             var rng = new Random((int)DateTime.Now.Ticks); // random number generator
 
