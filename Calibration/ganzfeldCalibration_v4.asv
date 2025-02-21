@@ -113,7 +113,7 @@ legend({PRs(1).name, LEDs(1).name, PRs(2).name, LEDs(2).name});
 defaultAxesProperties(gca, false)
 
 
-%% Process power meter readings
+%% Load Thorlabs power meter data
 % use Thor-labs power meter sensor responsivity calibration data to
 % convert measured power into a correctedf emission spectra for each light 
 % source in nW.
@@ -122,14 +122,18 @@ A_detect_um2 = 9700^2; %Thor labs photodiode active receptor area
 % A_detect_um2 = 7.8540e+05; % OVS sensor 
 
 % get calibration data for the photodiode
-P_meter_cal = readtable('S120VC_Responsivity.xlsx');
+%P_meter_cal = readtable('S120VC_Responsivity.xlsx');
+% P_meter_cal_wavelengths = P_meter_cal.Wavelength_nm_;
+% P_meter_cal_responsivity = P_meter_cal.Responsivity_mA_W_;
+
+P_meter_cal = readtable(fullfile(pwd, 'PowerMeterCalibrationFiles', 'S130VC_Responsivity.xlsx'));
 P_meter_cal_wavelengths = P_meter_cal.Wavelength_nm_;
-P_meter_cal_responsivity = P_meter_cal.Responsivity_mA_W_;
+P_meter_cal_responsivity = P_meter_cal.Responsivity_mA_W_; % without filter
 
 %% process power meter readings to scale LED spectra - GREEN
 
-lambda_meas = 525; % specified measurement wavelength for power meter
-P_total = 1e-5; % output of power meter in W
+lambda_meas = 524; % specified measurement wavelength for power meter
+P_total = 8.7E-6 *0.8; % output of power meter in W
 
 [wavelengths, green_power, green_P_true, green_correction_factor] = getLEDSpectraFromPowerMeter(...
     P_total, lambda_meas, wavelengths_nm, LEDs(1).spect_nw_norm, ...
@@ -144,7 +148,7 @@ LEDs(1).measured_power = P_total; % reference for the spectrum
 %% process power meter readings to scale LED spectra - UV
 
 lambda_meas = 385; % specified measurement wavelength for power meter
-P_total = 2.95e-5; % output of power meter in W
+P_total = 1185E-6 * ; % output of power meter in W
 
 [UV_wavelengths, UV_power, UV_P_true, UV_correction_factor] = getLEDSpectraFromPowerMeter(...
     P_total, lambda_meas, wavelengths_nm, LEDs(2).spect_nw_norm, ...
@@ -271,6 +275,7 @@ for iLED=1:2
     end
 end
 ylabel('Isomerisation rate')
+xlabel('wavelengths (nm)')
 
 yyaxis right
 for iPR = 1:2
@@ -282,4 +287,5 @@ for iLED = 1:2
 plot(wavelengths_nm, LEDs(iLED).spect_nw_corr_norm, 'Color', PRs(iLED).col, 'LineStyle', '--')
 end
 
-leg
+legend({'green on M-cone', 'green on S-cone','UV on M-cone', 'UV on S-cone',...
+    'M-cone sensitivity', 'S-cone sensitivity', 'Green LED spectra', 'UV LED spectra'})
