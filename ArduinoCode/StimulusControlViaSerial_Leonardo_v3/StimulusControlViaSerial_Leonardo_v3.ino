@@ -5,6 +5,7 @@
 
 // Declare a pointer to the current LUT
 const uint16_t* currentLUT;
+String GammaLUTName;
 
 const uint16_t defaultLUT[1041] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
@@ -333,6 +334,8 @@ const uint16_t UVLUT[1041] = {
 long prescaler;
 long TOP;      // set by the clock
 long TopLumi;  // use to limit max luminance
+long desiredPWMFrequency = 7680;
+float dutyCycle;
 
 // serial
 const byte numChars = 30;
@@ -344,6 +347,8 @@ String FirstChar;
 
 // Array to hold the wavetable
 uint16_t sineWaveTable[TABLE_SIZE];
+uint16_t baseSineWaveTable[TABLE_SIZE];
+
 // wavetable step size
 volatile int stepSize = 1;
 volatile int tableIndex = 0; //for sinewave table
@@ -377,8 +382,8 @@ void setup() {
 
   Serial.begin(115200);
 
-  // Set the desired PWM frequency (in Hz)
-  long desiredPWMFrequency = 7680;  // Example: 7680 Hz
+  // Set the desired PWM frequency (in Hz) -> set outside now
+  //long desiredPWMFrequency = 7680;  // Example: 7680 Hz
 
   // Constrain the desired PWM frequency to be a multiple of TABLE_SIZE
   // (probably not important since precision seems low at high frequenies)
@@ -394,6 +399,7 @@ void setup() {
   
 
   currentLUT = defaultLUT;
+  GammaLUTName = "default";
 
   // Generate the sine wave LUT based on the Timer1 config and TopLumi
   generateSineWaveTable(TopLumi);
@@ -545,9 +551,9 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
 
   } else if (FirstChar == "sd")  // Set duty cycle
   {
-    float DutyCyle = atof(serialVals[1]);
+    dutyCycle = atof(serialVals[1]);
 
-    setDutyCycle(DutyCyle, TopLumi);
+    setDutyCycle(dutyCycle, TopLumi);
 
   } else if (FirstChar == "gc") // do gamma correction routine
   {
@@ -555,12 +561,16 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     float waitTime = atof(serialVals[2]);
     int nReps = atoi(serialVals[3]);
     cycleDutyCycles(stepSize, waitTime, nReps, TopLumi);
-  } else if (FirstChar == "sgc") // do gamma correction routine
+  } else if (FirstChar == "agc") // apply gamma correction
   { 
     int GammaToUse = atoi(serialVals[1]);
     applyGammaCorrection(GammaToUse);
     
-  } else  // not valid stimulus code
+  } else if (FirstChar == "stat")
+  {
+    getStatus();
+  }
+  else  // not valid stimulus code
   {
     Serial.print(FirstChar);
     Serial.println(" is an invalid stimulus code - make sure you are using carriage return line ending");
@@ -578,9 +588,12 @@ void generateSineWaveTable(long TOP) {
   for (int i = 0; i < TABLE_SIZE; i++) {
     // Calculate the sine wave value (scaled between 0 and TOP)
     float angle = (2.0 * PI * i) / TABLE_SIZE;                     // Angle in radians
-    sineWaveTable[i] = (uint16_t)((sin(angle) + 1.0) * (TOP / 2.0));  // Scale to 0-TOP 
+    baseSineWaveTable[i] = (uint16_t)((sin(angle) + 1.0) * (TOP / 2.0));  // Scale to 0-TOP, un-corrected sinewave
     // use this value to index into LUT
   }
+      for (int i = 0; i < 256; i++) {
+        sineWaveTable[i] = currentLUT[baseSineWaveTable[i]]; // LUT-corrected 
+    }
 }
 
 void outputSinewave(float sinewaveFrequency, long duration) {
@@ -743,7 +756,7 @@ void sinewaveEnvelopeInterrupt() {
   {
     envCount = 0;                                                  // reset to 1
     tableEnvIndex = (tableEnvIndex + 1) % TABLE_SIZE;              // get the next contrast value index
-    contrastMult = sineWaveTable[tableEnvIndex] / float(TopLumi);  // use index to get the normalised contrast value
+    contrastMult = baseSineWaveTable[tableEnvIndex] / float(TopLumi);  // use index to get the normalised contrast value
     //Serial.println(contrastMult);
   }
 }
@@ -953,22 +966,45 @@ void applyGammaCorrection(int LUT_index){
   if (LUT_index==0)
     {
       currentLUT = defaultLUT;
+      // update sinewavetable!
       Serial.println("defaultLUT selected");
+      GammaLUTName = "default";
+    
     } 
     else if (LUT_index==1)
     {
       currentLUT = GREENLUT;
       Serial.println("GREENLUT selected");
+      GammaLUTName = "green";
+
     }
     else if (LUT_index==2)
     {
       Serial.println("UVLUT selected");
+      GammaLUTName = "UV";
+
     }
     else
     {
       Serial.println("Invalid LUT_index selected, gammaLUT not changed.");
     }
 }
+
+void getStatus()
+{
+  Serial.print("PWM FREQ: ");
+  Serial.println(desiredPWMFrequency);
+  Serial.print("TOP: ");
+  Serial.println(TOP);
+  Serial.print("TopLumi: ");
+  Serial.println(TopLumi);
+  Serial.print("Duty cycle: ");
+  Serial.println(dutyCycle);
+  Serial.print("Gamma Correction LUT: ");
+  Serial.println(GammaLUTName);
+
+}
+
 
 ////////////////////// TIMER 1 PWM FREQUENCY CONTROL //////////////////////////////
 
