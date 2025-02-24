@@ -133,7 +133,7 @@ P_meter_cal_responsivity = P_meter_cal.Responsivity_mA_W_; % without filter
 %% process power meter readings to scale LED spectra - GREEN
 
 lambda_meas = 524; % specified measurement wavelength for power meter
-P_total = 8.7E-6; % output of power meter in W
+P_total = 7.05E-6; % output of power meter in W
 
 [wavelengths, green_power, green_P_true, green_correction_factor] = getLEDSpectraFromPowerMeter(...
     P_total, lambda_meas, wavelengths_nm, LEDs(1).spect_nw_norm, ...
@@ -148,7 +148,7 @@ LEDs(1).measured_power = P_total; % reference for the spectrum
 %% process power meter readings to scale LED spectra - UV
 
 lambda_meas = 385; % specified measurement wavelength for power meter
-P_total = 1185E-6; % output of power meter in W
+P_total = 44E-6; % output of power meter in W
 
 [UV_wavelengths, UV_power, UV_P_true, UV_correction_factor] = getLEDSpectraFromPowerMeter(...
     P_total, lambda_meas, wavelengths_nm, LEDs(2).spect_nw_norm, ...

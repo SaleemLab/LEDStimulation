@@ -1,27 +1,29 @@
 %% Gamma calibration
 
-outputFileName = 'GREEN_gammaLUT.txt';
+outputFileName = 'GREEN_120mA_240225_gammaLUT.txt';
 
 %% parse power values from gamma data
 
+power_table = green120mA;
+
 figure, 
 subplot(121)
-plot(GREEN120.Time,GREEN120.Power)
+plot(power_table.Time,power_table.Power)
 
-waitTime = 5000; % duration of each power level used in gamma correction procedure
+waitTime = 10000; % duration of each power level used in gamma correction procedure
 delayTime = 2000; % how long to wait before taking values
-takeValsDuration = 2000;
-dutyCyclesOrig = 0:2:100;
+takeValsDuration = 6000;
+dutyCyclesOrig = 0:1:100;
 
 %%
-startTime = 12270; % estimate from figure
+startTime = 11289; % estimate from figure
 
 
 for icycle = 1:numel(dutyCyclesOrig)
     temp_startTime = startTime + waitTime*(icycle-1) + waitTime;
     temp_endTime = temp_startTime + takeValsDuration;
-    temp_idx = find(UV2400.Time>=temp_startTime,1,'first'):find(UV2400.Time<=temp_endTime,1,'last');
-    temp_powVals = UV2400.Power(temp_idx);
+    temp_idx = find(power_table.Time>=temp_startTime,1,'first'):find(power_table.Time<=temp_endTime,1,'last');
+    temp_powVals = power_table.Power(temp_idx);
     powerValsOrig(icycle) = median(temp_powVals);
 end
 
