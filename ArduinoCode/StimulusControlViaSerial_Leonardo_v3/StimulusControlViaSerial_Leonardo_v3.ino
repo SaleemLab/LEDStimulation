@@ -5,9 +5,9 @@
 
 // Declare a pointer to the current LUT
 const uint16_t* currentLUT;
-String GammaLUTName;
+char GammaLUTName;
 
-const uint16_t defaultLUT[1041] = {
+const uint16_t PROGMEM defaultLUT[1041] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
  20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
@@ -115,7 +115,7 @@ const uint16_t defaultLUT[1041] = {
  1040
 };
 
-const uint16_t GREENLUT[1041] = {
+const uint16_t PROGMEM GREENLUT[1041] = {
     0, 3, 5, 8, 11, 14, 16, 19, 21, 23, 
     24, 25, 27, 28, 29, 30, 32, 33, 34, 36, 
     37, 38, 40, 41, 42, 43, 44, 45, 47, 48, 
@@ -223,8 +223,8 @@ const uint16_t GREENLUT[1041] = {
     998};
 
 
-const uint16_t UVLUT[1041] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 
+const uint16_t PROGMEM UVLUT[1041] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 1, 3, // 1, 3 for last 2
     4, 5, 7, 8, 10, 11, 12, 14, 15, 17, 
     18, 19, 21, 22, 23, 24, 25, 27, 28, 29, 
     30, 31, 32, 33, 35, 36, 37, 38, 39, 40, 
@@ -347,7 +347,7 @@ String FirstChar;
 
 // Array to hold the wavetable
 uint16_t sineWaveTable[TABLE_SIZE];
-uint16_t baseSineWaveTable[TABLE_SIZE];
+//uint16_t baseSineWaveTable[TABLE_SIZE];
 
 // wavetable step size
 volatile int stepSize = 1;
@@ -399,7 +399,7 @@ void setup() {
   
 
   currentLUT = defaultLUT;
-  GammaLUTName = "default";
+  GammaLUTName = 'd';
 
   // Generate the sine wave LUT based on the Timer1 config and TopLumi
   generateSineWaveTable(TopLumi);
@@ -588,12 +588,12 @@ void generateSineWaveTable(long TOP) {
   for (int i = 0; i < TABLE_SIZE; i++) {
     // Calculate the sine wave value (scaled between 0 and TOP)
     float angle = (2.0 * PI * i) / TABLE_SIZE;                     // Angle in radians
-    baseSineWaveTable[i] = (uint16_t)((sin(angle) + 1.0) * (TOP / 2.0));  // Scale to 0-TOP, un-corrected sinewave
+    sineWaveTable[i] = (uint16_t)((sin(angle) + 1.0) * (TOP / 2.0));  // Scale to 0-TOP, un-corrected sinewave
     // use this value to index into LUT
   }
-      for (int i = 0; i < 256; i++) {
-        sineWaveTable[i] = currentLUT[baseSineWaveTable[i]]; // LUT-corrected 
-    }
+     // for (int i = 0; i < 256; i++) {
+    //    sineWaveTable[i] = baseSineWaveTable[i]; //currentLUT[baseSineWaveTable[i]]; // LUT-corrected 
+   // }
 }
 
 void outputSinewave(float sinewaveFrequency, long duration) {
@@ -756,7 +756,7 @@ void sinewaveEnvelopeInterrupt() {
   {
     envCount = 0;                                                  // reset to 1
     tableEnvIndex = (tableEnvIndex + 1) % TABLE_SIZE;              // get the next contrast value index
-    contrastMult = baseSineWaveTable[tableEnvIndex] / float(TopLumi);  // use index to get the normalised contrast value
+    contrastMult = sineWaveTable[tableEnvIndex] / float(TopLumi);  // use index to get the normalised contrast value
     //Serial.println(contrastMult);
   }
 }
@@ -925,11 +925,14 @@ void setDutyCycle(float dutyCyclePercentage, long TopLumi) {
   if (dutyCyclePercentage > 100.0) dutyCyclePercentage = 100.0;
 
   // Calculate the OCR1A value based on the duty cycle and TOP
-  long ocrValue = (long)((dutyCyclePercentage / 100.0) * TopLumi);
-
+  uint16_t ocrValue = (long)((dutyCyclePercentage / 100.0) * TopLumi);
+  
   // Set OCR1A to control the duty cycle
-  OCR1A = ocrValue;
-  //Serial.println(OCR1A);
+  //OCR1A = ocrValue;
+  OCR1A = pgm_read_word_near(currentLUT+ocrValue);
+  Serial.print(ocrValue);
+  Serial.print(',');
+  Serial.println(OCR1A);
 }
 
 
@@ -941,20 +944,12 @@ void cycleDutyCycles(float stepSize, float waitTime, int nReps, long TopLumi){
   {
   while (dutyCycle<=1)
   {
-    //Serial.println(dutyCycle);
+    Serial.println(dutyCycle);
     long ocrValue = (long)(dutyCycle* TopLumi);
     OCR1A = ocrValue;
     delay(waitTime);
     dutyCycle = dutyCycle+stepSize;
   }
-   while (dutyCycle>=0)
-  {
-    long ocrValue = (long)(dutyCycle* TopLumi);
-    OCR1A = ocrValue;
-    delay(waitTime);
-    dutyCycle = dutyCycle-stepSize;
-  }
-  dutyCycle=0;
   }
   Serial.println("-1");
   // Set pin 9 to 50% duty cycle as default
@@ -967,21 +962,22 @@ void applyGammaCorrection(int LUT_index){
     {
       currentLUT = defaultLUT;
       // update sinewavetable!
-      Serial.println("defaultLUT selected");
-      GammaLUTName = "default";
+      Serial.println(F("defaultLUT selected"));
+      GammaLUTName = 'd';
     
     } 
     else if (LUT_index==1)
     {
       currentLUT = GREENLUT;
-      Serial.println("GREENLUT selected");
-      GammaLUTName = "green";
+      Serial.println(F("GREENLUT selected"));
+      GammaLUTName = 'g';
 
     }
     else if (LUT_index==2)
     {
-      Serial.println("UVLUT selected");
-      GammaLUTName = "UV";
+      currentLUT = UVLUT;
+      Serial.println(F("UVLUT selected"));
+      GammaLUTName = 'u';
 
     }
     else

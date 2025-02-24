@@ -233,7 +233,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
   //Serial.print("rc: ");
   //Serial.println(receivedChars);
 }
-
+cy
 
 ///////////////////////////////////// SINEWAVE FLICKER  //////////////////////////////////////
 // Function to generate a sine wave table
@@ -590,20 +590,12 @@ void cycleDutyCycles(float stepSize, float waitTime, int nReps, long TopLumi){
   {
   while (dutyCycle<=1)
   {
-    //Serial.println(dutyCycle);
+    Serial.println(dutyCycle);
     long ocrValue = (long)(dutyCycle* TopLumi);
     OCR1A = ocrValue;
     delay(waitTime);
     dutyCycle = dutyCycle+stepSize;
   }
-   while (dutyCycle>=0)
-  {
-    long ocrValue = (long)(dutyCycle* TopLumi);
-    OCR1A = ocrValue;
-    delay(waitTime);
-    dutyCycle = dutyCycle-stepSize;
-  }
-  dutyCycle=0;
   }
   Serial.println("-1");
   // Set pin 9 to 50% duty cycle as default
