@@ -332,8 +332,9 @@ const uint16_t PROGMEM UVLUT[1041] = {
 
 
 long prescaler;
-long TOP;      // set by the clock
+uint16_t TOP;      // set by the clock
 long TopLumi;  // use to limit max luminance
+long MidLumi;
 long desiredPWMFrequency = 7680;
 float dutyCycle;
 
@@ -347,7 +348,6 @@ String FirstChar;
 
 // Array to hold the wavetable
 uint16_t sineWaveTable[TABLE_SIZE];
-uint16_t baseSineWaveTable[TABLE_SIZE];
 
 // wavetable step size
 volatile int stepSize = 1;
@@ -356,7 +356,8 @@ volatile int tableEnvIndex = 0; // for sinewave table contrast envelope
 volatile int envCount = 0;  // contrast envelope counter
 // contrast-envelope counter and contrast multiplier
 volatile int nEnvCounts = 1;
-volatile float contrastMult = 1;
+volatile float contrastMult = 0;
+volatile uint8_t contrastMultInt=0;
 
 // white noise update time and PWM value
 volatile long updateTime;
@@ -396,7 +397,7 @@ void setup() {
   configureTimer1(prescaler, TOP);
 
   TopLumi = TOP;  // set default TopLumi (max duty cycle) as the actual TOP (i.e. 100% for now)
-  
+  MidLumi=TopLumi/2;
 
   currentLUT = defaultLUT;
   GammaLUTName = 'd';
@@ -501,6 +502,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     long stimulusDuration = atof(serialVals[1]);
     int updateTime = atof(serialVals[2]);
     int nReps = atof(serialVals[3]);
+    int randSeedNum = atoi(serialVals[4]);
     //Serial.println("Stim: White noise");
     //Serial.flush();
   //  Serial.print("Stim duration: ");
@@ -510,7 +512,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
  //   Serial.println(updateTime);
   //  Serial.flush();
 
-    frozenWhiteNoise(updateTime, stimulusDuration,nReps);
+    frozenWhiteNoise(updateTime, stimulusDuration,nReps,randSeedNum);
   } else if (FirstChar == "se")  // sinusoidal flicker with contrast envelope
   {
     long stimulusDuration = atof(serialVals[1]);
@@ -588,12 +590,9 @@ void generateSineWaveTable(long TOP) {
   for (int i = 0; i < TABLE_SIZE; i++) {
     // Calculate the sine wave value (scaled between 0 and TOP)
     float angle = (2.0 * PI * i) / TABLE_SIZE;                     // Angle in radians
-    baseSineWaveTable[i] = (uint16_t)((sin(angle) + 1.0) * (TOP / 2.0));  // Scale to 0-TOP, un-corrected sinewave
+    sineWaveTable[i] = (uint16_t)((sin(angle) + 1.0) * (TOP / 2.0));  // Scale to 0-TOP, un-corrected sinewave
     // use this value to index into LUT
   }
-      for (int i = 0; i < 256; i++) {
-        sineWaveTable[i] = pgm_read_word_near(currentLUT+baseSineWaveTable[i]);//baseSineWaveTable[i]; //currentLUT[baseSineWaveTable[i]]; // LUT-corrected 
-      }
 }
 
 void outputSinewave(float sinewaveFrequency, long duration) {
@@ -648,7 +647,7 @@ void outputSinewave(float sinewaveFrequency, long duration) {
 void sinewaveInterrupt() {
   //static int tableIndex = 0;  // Start at the beginning of the sine wave table
   // Update PWM duty cycle with the next sine wave value
-  OCR1A = sineWaveTable[tableIndex];
+  setOCR1A(sineWaveTable[tableIndex]);
   //Serial.print(OCR1A);
   //Serial.print(',');
 
@@ -692,6 +691,7 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
   tableIndex = 0; // start at beginning of sinewave table
   tableEnvIndex = 0; // start at beginning of sinewave table
   envCount = 0;  // contrast envelope counter
+  contrastMult = 0;
 
 
   // Recalculate the effective update interval based on the step size
@@ -736,7 +736,8 @@ void sinewaveEnvelopeInterrupt() {
   //static int envCount = 0;  // contrast envelope counter
 
   // Update PWM duty cycle with the next sine wave value
-  OCR1A = TopLumi / 2 + (sineWaveTable[tableIndex] - TopLumi / 2) * contrastMult; 
+  uint16_t ocrVal = MidLumi + ((sineWaveTable[tableIndex] - MidLumi) * contrastMult);
+  setOCR1A(ocrVal);
   
   // Update the table index (wrap around if necessary)
   //tableIndex = (tableIndex + stepSize) % TABLE_SIZE;
@@ -745,19 +746,22 @@ void sinewaveEnvelopeInterrupt() {
  // }
 
    tableIndex = tableIndex + stepSize;
-  if (tableIndex >= TABLE_SIZE) {
-    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if sine wave cycle finished
-  }
+
   tableIndex = tableIndex % TABLE_SIZE;
+
+ 
 
   // update counter for contrast envelope
   envCount = envCount + 1;
   if (envCount > nEnvCounts - 1)  // if time to update contrast envelope
   {
     envCount = 0;                                                  // reset to 1
-    tableEnvIndex = (tableEnvIndex + 1) % TABLE_SIZE;              // get the next contrast value index
-    contrastMult = baseSineWaveTable[tableEnvIndex] / float(TopLumi);  // use index to get the normalised contrast value
-    //Serial.println(contrastMult);
+    tableEnvIndex = (tableEnvIndex + 1);
+  if (tableEnvIndex >= TABLE_SIZE) {
+    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if sine wave cycle finished. Consider changing to envIndex?
+  }
+   tableEnvIndex = tableEnvIndex % TABLE_SIZE;              // get the next contrast value index
+    contrastMult = sineWaveTable[tableEnvIndex] / float(TopLumi);  // use index to get the normalised contrast value
   }
 }
 
@@ -806,7 +810,7 @@ void whiteNoiseInterrupt() {
 
 /////////////////////////////////// FROZEN WHITE NOISE PWM FUNCTIONS //////////////////////////////
 
-void frozenWhiteNoise(int updateTime, long duration, long nReps) {
+void frozenWhiteNoise(int updateTime, long duration, long nReps, int randSeedNum) {
 
   float updateFrequency = 1e3 / updateTime;
   configureTimer3Interrupt(updateFrequency);
@@ -816,6 +820,7 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps) {
   Serial.print("LD: ");
   Serial.println(totalDuration);
 
+  randomSeed(randSeedNum); // for reproducible random sequence across different stimulus blocks
   for (int i = 0; i < frozenWhiteNoiseTableSize; i++) {
     // Calculate the sine wave value (scaled between 0 and TOP)
     frozenWhiteNoiseTable[i] = (int)random(0, TopLumi);  // Scale to 0-TOP
@@ -911,6 +916,7 @@ void SetTopLumi(float TopMultiplier) {
 
   // get new TOP value to use
   TopLumi = float(TOP) * TopMultiplier;
+  MidLumi = TopLumi/2;
 
   // Generate the sine wave LUT based on the Timer1 config
   generateSineWaveTable(TopLumi);

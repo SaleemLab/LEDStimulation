@@ -233,7 +233,6 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
   //Serial.print("rc: ");
   //Serial.println(receivedChars);
 }
-cy
 
 ///////////////////////////////////// SINEWAVE FLICKER  //////////////////////////////////////
 // Function to generate a sine wave table
