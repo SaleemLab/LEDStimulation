@@ -347,7 +347,7 @@ String FirstChar;
 
 // Array to hold the wavetable
 uint16_t sineWaveTable[TABLE_SIZE];
-//uint16_t baseSineWaveTable[TABLE_SIZE];
+uint16_t baseSineWaveTable[TABLE_SIZE];
 
 // wavetable step size
 volatile int stepSize = 1;
@@ -408,7 +408,7 @@ void setup() {
   randNumber = TopLumi / 2;
 
   // Set pin 9 to 50% duty cycle as default
-  OCR1A = TopLumi / 2;
+  setOCR1A(TopLumi / 2);
 
   //delay(5000);
   //whiteNoise(10000, 10);
@@ -588,12 +588,12 @@ void generateSineWaveTable(long TOP) {
   for (int i = 0; i < TABLE_SIZE; i++) {
     // Calculate the sine wave value (scaled between 0 and TOP)
     float angle = (2.0 * PI * i) / TABLE_SIZE;                     // Angle in radians
-    sineWaveTable[i] = (uint16_t)((sin(angle) + 1.0) * (TOP / 2.0));  // Scale to 0-TOP, un-corrected sinewave
+    baseSineWaveTable[i] = (uint16_t)((sin(angle) + 1.0) * (TOP / 2.0));  // Scale to 0-TOP, un-corrected sinewave
     // use this value to index into LUT
   }
-     // for (int i = 0; i < 256; i++) {
-    //    sineWaveTable[i] = baseSineWaveTable[i]; //currentLUT[baseSineWaveTable[i]]; // LUT-corrected 
-   // }
+      for (int i = 0; i < 256; i++) {
+        sineWaveTable[i] = pgm_read_word_near(currentLUT+baseSineWaveTable[i]);//baseSineWaveTable[i]; //currentLUT[baseSineWaveTable[i]]; // LUT-corrected 
+      }
 }
 
 void outputSinewave(float sinewaveFrequency, long duration) {
@@ -641,7 +641,7 @@ void outputSinewave(float sinewaveFrequency, long duration) {
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
 
-  OCR1A = TopLumi / 2;
+  setOCR1A(TopLumi / 2);
 }
 
 // sinewave interrupt function
@@ -724,7 +724,7 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
   Serial.flush();
-  OCR1A = TopLumi / 2;
+  setOCR1A(TopLumi / 2);
 }
 
 
@@ -756,7 +756,7 @@ void sinewaveEnvelopeInterrupt() {
   {
     envCount = 0;                                                  // reset to 1
     tableEnvIndex = (tableEnvIndex + 1) % TABLE_SIZE;              // get the next contrast value index
-    contrastMult = sineWaveTable[tableEnvIndex] / float(TopLumi);  // use index to get the normalised contrast value
+    contrastMult = baseSineWaveTable[tableEnvIndex] / float(TopLumi);  // use index to get the normalised contrast value
     //Serial.println(contrastMult);
   }
 }
@@ -790,13 +790,13 @@ void whiteNoise(long updateTime, long duration) {
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
   Serial.flush();
-  OCR1A = TopLumi / 2;
+  setOCR1A(TopLumi / 2);
 }
 
 // whitenoise interrupt function
 void whiteNoiseInterrupt() {
   // Update PWM duty cycle with the next sine wave value
-  OCR1A = randNumber;
+  setOCR1A(randNumber);
   PIND = (1 << PIND4);  // alternate PIN 4 value indicator pin
   Serial.println(randNumber);
   Serial.flush();
@@ -840,7 +840,7 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps) {
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
   Serial.flush();
-  OCR1A = TopLumi / 2;
+  setOCR1A(TopLumi / 2);
 }
 
 // whitenoise interrupt function
@@ -848,7 +848,7 @@ void frozenWhiteNoiseInterrupt() {
 
   static int tableIndex = 0;  // Start at the beginning of the sine wave table
   // Update PWM duty cycle with the frozen white noise value
-  OCR1A = frozenWhiteNoiseTable[tableIndex];
+  setOCR1A(frozenWhiteNoiseTable[tableIndex]);
   PIND = (1 << PIND4);  // alternate PIN 4 value indicator pin
 
   //if (tableIndex == 0) {
@@ -883,7 +883,7 @@ void FlickerLED(float flickerFreq, long duration) {
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
   Serial.flush();
-  OCR1A = TopLumi / 2;
+  setOCR1A(TopLumi / 2);
 }
 
 // square wave flicker interrupt function
@@ -896,6 +896,11 @@ void SquareWaveFlickerInterrupt() {
 /////////////////////////////////// SOME GENERIC PWM FUNCTIONS ///////////////////////////////////////////
 // function to artifically lower the max PWM duty cycle. (i.e. TopMultiplier=0.5 means max duty cycle of 50%)
 // other functions will work as normal but scale to this TOP value
+void setOCR1A(uint16_t ocrValue){
+  OCR1A = pgm_read_word_near(currentLUT+ocrValue);
+}
+
+
 void SetTopLumi(float TopMultiplier) {
 
   if (TopMultiplier > 1) {
@@ -914,7 +919,7 @@ void SetTopLumi(float TopMultiplier) {
   randNumber = TopLumi / 2;
 
   // Set pin 9 to 50% duty cycle as default
-  OCR1A = TopLumi / 2;
+  setOCR1A(TopLumi / 2);
 }
 
 
@@ -929,7 +934,7 @@ void setDutyCycle(float dutyCyclePercentage, long TopLumi) {
   
   // Set OCR1A to control the duty cycle
   //OCR1A = ocrValue;
-  OCR1A = pgm_read_word_near(currentLUT+ocrValue);
+  setOCR1A(ocrValue);
   Serial.print(ocrValue);
   Serial.print(',');
   Serial.println(OCR1A);
@@ -947,22 +952,24 @@ void cycleDutyCycles(float stepSize, float waitTime, int nReps, long TopLumi){
     Serial.println(dutyCycle);
     long ocrValue = (long)(dutyCycle* TopLumi);
     //OCR1A = ocrValue;
-    OCR1A = pgm_read_word_near(currentLUT+ocrValue);
+    setOCR1A(ocrValue);
     delay(waitTime);
     dutyCycle = dutyCycle+stepSize;
   }
   }
   Serial.println("-1");
   // Set pin 9 to 50% duty cycle as default
-  OCR1A = TopLumi / 2;
+  setOCR1A(TopLumi / 2);
     
 }
+
+
 
 void applyGammaCorrection(int LUT_index){
   if (LUT_index==0)
     {
       currentLUT = defaultLUT;
-      // update sinewavetable!
+      generateSineWaveTable(TOP); // generate new sinewave table
       Serial.println(F("defaultLUT selected"));
       GammaLUTName = 'd';
     
@@ -970,6 +977,7 @@ void applyGammaCorrection(int LUT_index){
     else if (LUT_index==1)
     {
       currentLUT = GREENLUT;
+      generateSineWaveTable(TOP);
       Serial.println(F("GREENLUT selected"));
       GammaLUTName = 'g';
 
@@ -977,6 +985,7 @@ void applyGammaCorrection(int LUT_index){
     else if (LUT_index==2)
     {
       currentLUT = UVLUT;
+      generateSineWaveTable(TOP);
       Serial.println(F("UVLUT selected"));
       GammaLUTName = 'u';
 
@@ -989,15 +998,17 @@ void applyGammaCorrection(int LUT_index){
 
 void getStatus()
 {
-  Serial.print("PWM FREQ: ");
+  Serial.print(F("PWM FREQ: "));
   Serial.println(desiredPWMFrequency);
-  Serial.print("TOP: ");
+  Serial.print(F("TOP: "));
   Serial.println(TOP);
-  Serial.print("TopLumi: ");
+  Serial.print(F("TopLumi: "));
   Serial.println(TopLumi);
-  Serial.print("Duty cycle: ");
+  Serial.print(F("Duty cycle: "));
   Serial.println(dutyCycle);
-  Serial.print("Gamma Correction LUT: ");
+  Serial.print(F("Current OCR1A: "));
+  Serial.println(OCR1A);
+  Serial.print(F("Gamma Correction LUT: "));
   Serial.println(GammaLUTName);
 
 }
