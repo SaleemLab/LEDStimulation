@@ -72,7 +72,7 @@ def generate():
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>\DotMotionTrialParams.csv</Value>
+                <Value>\SineFlickerTrialParams.csv</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
@@ -1465,23 +1465,7 @@ def process(value):
                       <Combinator xsi:type="rx:WithLatestFrom" />
                     </Expression>
                     <Expression xsi:type="scr:ExpressionTransform">
-                      <scr:Expression>new(Item1.Item1.Id as Id,
-Item1.Item1.Duration as Duration,
-Item1.Item1.Size as Size,
-Item1.Item1.Colour1 as Colour1,
-Item1.Item1.Colour2 as Colour2,
-Item1.Item1.numDots1 as numDots1,
-Item1.Item1.numDots2 as numDots2,
-Item1.Item1.dotLifeBool as dotLifeBool,
-Item1.Item1.dotLifetime as dotLifetime,
-Item1.Item1.Contrast1 as Contrast1,
-Item1.Item1.Contrast2 as Contrast2,
-Item1.Item1.VelX1 as VelX1,
-Item1.Item1.VelX2 as VelX2,
-Item1.Item1.Coherence1 as Coherence1,
-Item1.Item1.Coherence1 as Coherence1,
-Item1.Item2 as BonsaiTime,
-Item2 as ArduinoTime)</scr:Expression>
+                      <scr:Expression>new(Item1.Item1.Item1 as StimulusType, Item1.Item1.Item2 as StimulusDuration, Item1.Item1.Item3 as UpdateTime, Item2 as ArduinoTime, Item1.Item2 as BonsaiTime)</scr:Expression>
                     </Expression>
                     <Expression xsi:type="io:CsvWriter">
                       <io:FileName>D:\Data\test123\2025-02-24\DotMotionTrialParams.csv</io:FileName>
@@ -5333,6 +5317,86 @@ Item3.Item6 as Coherence2)</scr:Expression>
           <Name>Random</Name>
         </Builder>
       </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>TrialLogger</Name>
+        <Description>Creates and initializes a CSV file, and matching behavior subject, on which to timestamp and log events.</Description>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>TrialParamsPath</Name>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="FileName" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="Overwrite" />
+            </Expression>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="Suffix" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>TrialParams</Name>
+            </Expression>
+            <Expression xsi:type="Parse">
+              <Pattern>%s,%i,%i</Pattern>
+              <Separator />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Timestamp" />
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Timestamp.DateTime.TimeOfDay</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Zip" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>ArduinoTime</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:WithLatestFrom" />
+            </Expression>
+            <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Expression>new(Item1.Item1.Item1 as StimulusType, Item1.Item1.Item2 as StimulusDuration, Item1.Item1.Item3 as UpdateTime, Item2 as ArduinoTime, Item1.Item2 as BonsaiTime)</scr:Expression>
+            </Expression>
+            <Expression xsi:type="io:CsvWriter">
+              <io:FileName>D:\Data\eddtest321\2025-02-26\DotMotionTrialParams.csv</io:FileName>
+              <io:Delimiter>,</io:Delimiter>
+              <io:Append>false</io:Append>
+              <io:Overwrite>false</io:Overwrite>
+              <io:Suffix>Timestamp</io:Suffix>
+              <io:IncludeHeader>true</io:IncludeHeader>
+              <io:Selector />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="IntProperty">
+                <Value>0</Value>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>ArduinoTime</Name>
+            </Expression>
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="12" Label="Source1" />
+            <Edge From="2" To="12" Label="Source2" />
+            <Edge From="3" To="12" Label="Source3" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="5" To="8" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source2" />
+            <Edge From="8" To="10" Label="Source1" />
+            <Edge From="9" To="10" Label="Source2" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="11" To="12" Label="Source4" />
+            <Edge From="13" To="14" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
       <Expression xsi:type="ExternalizedMapping">
         <Property Name="Count" DisplayName="nReps" />
       </Expression>
@@ -5695,19 +5759,19 @@ Item3.Item6 as Coherence2)</scr:Expression>
       <Edge From="90" To="91" Label="Source2" />
       <Edge From="91" To="92" Label="Source1" />
       <Edge From="93" To="94" Label="Source1" />
-      <Edge From="95" To="96" Label="Source1" />
-      <Edge From="97" To="98" Label="Source1" />
-      <Edge From="98" To="104" Label="Source1" />
-      <Edge From="99" To="100" Label="Source1" />
+      <Edge From="96" To="97" Label="Source1" />
+      <Edge From="98" To="99" Label="Source1" />
+      <Edge From="99" To="105" Label="Source1" />
       <Edge From="100" To="101" Label="Source1" />
-      <Edge From="101" To="104" Label="Source2" />
-      <Edge From="102" To="103" Label="Source1" />
-      <Edge From="103" To="104" Label="Source3" />
-      <Edge From="104" To="105" Label="Source1" />
+      <Edge From="101" To="102" Label="Source1" />
+      <Edge From="102" To="105" Label="Source2" />
+      <Edge From="103" To="104" Label="Source1" />
+      <Edge From="104" To="105" Label="Source3" />
       <Edge From="105" To="106" Label="Source1" />
       <Edge From="106" To="107" Label="Source1" />
-      <Edge From="107" To="109" Label="Source1" />
-      <Edge From="108" To="109" Label="Source2" />
+      <Edge From="107" To="108" Label="Source1" />
+      <Edge From="108" To="110" Label="Source1" />
+      <Edge From="109" To="110" Label="Source2" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>
