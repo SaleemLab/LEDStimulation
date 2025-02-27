@@ -348,6 +348,7 @@ String FirstChar;
 
 // Array to hold the wavetable
 uint16_t sineWaveTable[TABLE_SIZE];
+uint8_t contrastSineWaveTable[TABLE_SIZE];
 
 // wavetable step size
 volatile int stepSize = 1;
@@ -591,6 +592,8 @@ void generateSineWaveTable(long TOP) {
     // Calculate the sine wave value (scaled between 0 and TOP)
     float angle = (2.0 * PI * i) / TABLE_SIZE;                     // Angle in radians
     sineWaveTable[i] = (uint16_t)((sin(angle) + 1.0) * (TOP / 2.0));  // Scale to 0-TOP, un-corrected sinewave
+    contrastSineWaveTable[i] = ((sin(angle) + 1.0) * (255 / 2.0));
+    Serial.println(contrastSineWaveTable[i]);
     // use this value to index into LUT
   }
 }
@@ -689,9 +692,10 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
   }
 
   tableIndex = 0; // start at beginning of sinewave table
-  tableEnvIndex = 0; // start at beginning of sinewave table
+  tableEnvIndex = 191; // start at 0 contrast
   envCount = 0;  // contrast envelope counter
   contrastMult = 0;
+  nEnvCounts = 0;
 
 
   // Recalculate the effective update interval based on the step size
@@ -703,12 +707,20 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
 
 
   // now get interval for updating envelope
-  float baseEnvUpdateInterval = 1.0 / (envelopeFreq * TABLE_SIZE);  // Time per table update in seconds
-  baseEnvUpdateInterval *= 1e6;                                     // Convert to microseconds
+  //float baseEnvUpdateInterval = 1.0 / (envelopeFreq * TABLE_SIZE);  // Time per table update in seconds
+  //baseEnvUpdateInterval *= 1e6;                                     // Convert to microseconds
 
-  nEnvCounts = baseEnvUpdateInterval / updateInterval;
-  //Serial.print("nc: ");
+  //nEnvCounts = baseEnvUpdateInterval / updateInterval;
+ // nEnvCounts = updateFrequency / (sinewaveFrequency/envelopeFreq);
+  
+  nEnvCounts = (int) (sinewaveFrequency/envelopeFreq);
+
+  //Serial.println("sf: " +sinewaveFrequency);
+  //Serial.println()
+  
   //Serial.println(nEnvCounts);
+  //Serial.flush();
+  //delay(500);
 
   long startTime = millis();  // Record the start time
   // set timer3 interrupt callback function to play the sinewave
@@ -731,37 +743,37 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
 
 // sinewave contrast envelope interrupt function
 void sinewaveEnvelopeInterrupt() {
-  //static int tableIndex = 0;  // Start at the beginning of the sine wave table
-  //static int tableEnvIndex = 0;
-  //static int envCount = 0;  // contrast envelope counter
 
   // Update PWM duty cycle with the next sine wave value
-  uint16_t ocrVal = MidLumi + ((sineWaveTable[tableIndex] - MidLumi) * contrastMult);
+  uint16_t ocrVal = MidLumi + ((sineWaveTable[tableIndex] - MidLumi) * (contrastMult));
+  //uint16_t ocrVal = ((sineWaveTable[tableIndex] - MidLumi) * contrastMult);
+  //ocrVal = ocrVal >> 8;
+  //ocrVal = ocrVal + MidLumi;
   setOCR1A(ocrVal);
+
+  //Serial.print(ocrValtest);
+  //Serial.print(",");
+  Serial.print(ocrVal);
+  Serial.print(",");
   
-  // Update the table index (wrap around if necessary)
-  //tableIndex = (tableIndex + stepSize) % TABLE_SIZE;
-  //if (tableIndex == 0) {
-  //  PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
- // }
+  // update sinewave table index based on interrupt frequency
+  tableIndex = tableIndex + stepSize;
+  if (tableIndex >= TABLE_SIZE) tableIndex -= TABLE_SIZE;  // wrap table index
 
-   tableIndex = tableIndex + stepSize;
 
-  tableIndex = tableIndex % TABLE_SIZE;
-
- 
-
-  // update counter for contrast envelope
+  // update counter for contrast envelope 
   envCount = envCount + 1;
-  if (envCount > nEnvCounts - 1)  // if time to update contrast envelope
+  if (envCount > nEnvCounts - 1)  // check if time to update contrast value
   {
-    envCount = 0;                                                  // reset to 1
-    tableEnvIndex = (tableEnvIndex + 1);
-  if (tableEnvIndex >= TABLE_SIZE) {
-    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if sine wave cycle finished. Consider changing to envIndex?
-  }
-   tableEnvIndex = tableEnvIndex % TABLE_SIZE;              // get the next contrast value index
-    contrastMult = sineWaveTable[tableEnvIndex] / float(TopLumi);  // use index to get the normalised contrast value
+    envCount = 0;                                                  // reset 
+    tableEnvIndex = tableEnvIndex + 1;                            // incremenet contrast LUT index
+  
+    if (tableEnvIndex >= TABLE_SIZE) 
+    {
+    PORTD ^= (1 << PIND4);  // Toggle Pin 4 if envelope cycle finished
+    tableEnvIndex -= TABLE_SIZE; // wrap tableEnvIndex
+    }
+    contrastMult = sineWaveTable[tableEnvIndex] / float(TopLumi); // update contrast multiplier
   }
 }
 
@@ -941,9 +953,9 @@ void setDutyCycle(float dutyCyclePercentage, long TopLumi) {
   // Set OCR1A to control the duty cycle
   //OCR1A = ocrValue;
   setOCR1A(ocrValue);
-  Serial.print(ocrValue);
-  Serial.print(',');
-  Serial.println(OCR1A);
+  //Serial.print(ocrValue);
+  //Serial.print(',');
+  //Serial.println(OCR1A);
 }
 
 
