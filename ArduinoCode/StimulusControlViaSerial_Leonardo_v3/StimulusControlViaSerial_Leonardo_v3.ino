@@ -1,6 +1,7 @@
 #define CLOCK_FREQ 16000000  // Arduino Leonardo clock frequency (16 MHz)
 #define TABLE_SIZE 256       // Number of samples in the wavetable
 
+
 // gamma correction LUTs
 
 // Declare a pointer to the current LUT
@@ -348,7 +349,6 @@ String FirstChar;
 
 // Array to hold the wavetable
 uint16_t sineWaveTable[TABLE_SIZE];
-uint8_t contrastSineWaveTable[TABLE_SIZE];
 
 // wavetable step size
 volatile int stepSize = 1;
@@ -358,7 +358,7 @@ volatile int envCount = 0;  // contrast envelope counter
 // contrast-envelope counter and contrast multiplier
 volatile int nEnvCounts = 1;
 volatile float contrastMult = 0;
-volatile uint8_t contrastMultInt=0;
+volatile uint16_t contrastMultInt=0;
 
 // white noise update time and PWM value
 volatile long updateTime;
@@ -398,7 +398,7 @@ void setup() {
   configureTimer1(prescaler, TOP);
 
   TopLumi = TOP;  // set default TopLumi (max duty cycle) as the actual TOP (i.e. 100% for now)
-  MidLumi=TopLumi/2;
+  MidLumi=TOP/2;
 
   currentLUT = defaultLUT;
   GammaLUTName = 'd';
@@ -593,8 +593,6 @@ void generateSineWaveTable(long TOP) {
     float angle = (2.0 * PI * i) / TABLE_SIZE;                     // Angle in radians
     sineWaveTable[i] = (uint16_t)((sin(angle) + 1.0) * (TOP / 2.0));  // Scale to 0-TOP, un-corrected sinewave
     contrastSineWaveTable[i] = ((sin(angle) + 1.0) * (255 / 2.0));
-    Serial.println(contrastSineWaveTable[i]);
-    // use this value to index into LUT
   }
 }
 
@@ -663,8 +661,8 @@ void sinewaveInterrupt() {
   tableIndex = tableIndex + stepSize;
   if (tableIndex >= TABLE_SIZE) {
     PORTD ^= (1 << PIND4);  // Toggle Pin 4 if sine wave cycle finished
+    tableIndex -= TABLE_SIZE; // wrap table
   }
-  tableIndex = tableIndex % TABLE_SIZE;
 }
 
 
@@ -700,27 +698,15 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
 
   // Recalculate the effective update interval based on the step size
   float updateInterval = baseUpdateInterval * stepSize;
+  Serial.print("req update: ");
+  Serial.println(updateInterval);
   float updateFrequency = 1e6 / updateInterval;  // update frequency for timer3 interrupt
 
   // Configure timer3 interrupt to updateFrequency
   configureTimer3Interrupt(updateFrequency);
-
-
-  // now get interval for updating envelope
-  //float baseEnvUpdateInterval = 1.0 / (envelopeFreq * TABLE_SIZE);  // Time per table update in seconds
-  //baseEnvUpdateInterval *= 1e6;                                     // Convert to microseconds
-
-  //nEnvCounts = baseEnvUpdateInterval / updateInterval;
- // nEnvCounts = updateFrequency / (sinewaveFrequency/envelopeFreq);
-  
   nEnvCounts = (int) (sinewaveFrequency/envelopeFreq);
 
-  //Serial.println("sf: " +sinewaveFrequency);
-  //Serial.println()
-  
-  //Serial.println(nEnvCounts);
-  //Serial.flush();
-  //delay(500);
+
 
   long startTime = millis();  // Record the start time
   // set timer3 interrupt callback function to play the sinewave
@@ -743,19 +729,12 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
 
 // sinewave contrast envelope interrupt function
 void sinewaveEnvelopeInterrupt() {
-
+//unsigned long startTime = micros();
   // Update PWM duty cycle with the next sine wave value
   uint16_t ocrVal = MidLumi + ((sineWaveTable[tableIndex] - MidLumi) * (contrastMult));
-  //uint16_t ocrVal = ((sineWaveTable[tableIndex] - MidLumi) * contrastMult);
-  //ocrVal = ocrVal >> 8;
-  //ocrVal = ocrVal + MidLumi;
+
   setOCR1A(ocrVal);
 
-  //Serial.print(ocrValtest);
-  //Serial.print(",");
-  Serial.print(ocrVal);
-  Serial.print(",");
-  
   // update sinewave table index based on interrupt frequency
   tableIndex = tableIndex + stepSize;
   if (tableIndex >= TABLE_SIZE) tableIndex -= TABLE_SIZE;  // wrap table index
@@ -775,6 +754,8 @@ void sinewaveEnvelopeInterrupt() {
     }
     contrastMult = sineWaveTable[tableEnvIndex] / float(TopLumi); // update contrast multiplier
   }
+  //unsigned long duration = micros() - startTime; // Measure execution time
+  //Serial.println(duration); // Print execution time
 }
 
 

@@ -1,10 +1,10 @@
 %% Gamma calibration
 
-outputFileName = 'UV1200_LUT.txt';
+outputFileName = 'UV1200.txt';
 
 %% parse power values from gamma data
 
-power_table = UV2400;
+power_table = UV1200;
 
 figure, 
 subplot(121)
