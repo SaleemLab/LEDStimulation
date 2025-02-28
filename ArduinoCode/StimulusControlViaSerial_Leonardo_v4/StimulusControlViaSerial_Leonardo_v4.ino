@@ -339,6 +339,10 @@ long MidLumi;
 long desiredPWMFrequency = 7680;
 float dutyCycle;
 
+// channel selection
+bool useUV = true;
+bool useGREEN = true;
+
 // serial
 const byte numChars = 30;
 char receivedChars[numChars];  // an array to store the received data
@@ -571,7 +575,30 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     int GammaToUse = atoi(serialVals[1]);
     applyGammaCorrection(GammaToUse);
     
-  } else if (FirstChar == "stat")
+  } else if (FirstChar == "useUV") // apply gamma correction
+  { 
+    useUV = atoi(serialVals[1]);
+    if (!useUV) 
+    {
+      OCR1B=0;
+      Serial.println(F("UV OFF"));
+    } else
+    { 
+      Serial.println(F("UV ON"));
+    };
+    
+  } else if (FirstChar == "useGREEN") // apply gamma correction
+  { 
+    useGREEN = atoi(serialVals[1]);
+    if (!useGREEN) 
+    {
+      OCR1A=0;
+      Serial.println(F("GREEN OFF"));
+    } else
+    { 
+      Serial.println(F("GREEN ON"));
+    };
+  }else if (FirstChar == "stat")
   {
     getStatus();
   }
@@ -887,7 +914,8 @@ void FlickerLED(float flickerFreq, long duration) {
 
 // square wave flicker interrupt function
 void SquareWaveFlickerInterrupt() {
-  OCR1A = (OCR1A == TopLumi) ? 0 : TopLumi;  // Toggle between 0 and TOP
+  if (useGREEN) OCR1A = (OCR1A == TopLumi) ? 0 : TopLumi;  // Toggle between 0 and TOP
+  if (useUV) OCR1B = (OCR1B == TopLumi) ? 0 : TopLumi;
   PORTD ^= (1 << PIND4);                     // set indicator pin similarly
 }
 
@@ -896,8 +924,8 @@ void SquareWaveFlickerInterrupt() {
 // function to artifically lower the max PWM duty cycle. (i.e. TopMultiplier=0.5 means max duty cycle of 50%)
 // other functions will work as normal but scale to this TOP value
 void setOCR1A(uint16_t ocrValue){
-  OCR1A = pgm_read_word_near(currentLUT+ocrValue);
-  OCR1B = pgm_read_word_near(currentLUT+ocrValue);
+  if (useGREEN) OCR1A = pgm_read_word_near(GREENLUT+ocrValue);
+  if (useUV) OCR1B = pgm_read_word_near(UVLUT+ocrValue);
 }
 
 
