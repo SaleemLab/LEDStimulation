@@ -601,6 +601,10 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
   }else if (FirstChar == "stat")
   {
     getStatus();
+
+  }else if (FirstChar == "ana")
+  {
+    readAnalogVals();
   }
   else  // not valid stimulus code
   {
@@ -1040,6 +1044,39 @@ void getStatus()
   Serial.print(F("Gamma Correction LUT: "));
   Serial.println(GammaLUTName);
 
+}
+
+
+void readAnalogVals() {
+  bool keepReading = true;
+  const unsigned long interval = 100;  // 100ms interval
+  unsigned long previousMillis = millis();
+  
+  while (keepReading) {
+    // Check if the interval has passed
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+      previousMillis = currentMillis;
+      
+      // Read and print analog values
+      int analogValue0 = analogRead(A0);
+      int analogValue1 = analogRead(A1);
+      Serial.print(analogValue0);
+      Serial.print(",");
+      Serial.println(analogValue1);
+    }
+    
+    // Check if there's serial input
+    if (Serial.available() > 0) {
+      String input = Serial.readStringUntil('\n');
+      input.trim();  // Remove whitespace and newline characters
+      
+      if (input.equalsIgnoreCase("done")) {
+        keepReading = false;
+        Serial.println("Stopped reading analog values.");
+      }
+    }
+  }
 }
 
 
