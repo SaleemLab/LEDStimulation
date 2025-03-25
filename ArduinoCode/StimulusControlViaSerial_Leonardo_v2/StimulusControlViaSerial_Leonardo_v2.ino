@@ -42,6 +42,8 @@ void setup() {
   pinMode(4, OUTPUT);      // Pin 4 indicator pin, e.g. for sinewave cycles
   pinMode(5, OUTPUT);      // Pin 5 stim ON or OFF pin 
 
+  pinMode(A0, INPUT);   // Set A0 as input
+
   PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW by changing register directly
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
 
@@ -86,6 +88,10 @@ void loop() {
     newData = false;
     ActionSerial();
   }
+
+
+  //int sensorValue = analogRead(A0);  // Read the analog value from A0
+  //Serial.println(sensorValue);       // Print the value to Serial Monitor
 }
 
 
