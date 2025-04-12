@@ -14,3 +14,15 @@ To limit the control range to a maximum of approximately **0.25 V**, correspon
 This attenuated signal was then fed into a **rail-to-rail input/output buffer op-amp** (OPA391, Texas Instruments) configured as a unity-gain voltage follower. The buffer provided a **low-impedance drive** capable of supporting multiple LED driver op-amp inputs without introducing loading effects or voltage droop. The buffer output was routed in parallel to the non-inverting inputs of all OPA2197 LED driver circuits, ensuring synchronized and consistent current setpoints across all channels.
 
 This configuration provided a clean, scalable, and stable reference voltage, suitable for low-current (<10 mA) LED stimulation applications requiring precise current regulation and global brightness modulation.
+
+### V<sub>ref</sub> Generation Circuit Components
+
+| Label | Component             | Value / Part Number   | Description                                                                 |
+|-------|------------------------|------------------------|-----------------------------------------------------------------------------|
+| R1    | Resistor               | 10 kΩ                  | Forms RC filter with C1 to smooth PWM signal into analog voltage            |
+| C1    | Capacitor              | 1 µF                   | RC low-pass filter capacitor (PWM smoothing)                                |
+| R2    | Resistor               | 10 kΩ                  | Voltage divider top resistor (scaling 5 V to ~0.45 V)                        |
+| R3    | Resistor               | 1 kΩ                   | Voltage divider bottom resistor                                             |
+| U1    | Op-Amp (buffer)        | OPA391 (TI)            | Unity-gain buffer, RRIO, low offset, drives multiple V<sub>ref</sub> loads  |
+| V<sub>in</sub> | PWM or DAC Source     | 5 V PWM or DAC         | From microcontroller (e.g. Arduino, STM32)                                  |
+| V<sub>ref</sub> Out | Analog Reference Voltage | 0–0.25 V              | Output to multiple OPA2197 current source channels                          |
