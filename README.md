@@ -15,7 +15,7 @@ This attenuated signal was then fed into a **rail-to-rail input/output buffer op
 
 This configuration provided a clean, scalable, and stable reference voltage, suitable for low-current (<10 mA) LED stimulation applications requiring precise current regulation and global brightness modulation.
 
-### V<sub>ref</sub> Generation Circuit Components
+## V<sub>ref</sub> Generation Circuit Components
 
 | Label | Component             | Value / Part Number   | Description                                                                 |
 |-------|------------------------|------------------------|-----------------------------------------------------------------------------|
@@ -26,3 +26,35 @@ This configuration provided a clean, scalable, and stable reference voltage, sui
 | U1    | Op-Amp (buffer)        | OPA391 (TI)            | Unity-gain buffer, RRIO, low offset, drives multiple V<sub>ref</sub> loads  |
 | V<sub>in</sub> | PWM or DAC Source     | 5 V PWM or DAC         | From microcontroller (e.g. Arduino, STM32)                                  |
 | V<sub>ref</sub> Out | Analog Reference Voltage | 0–0.25 V              | Output to multiple OPA2197 current source channels                          |
+
+
+
+### Constant Current LED Driver Design
+
+Each LED channel was driven by a high-side linear constant current source composed of a precision op-amp (`OPA2197ID`, Texas Instruments) and a P-channel MOSFET (`DMP2035U-7`, Diodes Inc.). This circuit regulates current through the LED by comparing a reference voltage (`V_ref`) to the voltage across a 25 Ω current sense resistor.
+
+The P-MOSFET’s source was connected to a regulated 12 V supply. The drain supplied current through an LED, which was returned to ground via a low-side N-channel PWM switch. The source and the top of the sense resistor were connected to the **inverting input** of the op-amp. The **non-inverting input** received a shared `V_ref` voltage, buffered from either a PWM+filter circuit or DAC.
+
+The op-amp output controlled the MOSFET’s gate through a 100 Ω gate resistor, adjusting the gate-to-source voltage (`V_GS`) to maintain:
+
+`V_ref = V_sense = I_LED × R_sense`
+
+A compensation capacitor (47 pF) was connected between the op-amp’s output and inverting input to ensure loop stability and minimize overshoot when LED current was modulated rapidly. This configuration maintained a constant LED current set by:
+
+`I_LED = V_ref / 25Ω`
+
+The use of the `OPA2197`, with its 10 V/µs slew rate and rail-to-rail I/O, ensured fast loop response suitable for integration with a 10 kHz global PWM modulation signal. This ensured that each LED line delivered precise, low-noise current from 0 to 10 mA, independent of load voltage variation or supply ripple.
+
+
+## Constant Current LED Driver Components
+
+| Label  | Component              | Value / Part Number    | Description                                                                 |
+|--------|------------------------|-------------------------|-----------------------------------------------------------------------------|
+| Rsense | Resistor               | 25 Ω, 1%                | Senses current: V = I × R; 0–10 mA range using 0–0.25 V V<sub>ref</sub>     |
+| Q1     | P-MOSFET               | DMP2035U-7              | High-side current control element, logic-level, low R<sub>ds(on)</sub>      |
+| U2     | Op-Amp                 | OPA2197 (TI)            | Precision RRIO op-amp regulates current via feedback                        |
+| Rg     | Gate resistor          | 100 Ω                   | Limits gate current, dampens switching transients                          |
+| Cc     | Feedback capacitor     | 47 pF                   | Miller compensation for op-amp stability                                    |
+| V<sub>ref</sub> | Analog input         | 0–0.25 V                | Sets current: I = V<sub>ref</sub> / Rsense                                  |
+| Supply | Power Source           | 12 V DC                 | Supply for LED and driver circuitry                                         |
+
