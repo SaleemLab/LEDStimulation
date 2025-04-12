@@ -1,5 +1,34 @@
 %% ganzfeld calibration v3
 
+
+%% values to aim for
+
+% green
+% 2x10^3: lambda_meas = 524; % P_total = 7.05E-6; Ana:
+% 2x10^2: lambda_meas = 524; % P_total = 0.705E-6; Ana: 
+
+% UV
+% 2x10^3: lambda_meas = 385; % P_total = 20.5E-6;
+% 2x10^2: lambda_meas = 385; % P_total = 2.05E-6;
+
+
+% measurements 26/03/25. D=14cm, background = 0.2nW
+% green, 2x10^3, ana=477. 2x10^2 ana = 432. 2x10^1 = 399
+% UV, 2x10^3, ana= 457, 2x10^2 ana = 431 / 425 (after on for a while?), 2x10^1 = 402
+
+% gamma correction - gc,0.01,10000,1 (inrement duty cycles 1, wait 10s,
+% repeat once). start at sd=50.
+% green, 2x10^3 (file01, 524lambda)
+% green, 2x10^2 (file02, 524lambda) -> peak fell to 0.6 b7 end...forgot to
+% end file, so has some messing around after, should be clear...
+
+% uv, 2x10^3 (file03, 385lambda)
+% uv, 2x10^2, (file04, 385lambda) looks a bit noisy in places. smooth?
+% (ana=425), didnt reach required power??
+% uv, 2x10^2 (file05), new attempt with 429 ana -> no file, pm console
+% died!
+
+
 %% Define constants
 
 % h: Planck's constant [eV*s]
@@ -148,7 +177,7 @@ LEDs(1).measured_power = P_total; % reference for the spectrum
 %% process power meter readings to scale LED spectra - UV
 
 lambda_meas = 385; % specified measurement wavelength for power meter
-P_total = 44E-6; % output of power meter in W
+P_total = 20.5E-6; % output of power meter in W
 
 [UV_wavelengths, UV_power, UV_P_true, UV_correction_factor] = getLEDSpectraFromPowerMeter(...
     P_total, lambda_meas, wavelengths_nm, LEDs(2).spect_nw_norm, ...

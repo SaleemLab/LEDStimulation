@@ -1,10 +1,10 @@
 %% Gamma calibration
 
-outputFileName = 'UV1200_LUT.txt';
+outputFileName = 'uv_2x10_2.txt';
 
 %% parse power values from gamma data
 
-power_table = UV2400;
+power_table = uv2x102;
 
 figure, 
 subplot(121)
@@ -16,7 +16,7 @@ takeValsDuration = 6000;
 dutyCyclesOrig = 0:1:100;
 
 %%
-startTime = 11289; % estimate from figure
+startTime = 11182; % estimate from figure
 
 
 for icycle = 1:numel(dutyCyclesOrig)

@@ -5,8 +5,8 @@
 % UV = 6.8Ω, 3W
 
 Vsupply = 12; 
-Vf_values = [9 10.5 11.9];
-I_values = [0.35]; 
+Vf_values = [9.24];
+I_values = [0.01]; 
 
 % Create a matrix to store resistor values
 Resistor_Values = zeros(length(Vf_values), length(I_values));
@@ -32,7 +32,7 @@ disp(Resistor_Table);
 
 %
 
-R = 4.7*1.05
+R = 150*0.95
 I = (Vsupply - Vf_values) ./ R% Current in Amperes
 
 P = I.^2 .* R % Power in Watts
