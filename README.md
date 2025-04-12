@@ -76,5 +76,6 @@ A small gate resistor (100 Ω) was optionally included to limit inrush current
 | Q2     | N-MOSFET               | IRLB8721               | Logic-level, low R<sub>ds(on)</sub> MOSFET; switches cathode path for all LEDs |
 | PWM    | MCU Output             | 10 kHz PWM             | Microcontroller PWM output for global modulation                          |
 | Gate R | Gate resistor (optional) | 100 Ω                | Reduces EMI and ringing during fast switching                             |
+| Q2 cap| Capacitor across the source/drain of Q2 | 10uF  | Reduces EMI and ringing during fast switching                             |
 | Supply | System Ground          | —                      | All constant current circuits return here through the N-MOSFET switch     |
 
