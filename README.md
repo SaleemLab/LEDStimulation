@@ -1,6 +1,6 @@
 # LEDStimulation
-code to run LED stimulation experiments
 
+![LedDriverCircuit_dev](https://github.com/user-attachments/assets/55d41437-afe3-4cde-a057-3e388293bc60)
 
 
 ## Reference Voltage Generation for LED Current Control
