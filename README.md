@@ -13,7 +13,7 @@
 |              | Diffusion base - corner               | [repo link](Hardware/Enclosure/box_corner_screws_and_magnets.stl)                                  | 4       | –               |
 |              | Diffusion base - edge                 | [repo link](Hardware/Enclosure/box_long_edge_screws_and_magnets.stl)                               | 4       | –               |
 |              | Diffusin clamp - corner               | [repo link](Hardware/Enclosure/box_corner_just_magnets.stl)                                        | 4        | –               |
-|              | 5mm magnets                           | [Link]([Hardware/Enclosure/box_corner_just_magnets.stl](https://www.amazon.co.uk/Magnet-Expert%C2%AE-5mm-thick-Neodymium/dp/B00TACMMP0/ref=sr_1_6?s=kitchen)                      | 8        | –               |
+|              | 5mm magnets                           | [Link](https://www.amazon.co.uk/Magnet-Expert%C2%AE-5mm-thick-Neodymium/dp/B00TACMMP0/ref=sr_1_6?s=kitchen)                      | 8        | –               |
 |              |                                       | –                                                                                                  | –        | –               |
 | **LEDs and connectors**|                             | -                                                                                                  |         |                 |
 |              | Custom LED PCBs                       | [repo link](https://github.com/SaleemLab/LEDStimulation/tree/main/Hardware/LED_board)              | –       | –               |
