@@ -19,8 +19,10 @@
 |              | Right-angled female pin headers       | –                                                                                                  | –        | –               |
 |              | Right-angled male pin headers         | –                                                                                                  | –       | –               |
 |              | red-black wire                        | –                                                                                                  | –      | –               |
-|              | M3 nylon spacers, 2mm                 | –                                                                                                  | –        | –               |
-|              | M3 nuts                               | –                                                                                                  | –       | –               |
+|              | M3 nylon spacers, 2mm                 | –                                                                                                  | 24        | –               |
+|              | M3 x 10mm Socket Flanged Button Screws | [Link](https://www.accu.co.uk/flanged-button-screws/8595-SSBF-M3-10-A2)                          | 24       | –               |
+|              | M3 nuts                               | –                                                                                                  | 24       | –               |
+
 |              |                                       | –                                                                                                  | –         | –               |
 | **Control circuit**|                                 |                                                                                                    |         |                 |
 |              | N-mosfet                              | –                                                                                                 | 2         | –               |
