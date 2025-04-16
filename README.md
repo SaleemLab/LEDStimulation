@@ -25,7 +25,8 @@
 |              |                                       | –                                                                                                  | –         | –               |
 | **Control circuit**|                                 |                                                                                                    |         |                 |
 |              | N-mosfet                              | –                                                                                                 | 2         | –               |
-|              | Resistors                             | –                                                                                                  | 2        | –               |
+|              | Mosfet gate Resistors (100ohm)        | –                                                                                                  | 2        | –               |
+|              | Mosfet source drain capacitor (100nF) | –                                                                                                  | 2        | –               |
 
 
 
