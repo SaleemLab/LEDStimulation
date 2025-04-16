@@ -1,3 +1,44 @@
+# LED stimulator
+
+
+| Category     | Part                                  | Link                                                                                               | Quantity | Unit Size | Total Price (£) |
+|--------------|----------------------------------------|---------------------------------------------------------------------------------------------------|----------|-----------|-----------------|
+| **Enclosure**|                                        |                                                                                                   |          |           |                 |
+|              | Custom aluminium baseplate            | –                                                                                                  | 1        | 206mm x 206mm         | –               |
+|              | 5mm aluminium side pieces             | –                                                                                                  | –        | –         | –               |
+|              | 200mm MakerBeam XL                    | [Link](https://www.technobotsonline.com/makerbeamxl-200mm-long-black-anodised-beam-threaded.html)  | 16       | 1         | 30.72           |
+|              | 50mm MakerBeam XL                     | [Link](https://www.technobotsonline.com/makerbeamxl-50mm-long-black-anodised-beam-threaded.html)   | 8        | 1         | 7.44            |
+|              | MakerBeam corner cubes (pack of 12)   | [Link](https://www.technobotsonline.com/makerbeam-xl-black-corner-cubes-pack-of-12.html)           | 24       | 12        | 36              |
+|              | M3 button head socket screws (x100)   | [Link](https://www.technobotsonline.com/button-head-socket-cap-stainless-screw-m3x6mm-pk-100.html) | 200      | 100       | 9.96            |
+|              | M3 nylon spacers, 2mm                 | –                                                                                                  | –        | –         | –               |
+|              | M3 nuts                               | –                                                                                                  | –        | –         | –               |
+| **LEDs and connectors**|                             | -                                                                                                  |          |           |                 |
+|              | Custom LED PCBs                       | –                                                                                                  | –        | –         | –               |
+|              | Right-angled female pin headers       | –                                                                                                  | –        | –         | –               |
+|              | Right-angled male pin headers         | –                                                                                                  | –        | –         | –               |
+|              | red-black wire                        | –                                                                                                  | –        | –         | –               |
+|              | Right-angled male pin headers         | –                                                                                                  | –        | –         | –               |
+|              | Right-angled male pin headers         | –                                                                                                  | –        | –         | –               |
+| **Control circuit**|                                      |                                                                                               |          |           |                 |
+|              | N-mosfet                               | –                                                                                                 | 2        | –         | –               |
+|              | Resistors                             | –                                                                                                  | 2        | –         | –               |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # LEDStimulation
 
 ![LedDriverCircuit_dev](https://github.com/user-attachments/assets/55d41437-afe3-4cde-a057-3e388293bc60)
