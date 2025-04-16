@@ -1,30 +1,30 @@
 # LED stimulator
 
 
-| Category     | Part                                  | Link                                                                                               | Quantity | Unit Size | Total Price (£) |
-|--------------|----------------------------------------|---------------------------------------------------------------------------------------------------|----------|-----------|-----------------|
-| **Enclosure**|                                        |                                                                                                   |          |           |                 |
-|              | Custom aluminium baseplate            | [repo link](Hardware/Enclosure/Baseplate_for_PCBs_mirroredHole.stp)                                | 1        | 206mm^2   | –               |
-|              | 5mm aluminium side pieces             | –                                                                                                  | –        | –         | –               |
-|              | 200mm MakerBeam XL                    | [Link](https://www.technobotsonline.com/makerbeamxl-200mm-long-black-anodised-beam-threaded.html)  | 16       | 1         | 30.72           |
-|              | 50mm MakerBeam XL                     | [Link](https://www.technobotsonline.com/makerbeamxl-50mm-long-black-anodised-beam-threaded.html)   | 8        | 1         | 7.44            |
-|              | MakerBeam corner cubes (pack of 12)   | [Link](https://www.technobotsonline.com/makerbeam-xl-black-corner-cubes-pack-of-12.html)           | 24       | 12        | 36              |
-|              | M3 button head socket screws (x100)   | [Link](https://www.technobotsonline.com/button-head-socket-cap-stainless-screw-m3x6mm-pk-100.html) | 200      | 100       | 9.96            |
-|              | Diffusion base - corner               | [repo link](Hardware/Enclosure/box_corner_screws_and_magnets.stl)                                  | 4        | –         | –               |
-|              | Diffusion base - edge                 | [repo link](Hardware/Enclosure/box_long_edge_screws_and_magnets.stl)                               | 4        | –         | –               |
-|              | Diffusin clamp - corner               | [repo link](Hardware/Enclosure/box_corner_just_magnets.stl)                                        | 4        | –         | –               |
-|              |                                       | –                                                                                                  | –        | –         | –               |
-| **LEDs and connectors**|                             | -                                                                                                  |          |           |                 |
-|              | Custom LED PCBs                       | [repo link](https://github.com/SaleemLab/LEDStimulation/tree/main/Hardware/LED_board)              | –        | –         | –               |
-|              | Right-angled female pin headers       | –                                                                                                  | –        | –         | –               |
-|              | Right-angled male pin headers         | –                                                                                                  | –        | –         | –               |
-|              | red-black wire                        | –                                                                                                  | –        | –         | –               |
-|              | M3 nylon spacers, 2mm                 | –                                                                                                  | –        | –         | –               |
-|              | M3 nuts                               | –                                                                                                  | –        | –         | –               |
-|              |                                       | –                                                                                                  | –        | –         | –               |
-| **Control circuit**|                                 |                                                                                                    |          |           |                 |
-|              | N-mosfet                              | –                                                                                                 | 2        | –         | –               |
-|              | Resistors                             | –                                                                                                  | 2        | –         | –               |
+| Category     | Part                                  | Link                                                                                               | Quantity  | Total Price (£) |
+|--------------|----------------------------------------|---------------------------------------------------------------------------------------------------|----------|-----------------|
+| **Enclosure**|                                        |                                                                                                   |          |                 |
+|              | Custom aluminium baseplate            | [repo link](Hardware/Enclosure/Baseplate_for_PCBs_mirroredHole.stp)                                | 1        |  –               |
+|              | 5mm aluminium side pieces             | –                                                                                                  | –        | –               |
+|              | 200mm MakerBeam XL                    | [Link](https://www.technobotsonline.com/makerbeamxl-200mm-long-black-anodised-beam-threaded.html)  | 8       |             |
+|              | 50mm MakerBeam XL                     | [Link](https://www.technobotsonline.com/makerbeamxl-50mm-long-black-anodised-beam-threaded.html)   | 4        |  7.44            |
+|              | MakerBeam corner cubes (pack of 12)   | [Link](https://www.technobotsonline.com/makerbeam-xl-black-corner-cubes-pack-of-12.html)           | 8       |  36              |
+|              | M3 button head socket screws (x100)   | [Link](https://www.technobotsonline.com/button-head-socket-cap-stainless-screw-m3x6mm-pk-100.html) | 200      | 9.96            |
+|              | Diffusion base - corner               | [repo link](Hardware/Enclosure/box_corner_screws_and_magnets.stl)                                  | 4       | –               |
+|              | Diffusion base - edge                 | [repo link](Hardware/Enclosure/box_long_edge_screws_and_magnets.stl)                               | 4       | –               |
+|              | Diffusin clamp - corner               | [repo link](Hardware/Enclosure/box_corner_just_magnets.stl)                                        | 4        | –               |
+|              |                                       | –                                                                                                  | –        | –               |
+| **LEDs and connectors**|                             | -                                                                                                  |         |                 |
+|              | Custom LED PCBs                       | [repo link](https://github.com/SaleemLab/LEDStimulation/tree/main/Hardware/LED_board)              | –       | –               |
+|              | Right-angled female pin headers       | –                                                                                                  | –        | –               |
+|              | Right-angled male pin headers         | –                                                                                                  | –       | –               |
+|              | red-black wire                        | –                                                                                                  | –      | –               |
+|              | M3 nylon spacers, 2mm                 | –                                                                                                  | –        | –               |
+|              | M3 nuts                               | –                                                                                                  | –       | –               |
+|              |                                       | –                                                                                                  | –         | –               |
+| **Control circuit**|                                 |                                                                                                    |         |                 |
+|              | N-mosfet                              | –                                                                                                 | 2         | –               |
+|              | Resistors                             | –                                                                                                  | 2        | –               |
 
 
 
