@@ -4296,6 +4296,28 @@
 		)
 	)
 	(gr_rect
+		(start 95.1 76.45)
+		(end 101.1 94.45)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "Dwgs.User")
+		(uuid "828607df-b387-4393-a2bd-ab84f5feb5de")
+	)
+	(gr_rect
+		(start 95.1 106.21)
+		(end 101.1 125)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "Dwgs.User")
+		(uuid "bb5a9c9a-0f3f-4fa7-a10f-da9bddb32541")
+	)
+	(gr_rect
 		(start 91 69)
 		(end 181 129)
 		(stroke
