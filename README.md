@@ -137,7 +137,6 @@ A small gate resistor (100 Ω) was optionally included to limit inrush current
 |                          | Frozen white noise            | green, UV, (maybe combined?) | $2 \times 10^3$     |                                                     |
 |                          | Contrast Adaptation           | green, UV                     | $2 \times 10^3$     | Periods: 4,8,16,32s    Contrast levels: 10 vs 100?                                                |
 |                          | Luminance Adaptation            | green, UV,          | $2 \times 10^3$     |       $2 \times 10^1$ to  $2 \times 10^3$, 5% or 10% contrast super-imposed                                        |
-
 | **Screen Stimuli** | Sparse Noise                  |                     |                      |                                                     |
 |                          | Dot field speed tuning        |                     |                      | Speeds: 0, 16, 32, 64, 128, 256; Direction: naso-temporal |
 |                          | Dot field fast speed changes  |                     |                      | Speeds: 0, 16, 32, 64, 128, 256; Times: 0.5s, 0.25s, 0.15s |
