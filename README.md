@@ -123,3 +123,22 @@ A small gate resistor (100 Ω) was optionally included to limit inrush current
 | Q2 cap| Capacitor across the source/drain of Q2 | 10uF  | Reduces EMI and ringing during fast switching                             |
 | Supply | System Ground          | —                      | All constant current circuits return here through the N-MOSFET switch     |
 
+
+
+
+# Stimuli
+
+| Stimulus Category        | Stimulus Type                 | Chroma              | Luminance            | Parameters / Notes                                  |
+| :----------------------- | :---------------------------- | :------------------ | :------------------- | :-------------------------------------------------- |
+| **LED Stimuli** | Sine wave flicker             | green, UV, green+UV | $2 \times 10^3$, $2 \times 10^2$ |                                                     |
+|                          | Sine wave envelope            | green, UV           | $2 \times 10^3$, $2 \times 10^2$ | (2p + verify on ephys)                             |
+|                          | Full-field flash              | UV, green, UV+green | $2 \times 10^3$, $2 \times 10^2$ | (slow square wave)                                |
+|                          | White noise                   | green, UV, (maybe combined?) | $2 \times 10^3$     |                                                     |
+|                          | Frozen white noise            | green, UV, (maybe combined?) | $2 \times 10^3$     |                                                     |
+| **Screen Stimuli** | Sparse Noise                  |                     |                      |                                                     |
+|                          | Dot field speed tuning        |                     |                      | Speeds: 0, 16, 32, 64, 128, 256; Direction: naso-temporal |
+|                          | Dot field fast speed changes  |                     |                      | Speeds: 0, 16, 32, 64, 128, 256; Times: 0.5s, 0.25s, 0.15s |
+|                          | Dot field motion coherence    |                     |                      | Speeds: 32 deg/s; Direction: nasal vs temporal; Coherence: [Specify Coherence Values Here] |
+|                          | Dot corridor - speed differences |                     |                      | Contra speeds: 32 deg/s, 128 deg/s; Speed diffs: -8, -4, -2, -1.5, 1, 1.5, 2, 4, 8 |
+|                          | Dot corridor - asymmetric flow |                     |                      | Contra speeds: 32 deg/s, 128 deg/s; Conditions: translation, rotation, orthogonal, stationary, incoherent, monocular (blank) |
+|                          | Gratings/plaids               |                     |                      |                                                     |
