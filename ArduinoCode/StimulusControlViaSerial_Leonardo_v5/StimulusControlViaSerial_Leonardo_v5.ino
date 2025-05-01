@@ -116,7 +116,7 @@ const uint16_t PROGMEM defaultLUT[1041] = {
  1040
 };
 
-const uint16_t PROGMEM GREENLUT[1041] = {
+const uint16_t PROGMEM ChALUT[1041] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
  20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
@@ -225,7 +225,7 @@ const uint16_t PROGMEM GREENLUT[1041] = {
 };
 
 
-const uint16_t PROGMEM UVLUT[1041] = {
+const uint16_t PROGMEM ChBLUT[1041] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
  20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
@@ -342,8 +342,8 @@ long desiredPWMFrequency = 7680; // 2000?
 float dutyCycle;
 
 // channel selection
-bool useUV = true;
-bool useGREEN = true;
+bool useChA = true;
+bool useChB = true;
 
 // serial
 const byte numChars = 30;
@@ -383,7 +383,7 @@ void setup() {
   pinMode(9, OUTPUT);      // Pin 9 controlled by Timer1 (Channel A)
   pinMode(10, OUTPUT);      // Pin 9 controlled by Timer1 (Channel B)
 
-  pinMode(4, OUTPUT);      // Pin 4 indicator pin, e.g. for sinewave cycles
+  pinMode(4, OUTPUT);      // Pin 4 indicator pin, e.g. for sinewave cycles, changes in duty cycle during white noise, changes in contrast etc.
   pinMode(5, OUTPUT);      // Pin 5 stim ON or OFF pin 
 
   PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW by changing register directly
@@ -392,8 +392,6 @@ void setup() {
 
   Serial.begin(115200);
 
-  // Set the desired PWM frequency (in Hz) -> set outside now
-  //long desiredPWMFrequency = 7680;  // Example: 7680 Hz
 
   // Constrain the desired PWM frequency to be a multiple of TABLE_SIZE
   // (probably not important since precision seems low at high frequenies)
@@ -417,8 +415,9 @@ void setup() {
   // initialise random number to 50% duty cyle for white noise stimuli
   randNumber = TopLumi / 2;
 
-  // Set pin 9 to 50% duty cycle as default
-  setOCR1A(TopLumi / 2);
+  
+  if (useChA) {setChA(TopLumi/2);} // Set pin 9 to 50% duty cycle as default
+  if (useChB) {setChB(TopLumi/2);} // Set pin 10 to 50% duty cycle as default
 
   //delay(5000);
   //whiteNoise(10000, 10);
@@ -572,15 +571,10 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     float waitTime = atof(serialVals[2]);
     int nReps = atoi(serialVals[3]);
     cycleDutyCycles(stepSize, waitTime, nReps, TopLumi);
-  } else if (FirstChar == "agc") // apply gamma correction
+  }  else if (FirstChar == "useChB") // apply gamma correction
   { 
-    int GammaToUse = atoi(serialVals[1]);
-    applyGammaCorrection(GammaToUse);
-    
-  } else if (FirstChar == "useUV") // apply gamma correction
-  { 
-    useUV = atoi(serialVals[1]);
-    if (!useUV) 
+    useChB = atoi(serialVals[1]);
+    if (!useChB) 
     {
       OCR1B=0;
       Serial.println(F("UV OFF"));
@@ -589,10 +583,10 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
       Serial.println(F("UV ON"));
     };
     
-  } else if (FirstChar == "useGREEN") // apply gamma correction
+  } else if (FirstChar == "useChA") // apply gamma correction
   { 
-    useGREEN = atoi(serialVals[1]);
-    if (!useGREEN) 
+    useChA = atoi(serialVals[1]);
+    if (!useChA) 
     {
       OCR1A=0;
       Serial.println(F("GREEN OFF"));
@@ -675,14 +669,16 @@ void outputSinewave(float sinewaveFrequency, long duration) {
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
 
-  setOCR1A(TopLumi / 2);
+  if (useChA) {setChA(TopLumi/2);} // Set pin 9 to 50% duty cycle as default
+  if (useChB) {setChB(TopLumi/2);} // Set pin 10 to 50% duty cycle as default
 }
 
 // sinewave interrupt function
 void sinewaveInterrupt() {
   //static int tableIndex = 0;  // Start at the beginning of the sine wave table
   // Update PWM duty cycle with the next sine wave value
-  setOCR1A(sineWaveTable[tableIndex]);
+  if (useChA) {setChA(sineWaveTable[tableIndex]);} // 
+  if (useChB) {setChB(sineWaveTable[tableIndex]);} // 
   //Serial.print(OCR1A);
   //Serial.print(',');
 
@@ -756,9 +752,9 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
   Serial.flush();
-  setOCR1A(TopLumi / 2);
+  if (useChA) {setChA(TopLumi/2);} // Set pin 9 to 50% duty cycle as default
+  if (useChB) {setChB(TopLumi/2);} // Set pin 10 to 50% duty cycle as default}
 }
-
 
 
 // sinewave contrast envelope interrupt function
@@ -767,8 +763,9 @@ void sinewaveEnvelopeInterrupt() {
   // Update PWM duty cycle with the next sine wave value
   uint16_t ocrVal = MidLumi + ((sineWaveTable[tableIndex] - MidLumi) * (contrastMult));
 
-  setOCR1A(ocrVal);
-
+  if (useChA) {setChA(ocrVal);} // 
+  if (useChB) {setChB(ocrVal);} // 
+  
   // update sinewave table index based on interrupt frequency
   tableIndex = tableIndex + stepSize;
   if (tableIndex >= TABLE_SIZE) tableIndex -= TABLE_SIZE;  // wrap table index
@@ -821,13 +818,16 @@ void whiteNoise(long updateTime, long duration) {
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
   Serial.flush();
-  setOCR1A(TopLumi / 2);
+  if (useChA) {setChA(TopLumi/2);} // Set pin 9 to 50% duty cycle as default
+  if (useChB) {setChB(TopLumi/2);} // Set pin 10 to 50% duty cycle as default
 }
 
 // whitenoise interrupt function
 void whiteNoiseInterrupt() {
-  // Update PWM duty cycle with the next sine wave value
-  setOCR1A(randNumber);
+
+  // Update PWM duty cycle with the next random value
+  if (useChA) {setChA(randNumber);} // Set pin 9 to 50% duty cycle as default
+  if (useChB) {setChB(randNumber);} // Set pin 10 to 50% duty cycle as default
   PIND = (1 << PIND4);  // alternate PIN 4 value indicator pin
   Serial.println(randNumber);
   Serial.flush();
@@ -872,7 +872,8 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps, int randSeedNum
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
   Serial.flush();
-  setOCR1A(TopLumi / 2);
+  if (useChA) {setChA(TopLumi/2);} // Set pin 9 to 50% duty cycle as default
+  if (useChB) {setChB(TopLumi/2);} // Set pin 10 to 50% duty cycle as default
 }
 
 // whitenoise interrupt function
@@ -880,7 +881,8 @@ void frozenWhiteNoiseInterrupt() {
 
   static int tableIndex = 0;  // Start at the beginning of the sine wave table
   // Update PWM duty cycle with the frozen white noise value
-  setOCR1A(frozenWhiteNoiseTable[tableIndex]);
+  if (useChA) {setChA(frozenWhiteNoiseTable[tableIndex]);} 
+  if (useChB) {setChB(frozenWhiteNoiseTable[tableIndex]);} 
   PIND = (1 << PIND4);  // alternate PIN 4 value indicator pin
 
   //if (tableIndex == 0) {
@@ -915,26 +917,32 @@ void FlickerLED(float flickerFreq, long duration) {
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
   Serial.println("-1");
   Serial.flush();
-  setOCR1A(TopLumi / 2);
+  if (useChA) {setChA(TopLumi/2);} // Set pin 9 to 50% duty cycle as default
+  if (useChB) {setChB(TopLumi/2);} // Set pin 10 to 50% duty cycle as default
 }
 
 // square wave flicker interrupt function
 void SquareWaveFlickerInterrupt() {
-  if (useGREEN) OCR1A = (OCR1A == TopLumi) ? 0 : TopLumi;  // Toggle between 0 and TOP
-  if (useUV) OCR1B = (OCR1B == TopLumi) ? 0 : TopLumi;
+  if (useChA) OCR1A = (OCR1A == TopLumi) ? 0 : TopLumi;  // Toggle between 0 and TOP
+  if (useChB) OCR1B = (OCR1B == TopLumi) ? 0 : TopLumi;
   PORTD ^= (1 << PIND4);                     // set indicator pin similarly
 }
 
 
 /////////////////////////////////// SOME GENERIC PWM FUNCTIONS ///////////////////////////////////////////
-// function to artifically lower the max PWM duty cycle. (i.e. TopMultiplier=0.5 means max duty cycle of 50%)
-// other functions will work as normal but scale to this TOP value
-void setOCR1A(uint16_t ocrValue){
-  if (useGREEN) OCR1A = pgm_read_word_near(GREENLUT+ocrValue);
-  if (useUV) OCR1B = pgm_read_word_near(UVLUT+ocrValue);
+
+// set gamma-corrected output of channel A (pin 9)
+void setChA(uint16_t ocrValue){
+  OCR1A = pgm_read_word_near(ChALUT+ocrValue);
 }
 
+// set gamma-corrected output of channel B (pin 10)
+void setChB(uint16_t ocrValue){
+  OCR1B = pgm_read_word_near(ChBLUT+ocrValue);
+}
 
+// function to artifically lower the max PWM duty cycle. (i.e. TopMultiplier=0.5 means max duty cycle of 50%)
+// other functions will work as normal but scale to this TOP value
 void SetTopLumi(float TopMultiplier) {
 
   if (TopMultiplier > 1) {
@@ -954,7 +962,8 @@ void SetTopLumi(float TopMultiplier) {
   randNumber = TopLumi / 2;
 
   // Set pin 9 to 50% duty cycle as default
-  setOCR1A(TopLumi / 2);
+  if (useChA) {setChA(TopLumi/2);} // Set pin 9 to 50% duty cycle as default
+  if (useChB) {setChB(TopLumi/2);} // Set pin 10 to 50% duty cycle as default
 }
 
 
@@ -969,7 +978,8 @@ void setDutyCycle(float dutyCyclePercentage, long TopLumi) {
   
   // Set OCR1A to control the duty cycle
   //OCR1A = ocrValue;
-  setOCR1A(ocrValue);
+  if (useChA) {setChA(ocrValue);} // Set pin 9 to 50% duty cycle as default
+  if (useChB) {setChB(ocrValue);} // Set pin 10 to 50% duty cycle as default
   //Serial.print(ocrValue);
   //Serial.print(',');
   //Serial.println(OCR1A);
@@ -987,48 +997,15 @@ void cycleDutyCycles(float stepSize, float waitTime, int nReps, long TopLumi){
     Serial.println(dutyCycle);
     long ocrValue = (long)(dutyCycle* TopLumi);
     //OCR1A = ocrValue;
-    setOCR1A(ocrValue);
-    delay(waitTime);
+    if (useChA) {setChA(ocrValue);} // Set pin 9 to 50% duty cycle as default
+    if (useChB) {setChB(ocrValue);} // Set pin 10 to 50% duty cycle as default    delay(waitTime);
     dutyCycle = dutyCycle+stepSize;
   }
   }
   Serial.println("-1");
   // Set pin 9 to 50% duty cycle as default
-  setOCR1A(TopLumi / 2);
-    
-}
-
-
-
-void applyGammaCorrection(int LUT_index){
-  if (LUT_index==0)
-    {
-      currentLUT = defaultLUT;
-      generateSineWaveTable(TOP); // generate new sinewave table
-      Serial.println(F("defaultLUT selected"));
-      GammaLUTName = 'd';
-    
-    } 
-    else if (LUT_index==1)
-    {
-      currentLUT = GREENLUT;
-      generateSineWaveTable(TOP);
-      Serial.println(F("GREENLUT selected"));
-      GammaLUTName = 'g';
-
-    }
-    else if (LUT_index==2)
-    {
-      currentLUT = UVLUT;
-      generateSineWaveTable(TOP);
-      Serial.println(F("UVLUT selected"));
-      GammaLUTName = 'u';
-
-    }
-    else
-    {
-      Serial.println("Invalid LUT_index selected, gammaLUT not changed.");
-    }
+  if (useChA) {setChA(TopLumi/2);} // Set pin 9 to 50% duty cycle as default
+  if (useChB) {setChB(TopLumi/2);} // Set pin 10 to 50% duty cycle as default    
 }
 
 void getStatus()
@@ -1045,7 +1022,6 @@ void getStatus()
   Serial.println(OCR1A);
   Serial.print(F("Gamma Correction LUT: "));
   Serial.println(GammaLUTName);
-
 }
 
 
@@ -1082,6 +1058,8 @@ void readAnalogVals() {
   }
 }
 
+
+///////////////////////////////////////// BIT REGISTERS ///////////////////////////////////////
 
 ////////////////////// TIMER 1 PWM FREQUENCY CONTROL //////////////////////////////
 
