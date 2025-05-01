@@ -352,7 +352,8 @@ uint16_t sineWaveTable[TABLE_SIZE];
 
 // wavetable step size
 volatile int stepSize = 1;
-volatile int tableIndex = 0; //for sinewave table
+volatile int tableIndexA = 0; //for sinewave table
+volatile int tableIndexB = 0; //for sinewave table
 volatile int tableEnvIndex = 0; // for sinewave table contrast envelope
 volatile int envCount = 0;  // contrast envelope counter
 // contrast-envelope counter and contrast multiplier
@@ -513,6 +514,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
   {
     long stimulusDuration = atof(serialVals[1]);
     float frequency = atof(serialVals[2]);
+    float phaseOffset = atof(serialVals[3]);
     //Serial.println("Stim: Sinusoidal dimming");
     //Serial.flush();
     //Serial.print("Stim duration: ");
@@ -522,7 +524,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     //Serial.println(frequency);
     //Serial.flush();
     
-    outputSinewave(frequency, stimulusDuration);
+    outputSinewave(frequency, stimulusDuration, phaseOffset);
   } else if (FirstChar == "wn")  // white noise
   {
     long stimulusDuration = atof(serialVals[1]);
@@ -657,9 +659,11 @@ void generateSineWaveTable(long TOP) {
   }
 }
 
-void outputSinewave(float sinewaveFrequency, long duration) {
+void outputSinewave(float sinewaveFrequency, long duration, float phaseOffset) {
 
-  tableIndex = 0;  // Start at the beginning of the sine wave table
+  tableIndexA = 0;  // Start at the beginning of the sine wave table
+  int phaseOffsetIndex = phaseOffset*(float)TABLE_SIZE;
+  tableIndexB = tableIndexA+phaseOffsetIndex;
 
   // first do some calculations to find the update interval and step size for Timer3 interrupts
   // Calculate the PWM cycle time in microseconds
@@ -708,23 +712,29 @@ void outputSinewave(float sinewaveFrequency, long duration) {
 
 // sinewave interrupt function
 void sinewaveInterrupt() {
-  //static int tableIndex = 0;  // Start at the beginning of the sine wave table
+  //static int tableIndexA = 0;  // Start at the beginning of the sine wave table
   // Update PWM duty cycle with the next sine wave value
-  if (useChA) {setChA(sineWaveTable[tableIndex]);} // 
-  if (useChB) {setChB(sineWaveTable[tableIndex]);} // 
+  if (useChA) {setChA(sineWaveTable[tableIndexA]);} // 
+  if (useChB) {setChB(sineWaveTable[tableIndexB]);} // 
   //Serial.print(OCR1A);
   //Serial.print(',');
 
- // tableIndex = (tableIndex + stepSize) % TABLE_SIZE;
-  //if (tableIndex == 0) {
- //   PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
+ // tableIndexA = (tableIndexA + stepSize) % TABLE_SIZE;
+  //if (tableIndexA == 0) {
+ //   PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndexA is 0
  // }
 
   // Update the table index (wrap around if necessary)
-  tableIndex = tableIndex + stepSize;
-  if (tableIndex >= TABLE_SIZE) {
+  tableIndexA = tableIndexA + stepSize;
+  if (tableIndexA >= TABLE_SIZE) {
     PORTD ^= (1 << PIND4);  // Toggle Pin 4 if sine wave cycle finished
-    tableIndex -= TABLE_SIZE; // wrap table
+    tableIndexA -= TABLE_SIZE; // wrap table
+  }
+
+    // Update the table index (wrap around if necessary)
+  tableIndexB = tableIndexB + stepSize;
+  if (tableIndexB >= TABLE_SIZE) {
+    tableIndexB -= TABLE_SIZE; // wrap table
   }
 }
 
@@ -752,7 +762,7 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
     }
   }
 
-  tableIndex = 0; // start at beginning of sinewave table
+  tableIndexA = 0; // start at beginning of sinewave table
   tableEnvIndex = 191; // start at 0 contrast
   envCount = 0;  // contrast envelope counter
   contrastMult = 0;
@@ -794,14 +804,14 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
 void sinewaveEnvelopeInterrupt() {
 //unsigned long startTime = micros();
   // Update PWM duty cycle with the next sine wave value
-  uint16_t ocrVal = MidLumi + ((sineWaveTable[tableIndex] - MidLumi) * (contrastMult));
+  uint16_t ocrVal = MidLumi + ((sineWaveTable[tableIndexA] - MidLumi) * (contrastMult));
 
   if (useChA) {setChA(ocrVal);} // 
   if (useChB) {setChB(ocrVal);} // 
   
   // update sinewave table index based on interrupt frequency
-  tableIndex = tableIndex + stepSize;
-  if (tableIndex >= TABLE_SIZE) tableIndex -= TABLE_SIZE;  // wrap table index
+  tableIndexA = tableIndexA + stepSize;
+  if (tableIndexA >= TABLE_SIZE) tableIndexA -= TABLE_SIZE;  // wrap table index
 
 
   // update counter for contrast envelope 
@@ -951,21 +961,21 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps, int randSeedNum
 // whitenoise interrupt function
 void frozenWhiteNoiseInterrupt() {
 
-  static int tableIndex = 0;  // Start at the beginning of the sine wave table
+  static int tableIndexA = 0;  // Start at the beginning of the sine wave table
   // Update PWM duty cycle with the frozen white noise value
-  if (useChA) {setChA(frozenWhiteNoiseTable[tableIndex]);} 
-  if (useChB) {setChB(frozenWhiteNoiseTable[tableIndex]);} 
+  if (useChA) {setChA(frozenWhiteNoiseTable[tableIndexA]);} 
+  if (useChB) {setChB(frozenWhiteNoiseTable[tableIndexA]);} 
   PIND = (1 << PIND4);  // alternate PIN 4 value indicator pin
 
-  //if (tableIndex == 0) {
-  //  PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndex is 0
+  //if (tableIndexA == 0) {
+  //  PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndexA is 0
   //}
   //Serial.print("ti: ");
-  //Serial.println(tableIndex);
-  Serial.println(frozenWhiteNoiseTable[tableIndex]);
+  //Serial.println(tableIndexA);
+  Serial.println(frozenWhiteNoiseTable[tableIndexA]);
   Serial.flush();
   // Update the table index (wrap around at actual white noise table size)
-  tableIndex = (tableIndex + 1) % frozenWhiteNoiseTableSize;  //
+  tableIndexA = (tableIndexA + 1) % frozenWhiteNoiseTableSize;  //
 }
 
 ////////////////////////////////////////// SQUARE WAVE FLICKER STIMULUS ////////////////////////////////
