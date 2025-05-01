@@ -2,12 +2,6 @@
 #define TABLE_SIZE 256       // Number of samples in the wavetable
 
 
-// gamma correction LUTs
-
-// Declare a pointer to the current LUT
-const uint16_t* currentLUT;
-char GammaLUTName;
-
 const uint16_t PROGMEM defaultLUT[1041] = {
  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
  10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -333,7 +327,7 @@ const uint16_t PROGMEM ChBLUT[1041] = {
  1040
 };
 
-
+// PWM variables
 long prescaler;
 uint16_t TOP;      // set by the clock
 long TopLumi;  // use to limit max luminance
@@ -366,9 +360,40 @@ volatile int nEnvCounts = 1;
 volatile float contrastMult = 0;
 volatile uint16_t contrastMultInt=0;
 
-// white noise update time and PWM value
+// white noise parameters
+volatile float target_mean;      // Desired mean of the final output
+volatile float target_std;   // Desired standard deviation of the final output
+
+volatile uint16_t finalRandNumber_A = 0; // Final output value 1
+volatile uint16_t finalRandNumber_B = 0; // Final output value 2
+volatile float map_float_min; 
+volatile float map_float_max;
+volatile float mapped_float_A;    
+volatile float mapped_float_B;
+
+const int CLT_N = 12;         // Number of uniform samples for Central Limit Theorem
+                                    // Higher N => better Gaussian approximation, but slower.
+                                    // (N >= 10 or 12 is common)
+const int RANDOM_UPPER_BOUND = 1001;// The argument 'M' for random(M). Generates [0, M-1].
+// --- Derived Constants (calculated once for efficiency) ---
+// Pre-calculate values needed for N(0,1) generation based on configuration
+const float UNIFORM_MEAN = (float)(RANDOM_UPPER_BOUND - 1) / 2.0;
+const float SUM_EXPECTED_MEAN = (float)CLT_N * UNIFORM_MEAN;
+// Variance of U[0, M-1] = (M^2 - 1) / 12
+const double UNIFORM_VARIANCE = (pow((double)RANDOM_UPPER_BOUND, 2) - 1.0) / 12.0;
+// Variance of Sum = N * Var(U)
+const double SUM_VARIANCE = (double)CLT_N * UNIFORM_VARIANCE;
+// Std Dev of Sum = sqrt(Var(Sum))
+const double SUM_STD_DEV = sqrt(SUM_VARIANCE);
+// Scale factor to achieve N(0,1) = 1 / Std Dev of Sum
+const float NORMALIZE_SCALE_FACTOR = (SUM_STD_DEV > 0) ? (1.0 / (float)SUM_STD_DEV) : 0.0;
+
+
+
+//update time and PWM value
 volatile long updateTime;
 volatile long randNumber = 0;
+// white noise parameters
 
 // flicker state
 volatile bool toggleState = false;  // Flag to track the current state
@@ -389,6 +414,13 @@ void setup() {
   PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW by changing register directly
   PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
 
+   // Check fixed derived constants for white noise generation
+  if (NORMALIZE_SCALE_FACTOR == 0.0) {
+     Serial.println("ERROR: Normalization scale factor is zero. Halting.");
+     while(1);
+  }
+
+
 
   Serial.begin(115200);
 
@@ -406,16 +438,15 @@ void setup() {
   TopLumi = TOP;  // set default TopLumi (max duty cycle) as the actual TOP (i.e. 100% for now)
   MidLumi=TOP/2;
 
-  currentLUT = defaultLUT;
-  GammaLUTName = 'd';
-
   // Generate the sine wave LUT based on the Timer1 config and TopLumi
   generateSineWaveTable(TopLumi);
 
   // initialise random number to 50% duty cyle for white noise stimuli
-  randNumber = TopLumi / 2;
+  finalRandNumber_A = TopLumi / 2;
+  finalRandNumber_B = TopLumi / 2;
 
-  
+
+
   if (useChA) {setChA(TopLumi/2);} // Set pin 9 to 50% duty cycle as default
   if (useChB) {setChB(TopLumi/2);} // Set pin 10 to 50% duty cycle as default
 
@@ -496,6 +527,8 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
   {
     long stimulusDuration = atof(serialVals[1]);
     long updateTime = atof(serialVals[2]);
+    float frac_target_mean = atof(serialVals[3]);
+    float frac_target_std = atof(serialVals[4]);
     //Serial.println("Stim: White noise");
     //Serial.print("Stim duration: ");
    // Serial.println(stimulusDuration);
@@ -504,7 +537,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
   // Serial.println(updateTime);
   //  Serial.flush();
 
-    whiteNoise(updateTime, stimulusDuration);
+    whiteNoise(updateTime, stimulusDuration, frac_target_mean, frac_target_std);
   } else if (FirstChar == "fwn")  // frozen white noise
   {
     long stimulusDuration = atof(serialVals[1]);
@@ -577,10 +610,10 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     if (!useChB) 
     {
       OCR1B=0;
-      Serial.println(F("UV OFF"));
+      Serial.println(F("ChB OFF"));
     } else
     { 
-      Serial.println(F("UV ON"));
+      Serial.println(F("ChB ON"));
     };
     
   } else if (FirstChar == "useChA") // apply gamma correction
@@ -589,10 +622,10 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     if (!useChA) 
     {
       OCR1A=0;
-      Serial.println(F("GREEN OFF"));
+      Serial.println(F("ChA OFF"));
     } else
     { 
-      Serial.println(F("GREEN ON"));
+      Serial.println(F("ChA ON"));
     };
   }else if (FirstChar == "stat")
   {
@@ -792,12 +825,30 @@ void sinewaveEnvelopeInterrupt() {
 
 /////////////////////////////////// WHITE NOISE PWM FUNCTIONS //////////////////////////////
 
-void whiteNoise(long updateTime, long duration) {
+// --- Function to generate N(0,1) using CLT ---
+float generateGaussianCLT() {
+  const int N = CLT_N;
+  long sum_random = 0;
+  for (int i = 0; i < N; i++) {
+    sum_random += random(RANDOM_UPPER_BOUND);
+  }
+  float gaussian_approx_zero_mean_unit_variance =
+      ((float)sum_random - SUM_EXPECTED_MEAN) * NORMALIZE_SCALE_FACTOR;
+  return gaussian_approx_zero_mean_unit_variance;
+}
+
+void whiteNoise(long updateTime, long duration, float frac_target_mean, float frac_target_std) {
 
   float updateFrequency = 1e3 / updateTime;
   configureTimer3Interrupt(updateFrequency);
 
+  target_mean = TopLumi*frac_target_mean;
+  target_std= TopLumi*frac_target_std;
 
+  // clamping limits
+  map_float_min = (float)0.0;
+  map_float_max = (float)TopLumi;
+  
   Serial.print("TOP: ");
   Serial.println(TopLumi);
 
@@ -826,12 +877,33 @@ void whiteNoise(long updateTime, long duration) {
 void whiteNoiseInterrupt() {
 
   // Update PWM duty cycle with the next random value
-  if (useChA) {setChA(randNumber);} // Set pin 9 to 50% duty cycle as default
-  if (useChB) {setChB(randNumber);} // Set pin 10 to 50% duty cycle as default
+  if (useChA) {setChA(finalRandNumber_A);} // Set pin 9 to 50% duty cycle as default
+  if (useChB) {setChB(finalRandNumber_B);} // Set pin 10 to 50% duty cycle as default
+
+  if (useChA)
+  {
+    float zA = generateGaussianCLT();
+    float float_gaussian_val_A = target_mean + target_std * zA;
+    if (float_gaussian_val_A < map_float_min) {float_gaussian_val_A=map_float_min;}
+    if (float_gaussian_val_A > map_float_max) {float_gaussian_val_A=map_float_max;}
+    finalRandNumber_A = (uint16_t)float_gaussian_val_A;
+  }
+  
+   if (useChB)
+  {
+    float zB = generateGaussianCLT();
+    float float_gaussian_val_B = target_mean + target_std * zB;
+    if (float_gaussian_val_B < map_float_min) {float_gaussian_val_B=map_float_min;}
+    if (float_gaussian_val_B > map_float_max) {float_gaussian_val_B=map_float_max;}
+    finalRandNumber_B = (uint16_t)float_gaussian_val_B;
+  }
+
   PIND = (1 << PIND4);  // alternate PIN 4 value indicator pin
-  Serial.println(randNumber);
+  Serial.print(finalRandNumber_A);
+  Serial.print(",");
+  Serial.println(finalRandNumber_B);
   Serial.flush();
-  randNumber = random(0, TopLumi);  // get a new random number ready
+  //randNumber = random(0, TopLumi);  // get a new random number ready
 }
 
 
@@ -1020,8 +1092,8 @@ void getStatus()
   Serial.println(dutyCycle);
   Serial.print(F("Current OCR1A: "));
   Serial.println(OCR1A);
-  Serial.print(F("Gamma Correction LUT: "));
-  Serial.println(GammaLUTName);
+  Serial.print(F("Current OCR1B: "));
+  Serial.println(OCR1B);
 }
 
 
