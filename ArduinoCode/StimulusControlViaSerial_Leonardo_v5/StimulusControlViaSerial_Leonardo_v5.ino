@@ -594,11 +594,12 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
 
     SetTopLumi(TopMultiplier);
 
-  } else if (FirstChar == "sd")  // Set duty cycle
+  } else if (FirstChar == "sd")  // Set duty cycle of both channels
   {
-    dutyCycle = atof(serialVals[1]);
+    float dutyCycle_A = atof(serialVals[1]);
+    float dutyCycle_B = atof(serialVals[2]);
 
-    setDutyCycle(dutyCycle, TopLumi);
+    setDutyCycle(dutyCycle_A,dutyCycle_B, TopLumi);
 
   } else if (FirstChar == "gc") // do gamma correction routine
   {
@@ -611,7 +612,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     useChB = atoi(serialVals[1]);
     if (!useChB) 
     {
-      OCR1B=0;
+      //OCR1B=0;
       Serial.println(F("ChB OFF"));
     } else
     { 
@@ -623,7 +624,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     useChA = atoi(serialVals[1]);
     if (!useChA) 
     {
-      OCR1A=0;
+      //OCR1A=0;
       Serial.println(F("ChA OFF"));
     } else
     { 
@@ -719,11 +720,6 @@ void sinewaveInterrupt() {
   //Serial.print(OCR1A);
   //Serial.print(',');
 
- // tableIndexA = (tableIndexA + stepSize) % TABLE_SIZE;
-  //if (tableIndexA == 0) {
- //   PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndexA is 0
- // }
-
   // Update the table index (wrap around if necessary)
   tableIndexA = tableIndexA + stepSize;
   if (tableIndexA >= TABLE_SIZE) {
@@ -737,9 +733,6 @@ void sinewaveInterrupt() {
     tableIndexB -= TABLE_SIZE; // wrap table
   }
 }
-
-
-
 
 /////////////////////////////////// SINE WAVE FLICKER WITH CONTRAST ENVELOPE //////////////////////////
 void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFreq) {
@@ -1050,18 +1043,24 @@ void SetTopLumi(float TopMultiplier) {
 
 
 // set the duty cycle manually until a new value is requested
-void setDutyCycle(float dutyCyclePercentage, long TopLumi) {
+void setDutyCycle(float dutyCyclePercentage_A,float dutyCyclePercentage_B, long TopLumi) {
   // Constrain the duty cycle percentage between 0% and 100%
-  if (dutyCyclePercentage < 0.0) dutyCyclePercentage = 0.0;
-  if (dutyCyclePercentage > 100.0) dutyCyclePercentage = 100.0;
+  if (dutyCyclePercentage_A < 0.0) dutyCyclePercentage_A = 0.0;
+  if (dutyCyclePercentage_A > 100.0) dutyCyclePercentage_A = 100.0;
+  // Calculate the OCR1 value based on the duty cycle and TOP
+  uint16_t ocrValueA = (long)((dutyCyclePercentage_A / 100.0) * TopLumi);
 
-  // Calculate the OCR1A value based on the duty cycle and TOP
-  uint16_t ocrValue = (long)((dutyCyclePercentage / 100.0) * TopLumi);
-  
+  if (dutyCyclePercentage_B < 0.0) {dutyCyclePercentage_B = 0.0;};
+  if (dutyCyclePercentage_B > 100.0) {dutyCyclePercentage_B = 100.0;}
+  // Calculate the OCR1 value based on the duty cycle and TOP
+  uint16_t ocrValueB = (long)((dutyCyclePercentage_B / 100.0) * TopLumi);
+
   // Set OCR1A to control the duty cycle
-  //OCR1A = ocrValue;
-  if (useChA) {setChA(ocrValue);} // Set pin 9 to 50% duty cycle as default
-  if (useChB) {setChB(ocrValue);} // Set pin 10 to 50% duty cycle as default
+  PORTD ^= (1 << PIND4); // toggle pin 4 whenever duty cycles are changed
+  //if (useChA) 
+  setChA(ocrValueA); 
+  //if (useChB) 
+  setChB(ocrValueB);
   //Serial.print(ocrValue);
   //Serial.print(',');
   //Serial.println(OCR1A);
@@ -1108,7 +1107,7 @@ void getStatus()
 
 
 void readAnalogVals() {
-  setDutyCycle(100, TopLumi); //set max duty cycle to get clean readings
+  setDutyCycle(100,100, TopLumi); //set max duty cycle to get clean readings
   bool keepReading = true;
   const unsigned long interval = 100;  // 100ms interval
   unsigned long previousMillis = millis();
