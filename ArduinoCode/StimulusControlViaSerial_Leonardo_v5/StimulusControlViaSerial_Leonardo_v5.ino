@@ -354,6 +354,8 @@ uint16_t sineWaveTable[TABLE_SIZE];
 volatile int stepSize = 1;
 volatile int tableIndexA = 0; //for sinewave table
 volatile int tableIndexB = 0; //for sinewave table
+volatile float contrastMultA;
+volatile float contrastMultB;
 volatile int tableEnvIndex = 0; // for sinewave table contrast envelope
 volatile int envCount = 0;  // contrast envelope counter
 // contrast-envelope counter and contrast multiplier
@@ -496,7 +498,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
   char delimiters[] = ",";
   char *token;
   uint8_t idx = 0;
-#define MAX_VALS 5  // max required? freq, duration, contrast, carrier freq?
+#define MAX_VALS 20  // max required? freq, duration, contrast, carrier freq?
   char *serialVals[MAX_VALS];
   token = strtok(receivedChars, ",");
 
@@ -514,7 +516,12 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
   {
     long stimulusDuration = atof(serialVals[1]);
     float frequency = atof(serialVals[2]);
-    float phaseOffset = atof(serialVals[3]);
+    float phaseA = atof(serialVals[3]);
+    float phaseB = atof(serialVals[4]);
+    float contrastA = atof(serialVals[5]);
+    float contrastB = atof(serialVals[6]);
+    Serial.println(contrastA);
+
     //Serial.println("Stim: Sinusoidal dimming");
     //Serial.flush();
     //Serial.print("Stim duration: ");
@@ -524,7 +531,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     //Serial.println(frequency);
     //Serial.flush();
     
-    outputSinewave(frequency, stimulusDuration, phaseOffset);
+    outputSinewave(frequency, stimulusDuration, phaseA, phaseB, contrastA, contrastB);
   } else if (FirstChar == "wn")  // white noise
   {
     long stimulusDuration = atof(serialVals[1]);
@@ -660,11 +667,13 @@ void generateSineWaveTable(long TOP) {
   }
 }
 
-void outputSinewave(float sinewaveFrequency, long duration, float phaseOffset) {
+void outputSinewave(float sinewaveFrequency, long duration, float phaseA, float phaseB, float contrastA, float contrastB) {
 
-  tableIndexA = 0;  // Start at the beginning of the sine wave table
-  int phaseOffsetIndex = phaseOffset*(float)TABLE_SIZE;
-  tableIndexB = tableIndexA+phaseOffsetIndex;
+  tableIndexA = phaseA*(float)TABLE_SIZE;  // Start at the beginning of the sine wave table
+  tableIndexB = phaseB*(float)TABLE_SIZE;
+
+  contrastMultA = contrastA;
+  contrastMultB = contrastB;
 
   // first do some calculations to find the update interval and step size for Timer3 interrupts
   // Calculate the PWM cycle time in microseconds
@@ -715,8 +724,15 @@ void outputSinewave(float sinewaveFrequency, long duration, float phaseOffset) {
 void sinewaveInterrupt() {
   //static int tableIndexA = 0;  // Start at the beginning of the sine wave table
   // Update PWM duty cycle with the next sine wave value
-  if (useChA) {setChA(sineWaveTable[tableIndexA]);} // 
-  if (useChB) {setChB(sineWaveTable[tableIndexB]);} // 
+
+  //ocrVal = MidLumi + ((sineWaveTable[tableIndexA] - MidLumi) * (contrastA));
+  float ocrValA = MidLumi + ((sineWaveTable[tableIndexA] - MidLumi) * (contrastMultA));
+  float ocrValB = MidLumi + ((sineWaveTable[tableIndexB] - MidLumi) * (contrastMultB));
+  Serial.println(contrastMultA);
+
+
+  if (useChA) {setChA(ocrValA);} // 
+  if (useChB) {setChB(ocrValB);} // 
   //Serial.print(OCR1A);
   //Serial.print(',');
 
