@@ -520,7 +520,6 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     float phaseB = atof(serialVals[4]);
     float contrastA = atof(serialVals[5]);
     float contrastB = atof(serialVals[6]);
-    Serial.println(contrastA);
 
     //Serial.println("Stim: Sinusoidal dimming");
     //Serial.flush();
@@ -532,6 +531,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     //Serial.flush();
     
     outputSinewave(frequency, stimulusDuration, phaseA, phaseB, contrastA, contrastB);
+
   } else if (FirstChar == "wn")  // white noise
   {
     long stimulusDuration = atof(serialVals[1]);
@@ -547,6 +547,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
   //  Serial.flush();
 
     whiteNoise(updateTime, stimulusDuration, frac_target_mean, frac_target_std);
+
   } else if (FirstChar == "fwn")  // frozen white noise
   {
     long stimulusDuration = atof(serialVals[1]);
@@ -563,6 +564,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
   //  Serial.flush();
 
     frozenWhiteNoise(updateTime, stimulusDuration,nReps,randSeedNum);
+
   } else if (FirstChar == "se")  // sinusoidal flicker with contrast envelope
   {
     long stimulusDuration = atof(serialVals[1]);
@@ -581,6 +583,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
  //   Serial.flush();
 
     SineContrastConv(stimulusDuration, frequency, envFrequency);
+
   } else if (FirstChar == "f")  // Square wave flicker
   {
     long stimulusDuration = atof(serialVals[1]);
@@ -595,6 +598,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
  //   Serial.flush();
 
     FlickerLED(FlickerFreq, stimulusDuration);
+
   } else if (FirstChar == "st")  // Set TopLuminance
   {
     float TopMultiplier = atof(serialVals[1]);
@@ -608,12 +612,21 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
 
     setDutyCycle(dutyCycle_A,dutyCycle_B, TopLumi);
 
+  } else if (FirstChar == "sdt")  // Set duty cycle of both channels for a time period
+  {
+    float dutyCycle_A = atof(serialVals[1]);
+    float dutyCycle_B = atof(serialVals[2]);
+    long stimulusDuration = atof(serialVals[3]);
+
+    setDutyCycleTime(dutyCycle_A,dutyCycle_B, stimulusDuration, TopLumi);
+
   } else if (FirstChar == "gc") // do gamma correction routine
   {
     float stepSize = atof(serialVals[1]);
     float waitTime = atof(serialVals[2]);
     int nReps = atoi(serialVals[3]);
     cycleDutyCycles(stepSize, waitTime, nReps, TopLumi);
+
   }  else if (FirstChar == "useChB") // apply gamma correction
   { 
     useChB = atoi(serialVals[1]);
@@ -728,7 +741,6 @@ void sinewaveInterrupt() {
   //ocrVal = MidLumi + ((sineWaveTable[tableIndexA] - MidLumi) * (contrastA));
   float ocrValA = MidLumi + ((sineWaveTable[tableIndexA] - MidLumi) * (contrastMultA));
   float ocrValB = MidLumi + ((sineWaveTable[tableIndexB] - MidLumi) * (contrastMultB));
-  Serial.println(contrastMultA);
 
 
   if (useChA) {setChA(ocrValA);} // 
@@ -1080,6 +1092,38 @@ void setDutyCycle(float dutyCyclePercentage_A,float dutyCyclePercentage_B, long 
   //Serial.print(ocrValue);
   //Serial.print(',');
   //Serial.println(OCR1A);
+}
+
+
+// set the duty cycle manually until a new value is requested
+void setDutyCycleTime(float dutyCyclePercentage_A, float dutyCyclePercentage_B, long duration, long TopLumi) {
+  // Constrain the duty cycle percentage between 0% and 100%
+  if (dutyCyclePercentage_A < 0.0) dutyCyclePercentage_A = 0.0;
+  if (dutyCyclePercentage_A > 100.0) dutyCyclePercentage_A = 100.0;
+  // Calculate the OCR1 value based on the duty cycle and TOP
+  uint16_t ocrValueA = (long)((dutyCyclePercentage_A / 100.0) * TopLumi);
+
+  if (dutyCyclePercentage_B < 0.0) {dutyCyclePercentage_B = 0.0;};
+  if (dutyCyclePercentage_B > 100.0) {dutyCyclePercentage_B = 100.0;}
+  // Calculate the OCR1 value based on the duty cycle and TOP
+  uint16_t ocrValueB = (long)((dutyCyclePercentage_B / 100.0) * TopLumi);
+
+
+  long startTime = millis();  // Record the start time
+  PORTC |= (1 << PORTC6);  // Stim on pin 5
+  if (useChA) {setChA(ocrValueA);} // Set pin 9 to 50% duty cycle as default
+  if (useChB) {setChB(ocrValueB);} // Set pin 10 to 50% duty cycle as default
+  // Loop until the specified duration has elapsed
+  while (millis() - startTime < duration) {
+    delayMicroseconds(1);  //wait for time to end
+  }
+  PORTD &= ~(1 << PIND4);  // Ensure Pin 4 is set to LOW by changing register directly
+  PORTC &= ~(1 << PORTC6); // Ensure Pin 5 is set to LOW
+  Serial.println("-1");
+  Serial.flush();
+  if (useChA) {setChA(TopLumi/2);} // Set pin 9 to 50% duty cycle as default
+  if (useChB) {setChB(TopLumi/2);} // Set pin 10 to 50% duty cycle as default
+
 }
 
 
