@@ -1,4 +1,4 @@
-#include <math.h>  //
+//#include <math.h>  //
 
 #define CLOCK_FREQ 16000000  // Arduino Leonardo clock frequency (16 MHz)
 #define TABLE_SIZE 256       // Number of samples in the wavetable
