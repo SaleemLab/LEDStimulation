@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Bonsai.Editor</id>
+    <version>2.7.2</version>
+    <title>Bonsai - Editor</title>
+    <authors>Gonçalo Lopes</authors>
+    <licenseUrl>https://bonsai-rx.org/license</licenseUrl>
+    <projectUrl>https://bonsai-rx.org/</projectUrl>
+    <iconUrl>https://bonsai-rx.org/assets/images/bonsai.png</iconUrl>
+    <description>An integrated development environment for the Bonsai visual programming language.</description>
+    <copyright>Copyright © Gonçalo Lopes 2011-2022</copyright>
+    <tags>Bonsai Editor Rx Reactive Extensions</tags>
+    <repository type="git" url="https://github.com/bonsai-rx/bonsai.git" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.7.2">
+        <dependency id="Bonsai.Design" version="2.7.0" exclude="Build,Analyzers" />
+        <dependency id="SvgNet" version="3.2.0" exclude="Build,Analyzers" />
+        <dependency id="YamlDotNet" version="12.0.2" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework=".NETFramework4.7.2" />
+    </frameworkAssemblies>
+  </metadata>
+</package>
