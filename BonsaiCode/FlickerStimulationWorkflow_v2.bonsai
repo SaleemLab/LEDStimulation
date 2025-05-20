@@ -71,7 +71,7 @@
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="io:CreateSerialPort">
           <io:Name>ArdPWM</io:Name>
-          <io:PortName>COM6</io:PortName>
+          <io:PortName>COM8</io:PortName>
           <io:BaudRate>115200</io:BaudRate>
           <io:Parity>None</io:Parity>
           <io:ParityReplace>63</io:ParityReplace>
@@ -440,9 +440,6 @@
       </Expression>
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="rx:SubscribeWhen" />
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>FreqArray</Name>
       </Expression>
       <Expression xsi:type="ExternalizedMapping">
         <Property Name="WHEEL COM" />
@@ -1621,13 +1618,13 @@
       <Edge From="25" To="26" Label="Source1" />
       <Edge From="26" To="27" Label="Source1" />
       <Edge From="27" To="28" Label="Source1" />
-      <Edge From="30" To="31" Label="Source1" />
-      <Edge From="33" To="35" Label="Source1" />
-      <Edge From="34" To="35" Label="Source2" />
-      <Edge From="36" To="37" Label="Source1" />
+      <Edge From="29" To="30" Label="Source1" />
+      <Edge From="32" To="34" Label="Source1" />
+      <Edge From="33" To="34" Label="Source2" />
+      <Edge From="35" To="36" Label="Source1" />
+      <Edge From="38" To="39" Label="Source1" />
       <Edge From="39" To="40" Label="Source1" />
       <Edge From="40" To="41" Label="Source1" />
-      <Edge From="41" To="42" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>
