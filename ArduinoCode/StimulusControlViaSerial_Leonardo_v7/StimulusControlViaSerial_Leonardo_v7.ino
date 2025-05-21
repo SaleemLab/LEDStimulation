@@ -441,6 +441,8 @@ void outputSinewave(float sinewaveFrequency, long duration, float phaseA, float 
 
   configureTimer3Interrupt(updateFrequency);  // Configure timer3 interrupt to updateFrequency
   PORTC |= (1 << PORTC6); // set Pin 5 HIGH
+  PORTD |= (1 << PIND4); // set Pin 4 HIGH
+
   long startTime = millis();  // Record the start time
   // set timer3 interrupt callback function to play the sinewave
   setTimer3Callback(sinewaveInterrupt);
@@ -680,6 +682,7 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
         configureTimer3Interrupt(timerInterruptFrequencyHz); 
 
     PORTC |= (1 << PORTC6); // set Pin 5 HIGH
+    PORTD |= (1 << PIND4);  // set pin 4 high initially, toggles every sinewave cycle
     unsigned long startTimeUs = micros();
     setTimer3Callback(sinewaveInterrupt);
 
@@ -835,12 +838,14 @@ void whiteNoise(long updateTime, long duration, float frac_target_mean, float fr
   if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
 }
 
-void SwitchingWhiteNoise(long updateTime, long switchTime, int nReps, float meanVal1, float contrastVal1, float meanVal2, float contrastVal2) {
+void SwitchingWhiteNoise(long updateTime, unsigned long switchTime, int nReps, float meanVal1, float contrastVal1, float meanVal2, float contrastVal2) {
 
   float updateFrequency = 1e3 / updateTime;
   configureTimer3Interrupt(updateFrequency);
 
   long duration = switchTime*2*nReps;
+  Serial.print("switch time:");
+  Serial.println(switchTime);
   Serial.print("duration:");
   Serial.println(duration);
 
@@ -857,6 +862,7 @@ void SwitchingWhiteNoise(long updateTime, long switchTime, int nReps, float mean
   Serial.println(TopLumi);
 
   PORTC |= (1 << PORTC6);     // Stim on pin 5
+
   long startTime = millis();  // Record the start time
 
   // set timer3 interrupt callback function to play the sinewave
@@ -868,9 +874,9 @@ void SwitchingWhiteNoise(long updateTime, long switchTime, int nReps, float mean
   // Loop until the specified duration has elapsed
   while (millis() - startTime < duration) {
     delayMicroseconds(1);  //wait for time to end
-    switchCurrentMillis = millis();
+    switchCurrentMillis = millis(); // get current time to check for whether to change distirbution
     if (switchCurrentMillis - switchPreviousMillis >= switchTime) {  // if time to switch distributions
-      PORTC ^= (1<<PORTC6); //Toggle Pin 5
+    //Serial.println(switchCurrentMillis);
 
       switchPreviousMillis = switchCurrentMillis;                            // reset switchPreviousMillis
       
@@ -878,13 +884,16 @@ void SwitchingWhiteNoise(long updateTime, long switchTime, int nReps, float mean
         target_mean = TopLumi * meanVal2;
         target_std = TopLumi * contrastVal2;
         currentDist = 2;
-        Serial.println(target_std);
+        //Serial.println(target_std);
       } else if (currentDist == 2) {
         target_mean = TopLumi * meanVal1;
         target_std = TopLumi * contrastVal1;
         currentDist = 1;
-        Serial.println(target_std);
+        //Serial.println(target_std);
       }
+      
+      PORTC ^= (1<<PORTC6); //Toggle Pin 5
+
     }
   }
 
@@ -926,7 +935,6 @@ void whiteNoiseInterrupt() {
   Serial.print(",");
   Serial.println(finalRandNumber_B);
   Serial.flush();
-  //randNumber = random(0, TopLumi);  // get a new random number ready
 }
 
 
@@ -1000,11 +1008,12 @@ void frozenWhiteNoiseInterrupt() {
   //Serial.println(tableIndexA);
   Serial.println(frozenWhiteNoiseTable[tableIndexFWN]);
   Serial.flush();
+
   // Update the table index (wrap around at actual white noise table size)
-  tableIndexFWN = (tableIndexFWN + 1) % FWN_TABLE_SIZE;  //
-  
-  if (tableIndexFWN == 0) {
-  PORTC ^= (1<<PORTC6); //Toggle Pin 5
+  tableIndexFWN = tableIndexFWN + 1;  // increment table index
+  if (tableIndexFWN >= FWN_TABLE_SIZE) {
+      PORTC ^= (1<<PORTC6); //Toggle Pin 5 when table finishes
+    tableIndexFWN -= FWN_TABLE_SIZE;  // wrap table
   }
 }
 
