@@ -439,12 +439,9 @@ void outputSinewave(float sinewaveFrequency, long duration, float phaseA, float 
   float updateInterval = baseUpdateInterval * stepSize;
   float updateFrequency = 1e6 / updateInterval;  // update frequency for timer3 interrupt
 
-  // Configure timer3 interrupt to updateFrequency
-  configureTimer3Interrupt(updateFrequency);
-
-
+  configureTimer3Interrupt(updateFrequency);  // Configure timer3 interrupt to updateFrequency
+  PORTC |= (1 << PORTC6); // set Pin 5 HIGH
   long startTime = millis();  // Record the start time
-  PORTC |= (1 << PORTC6);
   // set timer3 interrupt callback function to play the sinewave
   setTimer3Callback(sinewaveInterrupt);
 
@@ -524,16 +521,13 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
   //Serial.print("req update: ");
   //Serial.println(updateInterval);
   float updateFrequency = 1e6 / updateInterval;  // update frequency for timer3 interrupt
+  nEnvCounts = (int)(sinewaveFrequency / envelopeFreq);
 
   // Configure timer3 interrupt to updateFrequency
   configureTimer3Interrupt(updateFrequency);
-  nEnvCounts = (int)(sinewaveFrequency / envelopeFreq);
-
-
-
+  PORTC |= (1 << PORTC6);  // Stim on pin 5
   long startTime = millis();  // Record the start time
   // set timer3 interrupt callback function to play the sinewave
-  PORTC |= (1 << PORTC6);  // Stim on pin 5
   setTimer3Callback(sinewaveEnvelopeInterrupt);
 
   // Loop until the specified duration has elapsed
@@ -652,12 +646,42 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
         isSweeping = false;
     }
 
-    unsigned long startTimeUs = micros();
-    setTimer3Callback(sinewaveInterrupt);
-
     float actual_calc_freq = fmin; // This holds the frequency to be set for the current/next interval
     bool sweeping_up = true;       // State variable to track sweep direction (more robustly handled by time check)
     bool just_switched_to_down = false; // Flag to handle the exact moment of switching to downward sweep
+
+    // get initial timer interrupt frequency
+    float currentSinewaveFrequency = actual_calc_freq;
+        
+        // Clamp and ensure positive frequency before using it for calculations
+        if (currentSinewaveFrequency > fmax) currentSinewaveFrequency = fmax;
+        if (currentSinewaveFrequency < fmin) currentSinewaveFrequency = fmin;
+        if (currentSinewaveFrequency <= 0.0f) currentSinewaveFrequency = 0.0001f;
+
+
+        // --- Recalculate timer parameters based on currentSinewaveFrequency ---
+        float sinewaveFreqToUseForCalc = currentSinewaveFrequency;
+        float baseUpdateIntervalUs = (1.0f / (sinewaveFreqToUseForCalc * TABLE_SIZE)) * 1e6f;
+        int calculatedStepSize = TABLE_SIZE; 
+        for (int i = 1; i <= TABLE_SIZE; i++) {
+            if ((TABLE_SIZE % i == 0) && (baseUpdateIntervalUs * i >= pwmCycleTimeUs)) {
+                calculatedStepSize = i; 
+                break; 
+            }
+        }
+        
+        //noInterrupts();
+        stepSize = calculatedStepSize; 
+        //interrupts();
+
+        float effectiveTimerUpdateIntervalUs = baseUpdateIntervalUs * calculatedStepSize;
+        float timerInterruptFrequencyHz;
+        timerInterruptFrequencyHz = 1e6f / effectiveTimerUpdateIntervalUs;
+        configureTimer3Interrupt(timerInterruptFrequencyHz); 
+
+    PORTC |= (1 << PORTC6); // set Pin 5 HIGH
+    unsigned long startTimeUs = micros();
+    setTimer3Callback(sinewaveInterrupt);
 
     // Main loop
     while (micros() - startTimeUs < totalDurationUs) {
@@ -790,8 +814,8 @@ void whiteNoise(long updateTime, long duration, float frac_target_mean, float fr
   Serial.print("TOP: ");
   Serial.println(TopLumi);
 
-  long startTime = millis();  // Record the start time
   PORTC |= (1 << PORTC6);     // Stim on pin 5
+  long startTime = millis();  // Record the start time
 
   // set timer3 interrupt callback function to play the sinewave
   setTimer3Callback(whiteNoiseInterrupt);
@@ -832,8 +856,8 @@ void SwitchingWhiteNoise(long updateTime, long switchTime, int nReps, float mean
   Serial.print("TOP: ");
   Serial.println(TopLumi);
 
-  long startTime = millis();  // Record the start time
   PORTC |= (1 << PORTC6);     // Stim on pin 5
+  long startTime = millis();  // Record the start time
 
   // set timer3 interrupt callback function to play the sinewave
   setTimer3Callback(whiteNoiseInterrupt);
@@ -846,8 +870,10 @@ void SwitchingWhiteNoise(long updateTime, long switchTime, int nReps, float mean
     delayMicroseconds(1);  //wait for time to end
     switchCurrentMillis = millis();
     if (switchCurrentMillis - switchPreviousMillis >= switchTime) {  // if time to switch distributions
-      switchPreviousMillis = switchCurrentMillis;                            // reset switchPreviousMillis
+      PORTC ^= (1<<PORTC6); //Toggle Pin 5
 
+      switchPreviousMillis = switchCurrentMillis;                            // reset switchPreviousMillis
+      
       if (currentDist == 1) {
         target_mean = TopLumi * meanVal2;
         target_std = TopLumi * contrastVal2;
@@ -964,22 +990,22 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps, int randSeedNum
 // whitenoise interrupt function
 void frozenWhiteNoiseInterrupt() {
 
-  static int tableIndexA = 0;  // Start at the beginning of the sine wave table
   // Update PWM duty cycle with the frozen white noise value
   if (useChA) { setChA(frozenWhiteNoiseTable[tableIndexFWN]); }
   if (useChB) { setChB(frozenWhiteNoiseTable[tableIndexFWN]); }
   PIND = (1 << PIND4);  // alternate PIN 4 value indicator pin
 
-  //if (tableIndexA == 0) {
-  //  PORTD ^= (1 << PIND4);  // Toggle Pin 4 if tableIndexA is 0
-  //}
+
   //Serial.print("ti: ");
   //Serial.println(tableIndexA);
   Serial.println(frozenWhiteNoiseTable[tableIndexFWN]);
-
   Serial.flush();
   // Update the table index (wrap around at actual white noise table size)
   tableIndexFWN = (tableIndexFWN + 1) % FWN_TABLE_SIZE;  //
+  
+  if (tableIndexFWN == 0) {
+  PORTC ^= (1<<PORTC6); //Toggle Pin 5
+  }
 }
 
 ////////////////////////////////////////// SQUARE WAVE FLICKER STIMULUS ////////////////////////////////
@@ -1094,6 +1120,7 @@ void setDutyCycleTime(float dutyCyclePercentage_A, float dutyCyclePercentage_B, 
 
   long startTime = millis();          // Record the start time
   PORTC |= (1 << PORTC6);             // Stim on pin 5
+  PORTD |= (1 << PIND4);              // match pin 5 on pin 4 for this stimulus
   if (useChA) { setChA(ocrValueA); }  // Set pin 9 to 50% duty cycle as default
   if (useChB) { setChB(ocrValueB); }  // Set pin 10 to 50% duty cycle as default
   // Loop until the specified duration has elapsed
