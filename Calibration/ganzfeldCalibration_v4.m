@@ -70,12 +70,15 @@ PRs(3).col = 'r';
 
 %% Define light sources
 
-load('UV_spec.mat')
-load('green_spec.mat')
+%load('UV_spec.mat')
+%load('green_spec.mat')
+load('D:\Code\LEDStimulation\Calibration\LEDdata\GREEN_grabit.mat')
+load('D:\Code\LEDStimulation\Calibration\LEDdata\UV_grabit.mat')
+
 delta_lambda=1;
 
-UVspec = UV_LED_spectrum_grabit; clear UV_LED_spectrum_grabit
-greenspec = green_LED_spectrum_grabit; clear green_LED_spectrum_grabit
+UVspec = UV_grabit; clear UV_grabit
+greenspec = GREEN_grabit; clear green_grabit
 
 % sort grabit points in asending order of wavelength, then resample
 [UV_wavelength, UV_sortidx] = sort(UVspec(:,1));
@@ -135,7 +138,7 @@ LEDs(2).spect_nw_norm = UV_power_pad./max(UV_power_pad);
 figure, hold on
 for iPR=1:2
     plot(wavelengths_nm, PRs(iPR).spect,'color', PRs(iPR).col);
-    plot(wavelengths_nm, LEDs(iPR).spect_nw_norm, 'Color', PRs(iPR).col, 'LineStyle', '--')
+    plot(wavelengths_nm, LEDs(iPR).spect_nw_norm, 'Color', PRs(iPR).col, 'LineStyle', ':')
 end
 xlabel('wavelength (nm)'), ylabel('Rel. sensitivity'), 
 legend({PRs(1).name, LEDs(1).name, PRs(2).name, LEDs(2).name});
@@ -155,14 +158,14 @@ A_detect_um2 = 9700^2; %Thor labs photodiode active receptor area
 % P_meter_cal_wavelengths = P_meter_cal.Wavelength_nm_;
 % P_meter_cal_responsivity = P_meter_cal.Responsivity_mA_W_;
 
-P_meter_cal = readtable(fullfile(pwd, 'PowerMeterCalibrationFiles', 'S130VC_Responsivity.xlsx'));
+P_meter_cal = readtable(fullfile('D:\Code\LEDStimulation\Calibration\', 'PowerMeterCalibrationFiles', 'S130VC_Responsivity.xlsx'));
 P_meter_cal_wavelengths = P_meter_cal.Wavelength_nm_;
 P_meter_cal_responsivity = P_meter_cal.Responsivity_mA_W_; % without filter
 
 %% process power meter readings to scale LED spectra - GREEN
 
-lambda_meas = 524; % specified measurement wavelength for power meter
-P_total = 7.05E-6; % output of power meter in W
+lambda_meas = 525; % specified measurement wavelength for power meter
+P_total = 6.5E-6; % output of power meter in W
 
 [wavelengths, green_power, green_P_true, green_correction_factor] = getLEDSpectraFromPowerMeter(...
     P_total, lambda_meas, wavelengths_nm, LEDs(1).spect_nw_norm, ...
@@ -176,8 +179,8 @@ LEDs(1).measured_power = P_total; % reference for the spectrum
 
 %% process power meter readings to scale LED spectra - UV
 
-lambda_meas = 385; % specified measurement wavelength for power meter
-P_total = 20.5E-6; % output of power meter in W
+lambda_meas = 370; % specified measurement wavelength for power meter
+P_total = 15E-6; % output of power meter in W
 
 [UV_wavelengths, UV_power, UV_P_true, UV_correction_factor] = getLEDSpectraFromPowerMeter(...
     P_total, lambda_meas, wavelengths_nm, LEDs(2).spect_nw_norm, ...
@@ -189,11 +192,11 @@ LEDs(2).spect_nw = UV_power*1e9; % convert to nw to match OVS notebook
 LEDs(2).measured_power = P_total; % reference for the spectrum
 
 %% plot corrected-power spectra of LEDs 
-% figure, hold on
-% plot(wavelengths_nm, LEDs(1).spect_nw, 'Color', PRs(1).col)
-% plot(wavelengths_nm, LEDs(2).spect_nw, 'Color', PRs(2).col)
-% defaultAxesProperties(gca, false)
-% xlabel('wavelength (nm)'), ylabel('power (nW)')
+figure, hold on
+plot(wavelengths_nm, LEDs(1).spect_nw, 'Color', PRs(1).col)
+plot(wavelengths_nm, LEDs(2).spect_nw, 'Color', PRs(2).col)
+defaultAxesProperties(gca, false)
+xlabel('wavelength (nm)'), ylabel('power (nW)')
 
 %% correct emission spectra based on properties of mouse eye
 % 
