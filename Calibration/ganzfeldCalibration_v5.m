@@ -333,6 +333,7 @@ for iLED=1:2
 end
 ylabel('Isomerisation rate')
 xlabel('wavelengths (nm)')
+ax=gca; ax.YLim(1)=0;
 
 yyaxis right
 for iPR = 1:2
@@ -346,3 +347,5 @@ end
 
 legend({'green on M-cone', 'green on S-cone','UV on M-cone', 'UV on S-cone',...
     'M-cone sensitivity', 'S-cone sensitivity', 'Green LED spectra', 'UV LED spectra'})
+
+ax=gca; ax.YLim(1)=0;
