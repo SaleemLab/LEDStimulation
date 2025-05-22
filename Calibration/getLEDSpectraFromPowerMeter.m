@@ -2,6 +2,14 @@ function [wavelengths, power_per_bin, P_true, correction_factor] = getLEDSpectra
     P_total, lambda_meas, LED_wavelengths, LED_spectrum, ...
     P_meter_cal_wavelengths, P_meter_cal_responsivity)
 
+% P_total: the measured power on the powermeter
+% lamda_meas: the specified measurement wavelength on the power meter
+% LED wavelengths: binned wavelengths (normally 1nm) of the LED spectrum
+% LED_spectrum: the spectrum of the LED (normally normalised to max=1)
+% P_meter_cal_wavelengths: binned wavelengths of the responsivity curve of
+% the power meter
+% P_meter_cal_responsivity: responsivity values in mA/W
+
 % Raw LED spectrum (in arbitrary units)
 S = LED_spectrum;
 
