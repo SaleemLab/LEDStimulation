@@ -3,8 +3,9 @@
 
 %% select measurement device
 
-measurementDevice = 'PDA100A2'; % 'PDA100A2, S130VC, S120VC
-load('PDA100A2_gainTable.mat')
+measurementDevice = 'S120C'; % 'PDA100A2, S130VC, S120VC
+
+load('PDA100A2_gainTable.mat') % load gain LUT for photodiode
 
 %% Define constants
 
@@ -189,7 +190,7 @@ else % thorlabs power meter
 % process power meter readings to scale LED spectra - GREEN
 
 lambda_meas = 525; % specified measurement wavelength for power meter
-P_total = 6.5E-6; % output of power meter in W
+P_total = 6.1E-6; % output of power meter in W
 
 [wavelengths, green_power, green_P_true, green_correction_factor] = getLEDSpectraFromPowerMeter(...
     P_total, lambda_meas, wavelengths_nm, LEDs(1).spect_nw_norm, ...
