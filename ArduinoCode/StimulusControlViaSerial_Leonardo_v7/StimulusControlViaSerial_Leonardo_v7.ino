@@ -742,22 +742,22 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
 
   } else if (FirstChar == "sd")  // Set duty cycle of both channels
   {
-    uint8_t dutyCycle_A = atof(serialVals[1]);
-    uint8_t dutyCycle_B = atof(serialVals[2]);
+    float dutyCycle_A = atof(serialVals[1]);
+    float dutyCycle_B = atof(serialVals[2]);
 
     setDutyCycle(dutyCycle_A, dutyCycle_B, TopLumi);
 
   } else if (FirstChar == "sdt")  // Set duty cycle of both channels for a time period
   {
-    uint8_t dutyCycle_A = atof(serialVals[1]);
-    uint8_t dutyCycle_B = atof(serialVals[2]);
+    float dutyCycle_A = atof(serialVals[1]);
+    float dutyCycle_B = atof(serialVals[2]);
     long stimulusDuration = atof(serialVals[3]);
 
     setDutyCycleTime(dutyCycle_A, dutyCycle_B, stimulusDuration, TopLumi);
 
   } else if (FirstChar == "gc")  // do gamma correction routine
   {
-    uint8_t stepSize = atoi(serialVals[1]);
+    float stepSize = atof(serialVals[1]);
     long waitTime = atoi(serialVals[2]);
     int nReps = atoi(serialVals[3]);
     cycleDutyCycles(stepSize, waitTime, nReps, TopLumi);
