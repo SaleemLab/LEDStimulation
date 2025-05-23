@@ -47,8 +47,8 @@ end
 power_per_bin = P_bin_W;
 
 % --- 3. Display Results ---
-fprintf('\n--- Power per Bin (Incident on Photodiode) ---\n');
-fprintf('Wavelength (nm) | Power in Bin (uW)\n');
+% fprintf('\n--- Power per Bin (Incident on Photodiode) ---\n');
+% fprintf('Wavelength (nm) | Power in Bin (uW)\n');
 % fprintf('---------------------------------------\n');
 % for i = 1:length(LED_wavelengths)
 %     fprintf('%15.1f | %18.4f\n', LED_wavelengths(i), P_bin_W(i) * 1e6);

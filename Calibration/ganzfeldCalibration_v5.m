@@ -6,6 +6,7 @@
 measurementDevice = 'S121C'; % 'PDA100A2, S130VC, S120VC
 load('PDA100A2_gainTable.mat')
 
+
 CalibrationFolder = 'C:\Users\saleemlab\Documents\GitHub\LEDStimulation\Calibration';
 
 %% Define constants
