@@ -1157,6 +1157,7 @@ void cycleDutyCycles(float stepSize, float waitTime, int nReps, long TopLumi) {
       if (useChA) { setChA(ocrValue); }  // Set pin 9 to 50% duty cycle as default
       if (useChB) { setChB(ocrValue); }  // Set pin 10 to 50% duty cycle as default    delay(waitTime);
       dutyCycle = dutyCycle + stepSize;
+      delay(waitTime);
     }
   }
   Serial.println("-1");
@@ -1182,7 +1183,7 @@ void getStatus() {
 
 
 void readAnalogVals() {
-  setDutyCycle(100, 100, TopLumi);  //set max duty cycle to get clean readings
+  //setDutyCycle(100, 100, TopLumi);  //set max duty cycle to get clean readings
   bool keepReading = true;
   const unsigned long interval = 100;  // 100ms interval
   unsigned long previousMillis = millis();

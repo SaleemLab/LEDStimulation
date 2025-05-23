@@ -6,6 +6,8 @@
 measurementDevice = 'PDA100A2'; % 'PDA100A2, S130VC, S120VC
 load('PDA100A2_gainTable.mat')
 
+CalibrationFolder = 'C:\Users\saleemlab\Documents\GitHub\LEDStimulation\Calibration';
+
 %% Define constants
 
 % h: Planck's constant [eV*s]
@@ -49,8 +51,8 @@ PRs(3).col = 'r';
 
 %load('UV_spec.mat')
 %load('green_spec.mat')
-load('D:\Code\LEDStimulation\Calibration\LEDdata\GREEN_grabit.mat')
-load('D:\Code\LEDStimulation\Calibration\LEDdata\UV_grabit.mat')
+load(fullfile(CalibrationFolder,'LEDdata','GREEN_grabit.mat'))
+load(fullfile(CalibrationFolder,'LEDdata','UV_grabit.mat'))
 
 delta_lambda=1;
 
@@ -125,21 +127,28 @@ defaultAxesProperties(gca, false)
 %% load appropriate responsivity data and detection area of photodiode sensor
 switch measurementDevice
     case 'S130VC'
-        P_meter_cal = readtable(fullfile('D:\Code\LEDStimulation\Calibration\', 'PowerMeterCalibrationFiles', 'S130VC_Responsivity.xlsx'));
+        P_meter_cal = readtable(fullfile(CalibrationFolder, 'PowerMeterCalibrationFiles', 'S130VC_Responsivity.xlsx'));
         P_meter_cal_wavelengths = P_meter_cal.Wavelength_nm_;
         P_meter_cal_responsivity = P_meter_cal.Responsivity_mA_W_; % without filter
 
         A_detect_um2 = 9700^2; %Thor labs photodiode active receptor area
 
     case 'S120VC'
-        P_meter_cal = readtable(fullfile('D:\Code\LEDStimulation\Calibration\', 'PowerMeterCalibrationFiles', 'S120VC_Responsivity.xlsx'));
+        P_meter_cal = readtable(fullfile(CalibrationFolder, 'PowerMeterCalibrationFiles', 'S120VC_Responsivity.xlsx'));
         P_meter_cal_wavelengths = P_meter_cal.Wavelength_nm_;
         P_meter_cal_responsivity = P_meter_cal.Responsivity_mA_W_; % without filter
 
         A_detect_um2 = 9700^2; %Thor labs photodiode active receptor area
 
     case 'S120C'
-        P_meter_cal = readtable(fullfile('D:\Code\LEDStimulation\Calibration\', 'PowerMeterCalibrationFiles', 'S120C_Responsivity.xlsx'));
+        P_meter_cal = readtable(fullfile(CalibrationFolder, 'PowerMeterCalibrationFiles', 'S120C_Responsivity.xlsx'));
+        P_meter_cal_wavelengths = P_meter_cal.Wavelength_nm_;
+        P_meter_cal_responsivity = P_meter_cal.Responsivity_mA_W_; % without filter
+
+        A_detect_um2 = 9700^2; %Thor labs photodiode active receptor area
+
+   case 'S121C'
+        P_meter_cal = readtable(fullfile(CalibrationFolder, 'PowerMeterCalibrationFiles', 'S121C_Responsivity.xlsx'));
         P_meter_cal_wavelengths = P_meter_cal.Wavelength_nm_;
         P_meter_cal_responsivity = P_meter_cal.Responsivity_mA_W_; % without filter
 
@@ -160,18 +169,20 @@ end
 
 if strcmp(measurementDevice, 'PDA100A2') % thorlabs photodiode
 
-    V_measured = 2;
+    % green measurements
+    V_measured = 7.222; %*10^-1; ^-2
     V_dark=0;
-    gainVal = PDA100A2_gainTable.("50 Ohm gain (V/A")(PDA100A2_gainTable.("dB Setting")==50);
+    gainVal = PDA100A2_gainTable.("Hi-Z gain (V/A)")(PDA100A2_gainTable.("dB Setting")==70);
 
 
     [green_wavelengths, green_power, green_P_true] = getLEDSpectraFromPhotodiode(...
     V_measured, V_dark, wavelengths_nm,  LEDs(1).spect_nw_norm, ...
     P_meter_cal_wavelengths, P_meter_cal_responsivity, gainVal);
-
-    V_measured = 2;
+    
+    % uv measurements
+    V_measured = 9.10; % *10^-1; ^-2*10^-1;
     V_dark=0;
-    gainVal = PDA100A2_gainTable.("50 Ohm gain (V/A")(PDA100A2_gainTable.("dB Setting")==50);
+    gainVal = PDA100A2_gainTable.("Hi-Z gain (V/A)")(PDA100A2_gainTable.("dB Setting")==70);
 
 
     [UV_wavelengths, UV_power, UV_P_true] = getLEDSpectraFromPhotodiode(...
@@ -209,10 +220,10 @@ P_total = 15E-6; % output of power meter in W
 end
 
 LEDs(1).spect_nw = green_power*1e9;
-LEDs(1).measured_power = P_total; % reference for the spectrum
+LEDs(1).measured_power = green_P_true; % reference for the spectrum
 
 LEDs(2).spect_nw = UV_power*1e9; % convert to nw to match OVS notebook
-LEDs(2).measured_power = P_total; % reference for the spectrum
+LEDs(2).measured_power = UV_P_true; % reference for the spectrum
 
 %% plot corrected-power spectra of LEDs 
 figure, hold on
@@ -331,6 +342,7 @@ for iLED=1:2
 end
 ylabel('Isomerisation rate')
 xlabel('wavelengths (nm)')
+ax=gca; ax.YLim(1)=0;
 
 yyaxis right
 for iPR = 1:2
@@ -344,3 +356,5 @@ end
 
 legend({'green on M-cone', 'green on S-cone','UV on M-cone', 'UV on S-cone',...
     'M-cone sensitivity', 'S-cone sensitivity', 'Green LED spectra', 'UV LED spectra'})
+
+ax=gca; ax.YLim(1)=0;

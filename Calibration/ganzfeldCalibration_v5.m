@@ -3,8 +3,10 @@
 
 %% select measurement device
 
-measurementDevice = 'PDA100A2'; % 'PDA100A2, S130VC, S120VC
+measurementDevice = 'S121C'; % 'PDA100A2, S130VC, S120VC
 load('PDA100A2_gainTable.mat')
+
+CalibrationFolder = 'C:\Users\saleemlab\Documents\GitHub\LEDStimulation\Calibration';
 
 %% Define constants
 
@@ -49,8 +51,8 @@ PRs(3).col = 'r';
 
 %load('UV_spec.mat')
 %load('green_spec.mat')
-load('D:\Code\LEDStimulation\Calibration\LEDdata\GREEN_grabit.mat')
-load('D:\Code\LEDStimulation\Calibration\LEDdata\UV_grabit.mat')
+load(fullfile(CalibrationFolder,'LEDdata','GREEN_grabit.mat'))
+load(fullfile(CalibrationFolder,'LEDdata','UV_grabit.mat'))
 
 delta_lambda=1;
 
@@ -125,21 +127,28 @@ defaultAxesProperties(gca, false)
 %% load appropriate responsivity data and detection area of photodiode sensor
 switch measurementDevice
     case 'S130VC'
-        P_meter_cal = readtable(fullfile('D:\Code\LEDStimulation\Calibration\', 'PowerMeterCalibrationFiles', 'S130VC_Responsivity.xlsx'));
+        P_meter_cal = readtable(fullfile(CalibrationFolder, 'PowerMeterCalibrationFiles', 'S130VC_Responsivity.xlsx'));
         P_meter_cal_wavelengths = P_meter_cal.Wavelength_nm_;
         P_meter_cal_responsivity = P_meter_cal.Responsivity_mA_W_; % without filter
 
         A_detect_um2 = 9700^2; %Thor labs photodiode active receptor area
 
     case 'S120VC'
-        P_meter_cal = readtable(fullfile('D:\Code\LEDStimulation\Calibration\', 'PowerMeterCalibrationFiles', 'S120VC_Responsivity.xlsx'));
+        P_meter_cal = readtable(fullfile(CalibrationFolder, 'PowerMeterCalibrationFiles', 'S120VC_Responsivity.xlsx'));
         P_meter_cal_wavelengths = P_meter_cal.Wavelength_nm_;
         P_meter_cal_responsivity = P_meter_cal.Responsivity_mA_W_; % without filter
 
         A_detect_um2 = 9700^2; %Thor labs photodiode active receptor area
 
     case 'S120C'
-        P_meter_cal = readtable(fullfile('D:\Code\LEDStimulation\Calibration\', 'PowerMeterCalibrationFiles', 'S120C_Responsivity.xlsx'));
+        P_meter_cal = readtable(fullfile(CalibrationFolder, 'PowerMeterCalibrationFiles', 'S120C_Responsivity.xlsx'));
+        P_meter_cal_wavelengths = P_meter_cal.Wavelength_nm_;
+        P_meter_cal_responsivity = P_meter_cal.Responsivity_mA_W_; % without filter
+
+        A_detect_um2 = 9700^2; %Thor labs photodiode active receptor area
+
+   case 'S121C'
+        P_meter_cal = readtable(fullfile(CalibrationFolder, 'PowerMeterCalibrationFiles', 'S121C_Responsivity.xlsx'));
         P_meter_cal_wavelengths = P_meter_cal.Wavelength_nm_;
         P_meter_cal_responsivity = P_meter_cal.Responsivity_mA_W_; % without filter
 
@@ -147,7 +156,7 @@ switch measurementDevice
 
     case 'PDA100A2'
 
-        P_meter_cal = readtable(fullfile('D:\Code\LEDStimulation\Calibration\', 'PowerMeterCalibrationFiles', 'PDA100A2_Responsivity.xlsx'));
+        P_meter_cal = readtable(fullfile(CalibrationFolder, 'PowerMeterCalibrationFiles', 'PDA100A2_Responsivity.xlsx'));
         P_meter_cal_wavelengths = P_meter_cal.Wavelength_nm_;
         P_meter_cal_responsivity = P_meter_cal.Responsivity_A_W_; % without filter
 
@@ -189,7 +198,7 @@ else % thorlabs power meter
 % process power meter readings to scale LED spectra - GREEN
 
 lambda_meas = 525; % specified measurement wavelength for power meter
-P_total = 6.5E-6; % output of power meter in W
+P_total = 6.05E-6; % output of power meter in W
 
 [wavelengths, green_power, green_P_true, green_correction_factor] = getLEDSpectraFromPowerMeter(...
     P_total, lambda_meas, wavelengths_nm, LEDs(1).spect_nw_norm, ...
