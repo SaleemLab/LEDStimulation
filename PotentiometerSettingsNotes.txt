@@ -1,0 +1,11 @@
+vdark = 11.7mV
+
+green ~ 436 on pot for 7.2., 408 (just) for 0.72
+UV ~ 449 for 9.1, 421 for 0.91
+
+
+get charger
+
+pot levels for 10^2
+
+gamma correction 2 colours x 2 luminance
