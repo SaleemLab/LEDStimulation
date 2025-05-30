@@ -870,7 +870,7 @@ Item5 as BonsaiTime)
                   </Expression>
                   <Expression xsi:type="GreaterThan">
                     <Operand xsi:type="DoubleProperty">
-                      <Value>3</Value>
+                      <Value>1</Value>
                     </Operand>
                   </Expression>
                   <Expression xsi:type="WorkflowOutput" />
@@ -894,7 +894,7 @@ Item5 as BonsaiTime)
                   </Expression>
                   <Expression xsi:type="LessThanOrEqual">
                     <Operand xsi:type="DoubleProperty">
-                      <Value>3</Value>
+                      <Value>1</Value>
                     </Operand>
                   </Expression>
                   <Expression xsi:type="WorkflowOutput" />
@@ -1246,16 +1246,56 @@ Item5 as BonsaiTime)
               <Combinator xsi:type="p1:RandSampleFromIndexedDistribution">
                 <p1:ProbabilityDistributions>
                   <p1:ArrayOfFloat>
-                    <p1:float>50.0000038</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
                     <p1:float>0</p1:float>
-                    <p1:float>50.0000038</p1:float>
                     <p1:float>0</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
+                    <p1:float>5</p1:float>
                   </p1:ArrayOfFloat>
                   <p1:ArrayOfFloat>
-                    <p1:float>25.0000019</p1:float>
-                    <p1:float>25.0000019</p1:float>
-                    <p1:float>25.0000019</p1:float>
-                    <p1:float>25.0000019</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
+                    <p1:float>4.76190472</p1:float>
                   </p1:ArrayOfFloat>
                 </p1:ProbabilityDistributions>
                 <p1:DistributionIndex>0</p1:DistributionIndex>
@@ -1418,7 +1458,7 @@ Item5 as BonsaiTime)
                         </Expression>
                         <Expression xsi:type="GreaterThan">
                           <Operand xsi:type="DoubleProperty">
-                            <Value>3</Value>
+                            <Value>1</Value>
                           </Operand>
                         </Expression>
                         <Expression xsi:type="WorkflowOutput" />
@@ -1443,7 +1483,7 @@ Item5 as BonsaiTime)
                         </Expression>
                         <Expression xsi:type="LessThanOrEqual">
                           <Operand xsi:type="DoubleProperty">
-                            <Value>3</Value>
+                            <Value>1</Value>
                           </Operand>
                         </Expression>
                         <Expression xsi:type="WorkflowOutput" />
@@ -1605,11 +1645,51 @@ Item5 as BonsaiTime)
                       <p1:TrialCounterArray>
                         <p1:ArrayOfInt>
                           <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>1</p1:int>
+                          <p1:int>1</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
                           <p1:int>1</p1:int>
                           <p1:int>0</p1:int>
                           <p1:int>1</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
                         </p1:ArrayOfInt>
                         <p1:ArrayOfInt>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>1</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>1</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>1</p1:int>
                           <p1:int>0</p1:int>
                           <p1:int>0</p1:int>
                           <p1:int>0</p1:int>
@@ -1736,7 +1816,7 @@ Item5 as BonsaiTime)
                     <Property Name="FileName" DisplayName="DistsFileName" />
                   </Expression>
                   <Expression xsi:type="io:CsvReader">
-                    <io:FileName>StimulusCSVfiles\dists_sinewave_tfTuning.csv</io:FileName>
+                    <io:FileName>StimulusCSVfiles\dists_sinewave_contrastTuning.csv</io:FileName>
                     <io:ScanPattern>%f,%f</io:ScanPattern>
                     <io:SkipRows>1</io:SkipRows>
                   </Expression>
@@ -1805,7 +1885,7 @@ Item5 as BonsaiTime)
                     <Property Name="FileName" DisplayName="StimFileName" />
                   </Expression>
                   <Expression xsi:type="io:CsvReader">
-                    <io:FileName>StimulusCSVfiles\stimuli_sinewave_tfTuning.csv</io:FileName>
+                    <io:FileName>StimulusCSVfiles\stimuli_sinewave_contrastTuning.csv</io:FileName>
                     <io:ScanPattern />
                     <io:SkipRows>1</io:SkipRows>
                   </Expression>
@@ -1880,7 +1960,7 @@ def process(value):
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:RepeatCount">
-                      <rx:Count>4</rx:Count>
+                      <rx:Count>24</rx:Count>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="Combinator">
@@ -2190,7 +2270,7 @@ def process(value):
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="rx:Take">
-                            <rx:Count>4</rx:Count>
+                            <rx:Count>24</rx:Count>
                           </Combinator>
                         </Expression>
                         <Expression xsi:type="Combinator">
@@ -2225,7 +2305,7 @@ def process(value):
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="rx:Take">
-                            <rx:Count>3</rx:Count>
+                            <rx:Count>23</rx:Count>
                           </Combinator>
                         </Expression>
                         <Expression xsi:type="Combinator">

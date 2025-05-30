@@ -489,7 +489,7 @@ volatile float map_float_max;
 volatile float mapped_float_A;
 volatile float mapped_float_B;
 
-const int CLT_N = 12;                 // Number of uniform samples for Central Limit Theorem
+const int CLT_N = 4;                 // Number of uniform samples for Central Limit Theorem
                                       // Higher N => better Gaussian approximation, but slower.
                                       // (N >= 10 or 12 is common)
 const int RANDOM_UPPER_BOUND = 1001;  // The argument 'M' for random(M). Generates [0, M-1].
@@ -561,6 +561,7 @@ void setup() {
   generateSineWaveTable(TopLumi);
 
   // initialise random number to 50% duty cyle for white noise stimuli
+  randomSeed(0);
   finalRandNumber_A = TopLumi / 2;
   finalRandNumber_B = TopLumi / 2;
 
@@ -630,7 +631,7 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
 
   if (FirstChar == "s")  // sinusoidal flicker
   {
-    long stimulusDuration = atoi(serialVals[1]);
+    long stimulusDuration = atof(serialVals[1]);
     float frequency = atof(serialVals[2]);
     float phaseA = atof(serialVals[3]);
     float phaseB = atof(serialVals[4]);
@@ -650,8 +651,8 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
 
   } else if (FirstChar == "wn")  // white noise
   {
-    long stimulusDuration = atoi(serialVals[1]);
-    long updateTime = atoi(serialVals[2]);
+    long stimulusDuration = atof(serialVals[1]);
+    long updateTime = atof(serialVals[2]);
     float frac_target_mean = atof(serialVals[3]);
     float frac_target_std = atof(serialVals[4]);
     //Serial.println("Stim: White noise");
@@ -661,15 +662,15 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     // Serial.print("Update time: ");
     // Serial.println(updateTime);
     //  Serial.flush();
-
+    //Serial.println(stimulusDuration);
     whiteNoise(updateTime, stimulusDuration, frac_target_mean, frac_target_std);
 
   } else if (FirstChar == "fwn")  // frozen white noise
   {
-    long stimulusDuration = atoi(serialVals[1]);
-    int updateTime = atoi(serialVals[2]);
-    int nReps = atoi(serialVals[3]);
-    int randSeedNum = atoi(serialVals[4]);
+    long stimulusDuration = atof(serialVals[1]);
+    int updateTime = atof(serialVals[2]);
+    int nReps = atof(serialVals[3]);
+    int randSeedNum = atof(serialVals[4]);
     //Serial.println("Stim: White noise");
     //Serial.flush();
     //  Serial.print("Stim duration: ");
@@ -683,9 +684,9 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
 
   } else if (FirstChar == "cs")  // contrast switching white noise
   {
-    int updateTime = atoi(serialVals[1]);
-    int switchTime = atoi(serialVals[2]);
-    int nReps = atoi(serialVals[3]);
+    int updateTime = atof(serialVals[1]);
+    int switchTime = atof(serialVals[2]);
+    int nReps = atof(serialVals[3]);
     float meanVal1 = atof(serialVals[4]);
     float contrastVal1 = atof(serialVals[5]);
     float meanVal2 = atof(serialVals[6]);
@@ -758,8 +759,8 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
   } else if (FirstChar == "gc")  // do gamma correction routine
   {
     float stepSize = atof(serialVals[1]);
-    long waitTime = atoi(serialVals[2]);
-    int nReps = atoi(serialVals[3]);
+    long waitTime = atof(serialVals[2]);
+    int nReps = atof(serialVals[3]);
     cycleDutyCycles(stepSize, waitTime, nReps, TopLumi);
 
   } else if (FirstChar == "useChB")  // apply gamma correction
@@ -1330,16 +1331,16 @@ void whiteNoiseInterrupt() {
   if (useChA) {
     float zA = generateGaussianCLT();
     float float_gaussian_val_A = target_mean + target_std * zA;
-    if (float_gaussian_val_A < map_float_min) { float_gaussian_val_A = map_float_min; }
-    if (float_gaussian_val_A > map_float_max) { float_gaussian_val_A = map_float_max; }
+    //if (float_gaussian_val_A < map_float_min) { float_gaussian_val_A = map_float_min; }
+    //if (float_gaussian_val_A > map_float_max) { float_gaussian_val_A = map_float_max; }
     finalRandNumber_A = (uint16_t)float_gaussian_val_A;
   }
 
   if (useChB) {
     float zB = generateGaussianCLT();
     float float_gaussian_val_B = target_mean + target_std * zB;
-    if (float_gaussian_val_B < map_float_min) { float_gaussian_val_B = map_float_min; }
-    if (float_gaussian_val_B > map_float_max) { float_gaussian_val_B = map_float_max; }
+    //if (float_gaussian_val_B < map_float_min) { float_gaussian_val_B = map_float_min; }
+    //if (float_gaussian_val_B > map_float_max) { float_gaussian_val_B = map_float_max; }
     finalRandNumber_B = (uint16_t)float_gaussian_val_B;
   }
 
