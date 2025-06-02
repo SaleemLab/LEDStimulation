@@ -5,6 +5,19 @@
 #define FWN_TABLE_SIZE 375                 // Number of samples in the wavetable
 #define TARGET_RECONFIG_INTERVAL_US 1000L  // FOR FREQUENCY SWEEP 1000 microseconds = 1 millisecond
 
+volatile unsigned long printSequenceNum = 0; // for serial debugging 
+
+// --- Faster PRNG (xorshift32) ---
+uint32_t xorshift32_state = 1; // Seed with a non-zero value.
+
+uint32_t fast_rand32() {
+  xorshift32_state ^= (xorshift32_state << 13);
+  xorshift32_state ^= (xorshift32_state >> 17);
+  xorshift32_state ^= (xorshift32_state << 5);
+  return xorshift32_state;
+}
+
+
 // gamma-correction LUTS
 const uint16_t PROGMEM ChA1LUT[1041] = {
   0, 6, 11, 14, 16, 19, 21, 23, 25, 27,
@@ -489,10 +502,10 @@ volatile float map_float_max;
 volatile float mapped_float_A;
 volatile float mapped_float_B;
 
-const int CLT_N = 4;                 // Number of uniform samples for Central Limit Theorem
+const int CLT_N = 8;                 // Number of uniform samples for Central Limit Theorem
                                       // Higher N => better Gaussian approximation, but slower.
                                       // (N >= 10 or 12 is common)
-const int RANDOM_UPPER_BOUND = 1001;  // The argument 'M' for random(M). Generates [0, M-1].
+const int RANDOM_UPPER_BOUND = 1024;  // The argument 'M' for random(M). Generates [0, M-1]. Now using fast_rand32(), so must be power of 2 (e.g. 1024)
 // --- Derived Constants (calculated once for efficiency) ---
 // Pre-calculate values needed for N(0,1) generation based on configuration
 const float UNIFORM_MEAN = (float)(RANDOM_UPPER_BOUND - 1) / 2.0;
@@ -1210,7 +1223,8 @@ float generateGaussianCLT() {
   const int N = CLT_N;
   long sum_random = 0;
   for (int i = 0; i < N; i++) {
-    sum_random += random(RANDOM_UPPER_BOUND);
+    // sum_random += random(RANDOM_UPPER_BOUND); // Original
+    sum_random += fast_rand32() & (RANDOM_UPPER_BOUND - 1); // Faster core PRNG (RANDOM_UPPER_BOUND must be power of 2, e.g. 1024)
   }
   float gaussian_approx_zero_mean_unit_variance =
     ((float)sum_random - SUM_EXPECTED_MEAN) * NORMALIZE_SCALE_FACTOR;
@@ -1219,6 +1233,7 @@ float generateGaussianCLT() {
 
 void whiteNoise(long updateTime, long duration, float frac_target_mean, float frac_target_std) {
 
+  //printSequenceNum=1; // for serial debugging
   float updateFrequency = 1e3 / updateTime;
   configureTimer3Interrupt(updateFrequency);
 
@@ -1345,10 +1360,15 @@ void whiteNoiseInterrupt() {
   }
 
   PIND = (1 << PIND4);  // alternate PIN 4 value indicator pin
+  //Serial.print(printSequenceNum);
+  //Serial.print(",");
   Serial.print(finalRandNumber_A);
   Serial.print(",");
-  Serial.println(finalRandNumber_B);
-  Serial.flush();
+  Serial.print(finalRandNumber_B);
+  Serial.print(",");
+
+  printSequenceNum++;
+
 }
 
 
