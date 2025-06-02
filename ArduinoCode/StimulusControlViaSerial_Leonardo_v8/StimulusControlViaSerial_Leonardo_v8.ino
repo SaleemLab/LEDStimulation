@@ -502,7 +502,7 @@ volatile float map_float_max;
 volatile float mapped_float_A;
 volatile float mapped_float_B;
 
-const int CLT_N = 8;                 // Number of uniform samples for Central Limit Theorem
+const int CLT_N = 10;                 // Number of uniform samples for Central Limit Theorem
                                       // Higher N => better Gaussian approximation, but slower.
                                       // (N >= 10 or 12 is common)
 const int RANDOM_UPPER_BOUND = 1024;  // The argument 'M' for random(M). Generates [0, M-1]. Now using fast_rand32(), so must be power of 2 (e.g. 1024)
@@ -1360,12 +1360,12 @@ void whiteNoiseInterrupt() {
   }
 
   PIND = (1 << PIND4);  // alternate PIN 4 value indicator pin
-  //Serial.print(printSequenceNum);
-  //Serial.print(",");
+  Serial.print(printSequenceNum);
+  Serial.print(",");
   Serial.print(finalRandNumber_A);
   Serial.print(",");
-  Serial.print(finalRandNumber_B);
-  Serial.print(",");
+  Serial.println(finalRandNumber_B);
+  //Serial.print(",");
 
   printSequenceNum++;
 

@@ -672,32 +672,24 @@ Item2 as ArduinoTime)</scr:Expression>
                   <Expression xsi:type="SubscribeSubject">
                     <Name>ArdPWMInput</Name>
                   </Expression>
-                  <Expression xsi:type="Disable">
-                    <Builder xsi:type="Combinator">
-                      <Combinator xsi:type="rx:Timestamp" />
-                    </Builder>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Timestamp" />
                   </Expression>
-                  <Expression xsi:type="Disable">
-                    <Builder xsi:type="MemberSelector">
-                      <Selector>Timestamp.DateTime.TimeOfDay</Selector>
-                    </Builder>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Timestamp.DateTime.TimeOfDay</Selector>
                   </Expression>
-                  <Expression xsi:type="Disable">
-                    <Builder xsi:type="Combinator">
-                      <Combinator xsi:type="rx:Zip" />
-                    </Builder>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
                   </Expression>
                   <Expression xsi:type="Disable">
                     <Builder xsi:type="Combinator">
                       <Combinator xsi:type="rx:WithLatestFrom" />
                     </Builder>
                   </Expression>
-                  <Expression xsi:type="Disable">
-                    <Builder xsi:type="scr:ExpressionTransform">
-                      <scr:Expression>new(Item1.Item1 as ArduinoString,
-Item1.Item2 as BonsaiTime,
-Item2 as ArduinoTime)</scr:Expression>
-                    </Builder>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>new(Item1 as ArduinoString,
+Item2 as BonsaiTime)
+</scr:Expression>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
                     <io:FileName>D:\\Data\M25067\20250523\whiteNoiseTest_M25067_ArduinoStim.csv</io:FileName>
@@ -715,10 +707,10 @@ Item2 as ArduinoTime)</scr:Expression>
                   <Edge From="2" To="9" Label="Source2" />
                   <Edge From="3" To="4" Label="Source1" />
                   <Edge From="4" To="11" Label="Source1" />
-                  <Edge From="5" To="8" Label="Source2" />
+                  <Edge From="5" To="8" Label="Source1" />
                   <Edge From="5" To="6" Label="Source1" />
                   <Edge From="6" To="7" Label="Source1" />
-                  <Edge From="7" To="8" Label="Source1" />
+                  <Edge From="7" To="8" Label="Source2" />
                   <Edge From="8" To="9" Label="Source1" />
                   <Edge From="9" To="10" Label="Source1" />
                   <Edge From="10" To="11" Label="Source4" />
