@@ -624,7 +624,8 @@ void GetSerialInput() {  // part of code taken from http://forum.arduino.cc/inde
 
 void ActionSerial() {  // Actions serial data by choosing appropriate stimulation
   Serial.print("rc: ");
-  Serial.println(receivedChars);
+  Serial.print(receivedChars);
+  Serial.print("\n");
   char delimiters[] = ",";
   char *token;
   uint8_t idx = 0;
@@ -781,9 +782,11 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     useChB = atoi(serialVals[1]);
     if (!useChB) {
       //OCR1B=0;
-      Serial.println(F("ChB OFF"));
+      Serial.print(F("ChB OFF"));
+      Serial.print("\n");
     } else {
-      Serial.println(F("ChB ON"));
+      Serial.print(F("ChB ON"));
+      Serial.print("\n");
     };
 
   } else if (FirstChar == "useChA")  // apply gamma correction
@@ -791,9 +794,11 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     useChA = atoi(serialVals[1]);
     if (!useChA) {
       //OCR1A=0;
-      Serial.println(F("ChA OFF"));
+      Serial.print(F("ChA OFF"));
+      Serial.print("\n");
     } else {
-      Serial.println(F("ChA ON"));
+      Serial.print(F("ChA ON"));
+      Serial.print("\n");
     };
   }  //else if (FirstChar == "stat") {
   //getStatus();
@@ -808,17 +813,20 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     if (lutIndex == 1) {
       currentChALUT = ChA1LUT;
       currentChBLUT = ChB1LUT;
-      Serial.println(F("LUT 1 SELECTED"));
+      Serial.print(F("LUT 1 SELECTED"));
+      Serial.print("\n");
 
     } else if (lutIndex == 2) {
       currentChALUT = ChA2LUT;
       currentChBLUT = ChB2LUT;
-      Serial.println(F("LUT 2 SELECTED"));
+      Serial.print(F("LUT 2 SELECTED"));
+      Serial.print("\n");
     }
   } else  // not valid stimulus code
   {
     Serial.print(FirstChar);
-    Serial.println(F(" is an invalid stimulus code - make sure you are using carriage return line ending"));
+    Serial.print(F(" is an invalid stimulus code - make sure you are using carriage return line ending"));
+    Serial.print("\n");
   }
   //memset('\0', receivedChars, sizeof(receivedChars));
   memset(receivedChars, '\0', sizeof(receivedChars));
@@ -883,7 +891,8 @@ void outputSinewave(float sinewaveFrequency, long duration, float phaseA, float 
   stopTimer3Interrupt();    // finish playing sinewave
   PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW by changing register directly
   PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
-  Serial.println("-1");
+  Serial.print("-1");
+  Serial.print("\n");
 
   if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
   if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
@@ -1207,7 +1216,8 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
   stopTimer3Interrupt();    // finish playing sinewave
   PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW by changing register directly
   PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
-  Serial.println("-1");
+  Serial.print("-1");
+  Serial.print("\n");
 
   if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
   if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
@@ -1245,7 +1255,8 @@ void whiteNoise(long updateTime, long duration, float frac_target_mean, float fr
   map_float_max = (float)TopLumi;
 
   Serial.print("TOP: ");
-  Serial.println(TopLumi);
+  Serial.print(TopLumi);
+  Serial.print("\n");
 
   PORTC |= (1 << PORTC6);     // Stim on pin 5
   long startTime = millis();  // Record the start time
@@ -1262,7 +1273,8 @@ void whiteNoise(long updateTime, long duration, float frac_target_mean, float fr
   delay(updateTime);
   PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW by changing register directly
   PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
-  Serial.println("-1");
+  Serial.print("-1");
+  Serial.print("\n");
   Serial.flush();
   if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
   if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
@@ -1275,9 +1287,11 @@ void SwitchingWhiteNoise(long updateTime, unsigned long switchTime, int nReps, f
 
   long duration = switchTime * 2 * nReps;
   Serial.print("switch time:");
-  Serial.println(switchTime);
+  Serial.print(switchTime);
+  Serial.print("\n");
   Serial.print("duration:");
-  Serial.println(duration);
+  Serial.print(duration);
+  Serial.print("\n");
 
   // start with dist1 values
   target_mean = TopLumi * meanVal1;
@@ -1289,7 +1303,8 @@ void SwitchingWhiteNoise(long updateTime, unsigned long switchTime, int nReps, f
   map_float_max = (float)TopLumi;
 
   Serial.print("TOP: ");
-  Serial.println(TopLumi);
+  Serial.print(TopLumi);
+  Serial.print("\n");
 
   PORTC |= (1 << PORTC6);  // Stim on pin 5
 
@@ -1330,7 +1345,8 @@ void SwitchingWhiteNoise(long updateTime, unsigned long switchTime, int nReps, f
   delay(updateTime);
   PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW by changing register directly
   PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
-  Serial.println("-1");
+  Serial.print("-1");
+  Serial.print("\n");
   Serial.flush();
   if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
   if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
@@ -1364,7 +1380,8 @@ void whiteNoiseInterrupt() {
   Serial.print(",");
   Serial.print(finalRandNumber_A);
   Serial.print(",");
-  Serial.println(finalRandNumber_B);
+  Serial.print(finalRandNumber_B);
+  Serial.print("\n");
   //Serial.print(",");
 
   printSequenceNum++;
@@ -1382,7 +1399,8 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps, int randSeedNum
 
   long totalDuration = duration * nReps;
   Serial.print("LD: ");
-  Serial.println(totalDuration);
+  Serial.print(totalDuration);
+  Serial.print("\n");
   randomSeed(randSeedNum);  // for reproducible random sequence across different stimulus blocks
 
 
@@ -1406,7 +1424,8 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps, int randSeedNum
   }
 
   Serial.print("TOP: ");
-  Serial.println(TopLumi);
+  Serial.print(TopLumi);
+  Serial.print("\n");
   Serial.flush();
 
   long startTime = millis();  // Record the start time
@@ -1423,7 +1442,8 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps, int randSeedNum
   delay(updateTime);
   PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW by changing register directly
   PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
-  Serial.println("-1");
+  Serial.print("-1");
+  Serial.print("\n");
   Serial.flush();
   if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
   if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
@@ -1440,7 +1460,8 @@ void frozenWhiteNoiseInterrupt() {
 
   //Serial.print("ti: ");
   //Serial.println(tableIndexA);
-  Serial.println(frozenWhiteNoiseTable[tableIndexFWN]);
+  Serial.print(frozenWhiteNoiseTable[tableIndexFWN]);
+  Serial.print("\n");
   Serial.flush();
 
   // Update the table index (wrap around at actual white noise table size)
@@ -1539,7 +1560,8 @@ void setDutyCycleTime(float dutyCyclePercentage_A, float dutyCyclePercentage_B, 
   }
   PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW by changing register directly
   PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
-  Serial.println("-1");
+  Serial.print("-1");
+  Serial.print("\n");
   Serial.flush();
   if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
   if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
@@ -1552,7 +1574,8 @@ void cycleDutyCycles(float stepSize, float waitTime, int nReps, long TopLumi) {
 
   for (int irep = 0; irep < nReps; irep++) {
     while (dutyCycle <= 1) {
-      Serial.println(dutyCycle);
+      Serial.print(dutyCycle);
+      Serial.print("\n");
       long ocrValue = (long)(dutyCycle * TopLumi);
       //OCR1A = ocrValue;
       if (useChA) { setChA(ocrValue); }  // Set pin 9 to 50% duty cycle as default
@@ -1561,7 +1584,8 @@ void cycleDutyCycles(float stepSize, float waitTime, int nReps, long TopLumi) {
       delay(waitTime);
     }
   }
-  Serial.println("-1");
+  Serial.print("-1");
+  Serial.print("\n");
   // Set pin 9 to 50% duty cycle as default
   if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
   if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
