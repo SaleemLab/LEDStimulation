@@ -40,7 +40,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="cv:VideoWriter">
-                <cv:FileName>D:\\Data\M25068\20250602\tf_tuning_hab_M25068_FaceVideo.avi</cv:FileName>
+                <cv:FileName>D:\\Data\test\20250603\tf_tuning_hab_test_FaceVideo.avi</cv:FileName>
                 <cv:Suffix>Timestamp</cv:Suffix>
                 <cv:Buffered>true</cv:Buffered>
                 <cv:Overwrite>false</cv:Overwrite>
@@ -73,7 +73,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="cv:VideoWriter">
-                <cv:FileName>D:\\Data\M25068\20250602\tf_tuning_hab_M25068_BodyVideo.avi</cv:FileName>
+                <cv:FileName>D:\\Data\test\20250603\tf_tuning_hab_test_BodyVideo.avi</cv:FileName>
                 <cv:Suffix>Timestamp</cv:Suffix>
                 <cv:Buffered>true</cv:Buffered>
                 <cv:Overwrite>false</cv:Overwrite>
@@ -222,7 +222,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>M25068</Value>
+                <Value>test</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="SubscribeSubject">
@@ -358,7 +358,7 @@ def generate():
                     </PropertyMappings>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>D:\\Data\M25068\20250603\tf_tuning_hab_M25068_WheelLog.csv</io:FileName>
+                    <io:FileName>D:\\Data\test\20250603\tf_tuning_hab_test_WheelLog.csv</io:FileName>
                     <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
@@ -409,7 +409,7 @@ def generate():
                     </PropertyMappings>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>D:\\Data\M25068\20250603\tf_tuning_hab_M25068_Video.csv</io:FileName>
+                    <io:FileName>D:\\Data\test\20250603\tf_tuning_hab_test_Video.csv</io:FileName>
                     <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
@@ -496,7 +496,7 @@ def generate():
                     <Combinator xsi:type="rx:Timestamp" />
                   </Expression>
                   <Expression xsi:type="MemberSelector">
-                    <Selector>Timestamp.DateTime.TimeOfDay</Selector>
+                    <Selector>Timestamp.TimeOfDay.TotalMilliseconds</Selector>
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:Zip" />
@@ -527,7 +527,7 @@ Item2 as ArduinoTime)</scr:Expression>
                     </PropertyMappings>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>D:\\Data\M25068\20250603\tf_tuning_hab_M25068_Trial.csv</io:FileName>
+                    <io:FileName>D:\\Data\test\20250603\tf_tuning_hab_test_Trial.csv</io:FileName>
                     <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
@@ -583,6 +583,17 @@ Item2 as ArduinoTime)</scr:Expression>
                     <Name>ArdPWMInput</Name>
                   </Expression>
                   <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="StringProperty">
+                      <Value>"</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:CombineLatest" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>Item2+Item1+Item2</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:Timestamp" />
                   </Expression>
                   <Expression xsi:type="MemberSelector">
@@ -601,7 +612,7 @@ Item2 as ArduinoTime)</scr:Expression>
 Item2 as BonsaiTime)</scr:Expression>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>D:\\Data\M25068\20250603\tf_tuning_hab_M25068_ArduinoStim.csv</io:FileName>
+                    <io:FileName>D:\\Data\test\20250603\tf_tuning_hab_test_ArduinoStim.csv</io:FileName>
                     <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
@@ -611,18 +622,21 @@ Item2 as BonsaiTime)</scr:Expression>
                   </Expression>
                 </Nodes>
                 <Edges>
-                  <Edge From="0" To="11" Label="Source2" />
-                  <Edge From="1" To="11" Label="Source3" />
-                  <Edge From="2" To="9" Label="Source2" />
+                  <Edge From="0" To="14" Label="Source2" />
+                  <Edge From="1" To="14" Label="Source3" />
+                  <Edge From="2" To="12" Label="Source2" />
                   <Edge From="3" To="4" Label="Source1" />
-                  <Edge From="4" To="11" Label="Source1" />
-                  <Edge From="5" To="8" Label="Source1" />
-                  <Edge From="5" To="6" Label="Source1" />
-                  <Edge From="6" To="7" Label="Source1" />
-                  <Edge From="7" To="8" Label="Source2" />
+                  <Edge From="4" To="14" Label="Source1" />
+                  <Edge From="5" To="7" Label="Source1" />
+                  <Edge From="6" To="7" Label="Source2" />
+                  <Edge From="7" To="8" Label="Source1" />
+                  <Edge From="8" To="11" Label="Source1" />
                   <Edge From="8" To="9" Label="Source1" />
                   <Edge From="9" To="10" Label="Source1" />
-                  <Edge From="10" To="11" Label="Source4" />
+                  <Edge From="10" To="11" Label="Source2" />
+                  <Edge From="11" To="12" Label="Source1" />
+                  <Edge From="12" To="13" Label="Source1" />
+                  <Edge From="13" To="14" Label="Source4" />
                 </Edges>
               </Workflow>
             </Expression>
@@ -1237,26 +1251,26 @@ Item5 as BonsaiTime)
               <Combinator xsi:type="p1:RandSampleFromIndexedDistribution">
                 <p1:ProbabilityDistributions>
                   <p1:ArrayOfFloat>
-                    <p1:float>5.882353</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
                     <p1:float>0</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>0</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>0</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>5.882353</p1:float>
-                    <p1:float>5.882353</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
+                    <p1:float>5.26315832</p1:float>
                   </p1:ArrayOfFloat>
                   <p1:ArrayOfFloat>
                     <p1:float>5</p1:float>
@@ -1628,10 +1642,6 @@ Item5 as BonsaiTime)
                       <p1:TrialCounterArray>
                         <p1:ArrayOfInt>
                           <p1:int>0</p1:int>
-                          <p1:int>1</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>1</p1:int>
                           <p1:int>0</p1:int>
                           <p1:int>0</p1:int>
                           <p1:int>0</p1:int>
@@ -1644,6 +1654,10 @@ Item5 as BonsaiTime)
                           <p1:int>0</p1:int>
                           <p1:int>0</p1:int>
                           <p1:int>1</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
                           <p1:int>0</p1:int>
                           <p1:int>0</p1:int>
                           <p1:int>0</p1:int>

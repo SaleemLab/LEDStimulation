@@ -448,7 +448,7 @@ def generate():
                     </PropertyMappings>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>D:\\Data\M25067\20250523\whiteNoiseTest_M25067_WheelLog.csv</io:FileName>
+                    <io:FileName>D:\\Data\M25067\20250603\whiteNoiseTest_M25067_WheelLog.csv</io:FileName>
                     <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
@@ -499,7 +499,7 @@ def generate():
                     </PropertyMappings>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>D:\\Data\M25067\20250523\whiteNoiseTest_M25067_Video.csv</io:FileName>
+                    <io:FileName>D:\\Data\M25067\20250603\whiteNoiseTest_M25067_Video.csv</io:FileName>
                     <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
@@ -586,7 +586,7 @@ def generate():
                     <Combinator xsi:type="rx:Timestamp" />
                   </Expression>
                   <Expression xsi:type="MemberSelector">
-                    <Selector>Timestamp.DateTime.TimeOfDay</Selector>
+                    <Selector>Timestamp.TimeOfDay.TotalMilliseconds</Selector>
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:Zip" />
@@ -617,7 +617,7 @@ Item2 as ArduinoTime)</scr:Expression>
                     </PropertyMappings>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>D:\\Data\M25067\20250523\whiteNoiseTest_M25067_Trial.csv</io:FileName>
+                    <io:FileName>D:\\Data\M25067\20250603\whiteNoiseTest_M25067_Trial.csv</io:FileName>
                     <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
@@ -673,10 +673,21 @@ Item2 as ArduinoTime)</scr:Expression>
                     <Name>ArdPWMInput</Name>
                   </Expression>
                   <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="StringProperty">
+                      <Value>"</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:CombineLatest" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>Item2+Item1+Item2</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:Timestamp" />
                   </Expression>
                   <Expression xsi:type="MemberSelector">
-                    <Selector>Timestamp.DateTime.TimeOfDay</Selector>
+                    <Selector>Timestamp.TimeOfDay.TotalMilliseconds</Selector>
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:Zip" />
@@ -688,32 +699,34 @@ Item2 as ArduinoTime)</scr:Expression>
                   </Expression>
                   <Expression xsi:type="scr:ExpressionTransform">
                     <scr:Expression>new(Item1 as ArduinoString,
-Item2 as BonsaiTime)
-</scr:Expression>
+Item2 as BonsaiTime)</scr:Expression>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>D:\\Data\M25067\20250523\whiteNoiseTest_M25067_ArduinoStim.csv</io:FileName>
-                    <io:ListSeparator />
+                    <io:FileName>D:\\Data\M25067\20250603\whiteNoiseTest_M25067_ArduinoStim.csv</io:FileName>
+                    <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
                     <io:Suffix>Timestamp</io:Suffix>
-                    <io:IncludeHeader>false</io:IncludeHeader>
-                    <io:Selector>it</io:Selector>
+                    <io:IncludeHeader>true</io:IncludeHeader>
+                    <io:Selector>ArduinoString,BonsaiTime</io:Selector>
                   </Expression>
                 </Nodes>
                 <Edges>
-                  <Edge From="0" To="11" Label="Source2" />
-                  <Edge From="1" To="11" Label="Source3" />
-                  <Edge From="2" To="9" Label="Source2" />
+                  <Edge From="0" To="14" Label="Source2" />
+                  <Edge From="1" To="14" Label="Source3" />
+                  <Edge From="2" To="12" Label="Source2" />
                   <Edge From="3" To="4" Label="Source1" />
-                  <Edge From="4" To="11" Label="Source1" />
-                  <Edge From="5" To="8" Label="Source1" />
-                  <Edge From="5" To="6" Label="Source1" />
-                  <Edge From="6" To="7" Label="Source1" />
-                  <Edge From="7" To="8" Label="Source2" />
+                  <Edge From="4" To="14" Label="Source1" />
+                  <Edge From="5" To="7" Label="Source1" />
+                  <Edge From="6" To="7" Label="Source2" />
+                  <Edge From="7" To="8" Label="Source1" />
+                  <Edge From="8" To="11" Label="Source1" />
                   <Edge From="8" To="9" Label="Source1" />
                   <Edge From="9" To="10" Label="Source1" />
-                  <Edge From="10" To="11" Label="Source4" />
+                  <Edge From="10" To="11" Label="Source2" />
+                  <Edge From="11" To="12" Label="Source1" />
+                  <Edge From="12" To="13" Label="Source1" />
+                  <Edge From="13" To="14" Label="Source4" />
                 </Edges>
               </Workflow>
             </Expression>
@@ -1157,7 +1170,7 @@ Item5 as BonsaiTime)
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="io:SerialStringRead">
                 <io:PortName>ArdPWM</io:PortName>
-                <io:NewLine>\r</io:NewLine>
+                <io:NewLine>\n</io:NewLine>
               </Combinator>
             </Expression>
             <Expression xsi:type="Parse">
@@ -1761,7 +1774,7 @@ Item5 as BonsaiTime)
                     <Property Name="FileName" DisplayName="DistsFileName" />
                   </Expression>
                   <Expression xsi:type="io:CsvReader">
-                    <io:FileName>StimulusCSVfiles\dists_wnTest.csv</io:FileName>
+                    <io:FileName>StimulusCSVfiles\gaussianWhiteNoise\dists_wn30mins.csv</io:FileName>
                     <io:ScanPattern>%f,%f</io:ScanPattern>
                     <io:SkipRows>1</io:SkipRows>
                   </Expression>
@@ -1830,7 +1843,7 @@ Item5 as BonsaiTime)
                     <Property Name="FileName" DisplayName="StimFileName" />
                   </Expression>
                   <Expression xsi:type="io:CsvReader">
-                    <io:FileName>StimulusCSVfiles\stimuli_wnTest.csv</io:FileName>
+                    <io:FileName>StimulusCSVfiles\gaussianWhiteNoise\stimuli_wn30mins.csv</io:FileName>
                     <io:ScanPattern />
                     <io:SkipRows>1</io:SkipRows>
                   </Expression>
