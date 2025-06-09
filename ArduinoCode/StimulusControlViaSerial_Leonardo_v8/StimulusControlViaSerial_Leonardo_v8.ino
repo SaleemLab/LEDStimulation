@@ -1461,6 +1461,7 @@ void frozenWhiteNoiseInterrupt() {
   //Serial.print("ti: ");
   //Serial.println(tableIndexA);
   Serial.print(frozenWhiteNoiseTable[tableIndexFWN]);
+  //Serial.print(",");
   Serial.print("\n");
   Serial.flush();
 
