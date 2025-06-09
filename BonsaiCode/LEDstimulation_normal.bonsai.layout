@@ -1598,7 +1598,7 @@
             </Location>
             <Size>
               <Width>336</Width>
-              <Height>65</Height>
+              <Height>82</Height>
             </Size>
             <WindowState>Normal</WindowState>
             <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>

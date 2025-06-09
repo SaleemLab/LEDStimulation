@@ -78,7 +78,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="cv:VideoWriter">
-                <cv:FileName>D:\\Data\M25067\20250521\SinewaveFlicker_M25067_FaceVideo.avi</cv:FileName>
+                <cv:FileName>D:\\Data\M25067\20250603\whiteNoiseTest_M25067_FaceVideo.avi</cv:FileName>
                 <cv:Suffix>Timestamp</cv:Suffix>
                 <cv:Buffered>true</cv:Buffered>
                 <cv:Overwrite>false</cv:Overwrite>
@@ -149,7 +149,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="cv:VideoWriter">
-                <cv:FileName>D:\\Data\M25067\20250521\SinewaveFlicker_M25067_BodyVideo.avi</cv:FileName>
+                <cv:FileName>D:\\Data\M25067\20250603\whiteNoiseTest_M25067_BodyVideo.avi</cv:FileName>
                 <cv:Suffix>Timestamp</cv:Suffix>
                 <cv:Buffered>true</cv:Buffered>
                 <cv:Overwrite>false</cv:Overwrite>
@@ -1282,7 +1282,7 @@ Item5 as BonsaiTime)
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Delay">
-                <rx:DueTime>PT10S</rx:DueTime>
+                <rx:DueTime>PT3M</rx:DueTime>
               </Combinator>
             </Expression>
             <Expression xsi:type="Unit" />
@@ -2485,7 +2485,7 @@ def process(value):
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="IntProperty">
-                <Value>1</Value>
+                <Value>0</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="scr:ExpressionTransform">

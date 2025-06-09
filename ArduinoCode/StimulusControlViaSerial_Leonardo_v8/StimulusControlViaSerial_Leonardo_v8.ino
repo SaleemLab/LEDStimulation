@@ -1401,7 +1401,7 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps, int randSeedNum
   Serial.print("LD: ");
   Serial.print(totalDuration);
   Serial.print("\n");
-  randomSeed(randSeedNum);  // for reproducible random sequence across different stimulus blocks
+  xorshift32_state = randSeedNum; // for reproducible random sequence across different stimulus blocks
 
 
   float frac_target_mean = 0.5;
