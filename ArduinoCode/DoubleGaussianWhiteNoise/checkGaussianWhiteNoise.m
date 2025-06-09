@@ -30,7 +30,7 @@ fprintf('\nUsing rng(''shuffle'') for potentially different random sequence.\n')
 % x = x_gw; % Test the generated Gaussian white noise
 % fprintf('Testing data with N = %d samples.\n', N);
 
-x = vals;
+%x = vals;
 N = numel(x);
 
 % --- 2. Set Significance Level ---
