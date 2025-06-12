@@ -1,8 +1,8 @@
 %% get session info
 
-Subject = 'M24077';
-Session = '20241219';
-AcquisitionsID = '2';
+Subject = 'M25065';
+Session = '20250605';
+AcquisitionsID = '0';
 BaseDir = 'Z:\ibn-vision\DATA\SUBJECTS';
 % kilosortDir = fullfile(BaseDir,Subject,'ephys',Session,'spike_sorting','probe0','sorters','kilosort3_merged');
 
@@ -10,7 +10,7 @@ BaseDir = 'Z:\ibn-vision\DATA\SUBJECTS';
 
 
 %% load units
-SorterName = 'kilosort3_merged';
+SorterName = 'kilosort4';
 units = createClusterTable(ephysDir, SorterName);
 units = table2struct(units);
 
@@ -27,7 +27,7 @@ wheel = processNidqWheel(wheel,samplingFreq,'gaussian',0.175); % window size in 
 
 %% get stim timing info from nidq
 stimONChan = [5];
-stimChangeChan = [6];
+stimCHANGEChan = [6];
 
 nidqMetaFile =  dir(fullfile(nidqDir,'*.meta'));
 nidqBinFile =  dir(fullfile(nidqDir,'*.bin'));
@@ -36,7 +36,7 @@ NidqMeta = ReadMeta(fullfile(nidqMetaFile.folder, nidqMetaFile.name));
 NidqBin = ReadBin(1, inf, NidqMeta, nidqBinFile.name,nidqBinFile.folder);
 
 stimON = NidqBin(stimONChan,:);
-stimCHANGE = NidqBin(stimChangeChan,:);
+stimCHANGE = NidqBin(stimCHANGEChan,:);
 
 niSampRate = str2double(NidqMeta.niSampRate);
 
@@ -45,7 +45,7 @@ NidqTime = (1:size(NidqBin,2))./niSampRate;
 clear NidqBin
 
 %% get stimulus change times
-stimIdx = 6;
+stimIdx = 1;
 
 if stimIdx<height(ExpInfo)
     nidqidx = [ExpInfo.smp_nidq(stimIdx):ExpInfo.smp_nidq(stimIdx+1)];
@@ -90,26 +90,56 @@ idx_down = find(diff(Stim_CHANGE_binary)==-1)+1;
 all_idx = sort([idx_up, idx_down, stimOFFidx]);
 stimCHANGETimes = thisTime(all_idx);
 
-%% load duty cycle values for each stim change
-opts = delimitedTextImportOptions("NumVariables", 3);
-% Specify range and delimiter
-opts.Delimiter = ",";
-opts.VariableTypes = ["string", "double", "double"];
+%% load and process arduino stim file
+stimFile = ExpInfo.ArduinoStimFiles{stimIdx};
+rawStimTbl = readtable(stimFile);
+TOP_idx = find(contains(rawStimTbl.ArduinoString, "TOP"));
+TOP_value = str2num(cell2mat(regexp(rawStimTbl.ArduinoString{TOP_idx}, '\d+', 'match')));
 
-% ardStimLog = readtable(fullfile('D:\Code\LEDStimulation\Analysis\WhiteNoise','M24077_WhiteNoise_UV_ArduinoStimLog2024-12-19T17_51_48'),opts);
-ardStimLog = readtable(fullfile('D:\Code\LEDStimulation\Analysis\WhiteNoise','M24077_WhiteNoise_GREEN_ArduinoStimLog2024-12-19T18_23_40'),opts);
-TOP_idx = find(contains(ardStimLog.Var1, "TOP"));
-TOP_value = double(regexp(ardStimLog.Var1(TOP_idx), '\d+', 'match'));
+C = rawStimTbl.ArduinoString(TOP_idx+1:end-1); % after TOP, ocr values are printed. last element is a flag (-1) so we skip that
 
-reqLumVals = double(ardStimLog.Var1(TOP_idx+1:end)); % last value is -1 to show stimulus finished...
-if reqLumVals(end)==-1, reqLumVals(end)=[]; end
+% Step 1 & 2: Convert each string to numeric row vector and combine
+numCells = cellfun(@(s) str2double(strsplit(s, ',')), C, 'UniformOutput', false);
 
-dutyCycleValues = reqLumVals./TOP_value;
+% Check if all rows have length 3 (if not, error)
+rowLengths = cellfun(@numel, numCells);
+if any(rowLengths ~= 3)
+    error('Not all rows have exactly 3 numbers.');
+end
 
-dutyCycleRecon = repelem(dutyCycleValues,diff(all_idx));
+% Convert to numeric matrix (n-by-3)
+numMatrix = cell2mat(numCells);
+
+% Step 3: Create table with 3 variables (columns)
+StimTable = array2table(numMatrix, 'VariableNames', {'StimIndex', 'Ch1', 'Ch2'});
+StimTable.Ch1 = StimTable.Ch1./TOP_value;
+StimTable.Ch2 = StimTable.Ch2./TOP_value;
+
+dutyCycle_ch1 = repelem(StimTable.Ch1,diff(all_idx));
+dutyCycle_ch2 = repelem(StimTable.Ch2,diff(all_idx));
 dutyCycleTime = thisTime(all_idx(1):all_idx(end)-1);
 
 clear stimCHANGETimes all_idx idx_up idx_down Stim_CHANGE_binary Stim_ON_binary
+
+%% load duty cycle values for each stim change (OLD VERSION)
+% opts = delimitedTextImportOptions("NumVariables", 3);
+% % Specify range and delimiter
+% opts.Delimiter = ",";
+% opts.VariableTypes = ["string", "double", "double"];
+% 
+% % ardStimLog = readtable(fullfile('D:\Code\LEDStimulation\Analysis\WhiteNoise','M24077_WhiteNoise_UV_ArduinoStimLog2024-12-19T17_51_48'),opts);
+% ardStimLog = readtable(fullfile('D:\Code\LEDStimulation\Analysis\WhiteNoise','M24077_WhiteNoise_GREEN_ArduinoStimLog2024-12-19T18_23_40'),opts);
+% TOP_idx = find(contains(ardStimLog.Var1, "TOP"));
+% TOP_value = double(regexp(ardStimLog.Var1(TOP_idx), '\d+', 'match'));
+% 
+% reqLumVals = double(ardStimLog.Var1(TOP_idx+1:end)); % last value is -1 to show stimulus finished...
+% if reqLumVals(end)==-1, reqLumVals(end)=[]; end
+% 
+% dutyCycleValues = reqLumVals./TOP_value;
+% 
+% 
+% 
+% clear stimCHANGETimes all_idx idx_up idx_down Stim_CHANGE_binary Stim_ON_binary
 
 %% generate STAs
 tic
@@ -117,7 +147,7 @@ timeWindowBefore = 0.2;
 bufferVal = 0.5; % extra time buffer
 nSampsBefore = ceil(timeWindowBefore * niSampRate);
 
-for iunit = 1:numel(units)
+for iunit = 346:numel(units)
     disp(['Processing Unit ', num2str(iunit)]);
 
     % Extract spike times and apply filtering criteria
@@ -127,7 +157,6 @@ for iunit = 1:numel(units)
 
     if ~isempty(spikeTimes)
     numSpikes = numel(spikeTimes);
-    STA = nan(numSpikes, nSampsBefore); % Preallocate for speed
 
     % Find indices of spike times in dutyCycleTime (vectorized search)
     [~, spike_idx] = histc(spikeTimes, dutyCycleTime);
@@ -136,20 +165,36 @@ for iunit = 1:numel(units)
     sample_indices = spike_idx - (nSampsBefore - 1) + (0:(nSampsBefore - 1));
 
     % Ensure indices are within bounds
-    valid_mask = all(sample_indices > 0 & sample_indices <= numel(dutyCycleRecon), 2);
+    valid_mask = all(sample_indices > 0 & sample_indices <= numel(dutyCycle_ch1), 2);
     
+    STA = nan(numSpikes, nSampsBefore); % Preallocate for speed
     % Extract values in one step (vectorized)
-    STA(valid_mask, :) = dutyCycleRecon(sample_indices(valid_mask, :));
+    STA(valid_mask, :) = dutyCycle_ch1(sample_indices(valid_mask, :));
 
     units(iunit).STA_mean_GREEN = mean(STA,1);
     units(iunit).STA_sem_GREEN = sem(STA,1);
+
+    % Ensure indices are within bounds
+    valid_mask = all(sample_indices > 0 & sample_indices <= numel(dutyCycle_ch2), 2);
+    
+
+     STA = nan(numSpikes, nSampsBefore); % Preallocate for speed
+    % Extract values in one step (vectorized)
+    STA(valid_mask, :) = dutyCycle_ch2(sample_indices(valid_mask, :));
+
+    units(iunit).STA_mean_UV = mean(STA,1);
+    units(iunit).STA_sem_UV = sem(STA,1);
 
     else
 
 
     units(iunit).STA_mean_GREEN = nan(1,nSampsBefore);
     units(iunit).STA_sem_GREEN = nan(1,nSampsBefore);
+    units(iunit).STA_mean_UV = nan(1,nSampsBefore);
+    units(iunit).STA_sem_UV = nan(1,nSampsBefore);
 
+
+    end
 
 end
 
@@ -159,5 +204,24 @@ toc
 
 %% plot STAs
 
-% for iunit = 1:numel(units)
+for iunit = 1:numel(units)
+    figure, hold on
+
+title(['White noise STA for unit: ', num2str(iunit)])
+xvals = (1:nSampsBefore)./niSampRate;
+
+shadedErrorBar(xvals, units(iunit).STA_mean_UV, units(iunit).STA_sem_UV, 'lineProps', 'b')
+shadedErrorBar(xvals, units(iunit).STA_mean_GREEN, units(iunit).STA_sem_GREEN, 'lineProps', 'g')
+
+ax = gca;
+ax.XTick = (0:0.05:0.2);
+ax.XTickLabel = -200:50:0;
+ylabel('PWM duty cycle')
+xlabel('Time before spike (ms)')
+xlim([0 0.2])
+defaultAxesProperties(gca, true)
+pause
+close
+
+end
 
