@@ -1614,6 +1614,9 @@ void readAnalogVals() {
   const unsigned long interval = 100;  // 100ms interval
   unsigned long previousMillis = millis();
 
+  int analogValue0 = analogRead(A0);
+  int analogValue1 = analogRead(A1);
+
   while (keepReading) {
     // Check if the interval has passed
     unsigned long currentMillis = millis();
@@ -1621,8 +1624,8 @@ void readAnalogVals() {
       previousMillis = currentMillis;
 
       // Read and print analog values
-      int analogValue0 = analogRead(A0);
-      int analogValue1 = analogRead(A1);
+      analogValue0 = analogRead(A0);
+      analogValue1 = analogRead(A1);
       Serial.print(analogValue0);
       Serial.print(",");
       Serial.println(analogValue1);
@@ -1637,6 +1640,22 @@ void readAnalogVals() {
         keepReading = false;
         Serial.println("Stopped reading analog values.");
       }
+      // automatically set appropriate gamma correction
+      if (analogValue0<420)
+      {
+        currentChALUT = ChA2LUT;
+        currentChBLUT = ChB2LUT;
+        Serial.print(F("LUT 2 SELECTED"));
+        Serial.print("\n");
+      } 
+      else 
+      {
+        currentChALUT = ChA1LUT;
+        currentChBLUT = ChB1LUT;
+        Serial.print(F("LUT 1 SELECTED"));
+        Serial.print("\n");
+      }
+
     }
   }
 }
