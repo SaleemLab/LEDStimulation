@@ -20,14 +20,15 @@ units = table2struct(units);
 %% get wheel data from nidq
 
 % nidqDir = 'Z:\ibn-vision\DATA\SUBJECTS\M24077\ephys\20241219\nidq_processed';
-samplingFreq=100; % (resample freq in Hz)
-wheelChans = [3,4]; % NIDQ channels for wheel signal
-wheel = getWheelPos(nidqDir,wheelChans);
-wheel = processNidqWheel(wheel,samplingFreq,'gaussian',0.175); % window size in s
+% samplingFreq=100; % (resample freq in Hz)
+% wheelChans = [3,4]; % NIDQ channels for wheel signal
+% wheel = getWheelPos(nidqDir,wheelChans);
+% wheel = processNidqWheel(wheel,samplingFreq,'gaussian',0.175); % window size in s
 
-%% get stim timing info from nidq
+%% get stim timing and async pulse info from nidq
 stimONChan = [5];
 stimCHANGEChan = [6];
+AsyncPulseChan = [1];
 
 nidqMetaFile =  dir(fullfile(nidqDir,'*.meta'));
 nidqBinFile =  dir(fullfile(nidqDir,'*.bin'));
@@ -37,6 +38,8 @@ NidqBin = ReadBin(1, inf, NidqMeta, nidqBinFile.name,nidqBinFile.folder);
 
 stimON = NidqBin(stimONChan,:);
 stimCHANGE = NidqBin(stimCHANGEChan,:);
+NidqSyncChan = NidqBin(AsyncPulseChan,:);
+
 
 niSampRate = str2double(NidqMeta.niSampRate);
 
@@ -54,10 +57,19 @@ else
 end
 
 
-% get stimON and stimCHANGE times
+% process nidq data
 thisStimON = stimON(nidqidx);
 thisStimCHANGE = stimCHANGE(nidqidx);
 thisTime = NidqTime(nidqidx);
+
+% get sync pulse times
+thisSync = NidqSyncChan(nidqidx);
+threshold = mean(thisSync);
+thisSync(thisSync<threshold)=0;
+thisSync(thisSync>=threshold)=1;
+nidq_sync_idx = find(diff(thisSync)==1);
+syncTimes_nidq = thisTime(nidq_sync_idx+1);
+
 stimTimeIdx = nidqidx;
 
 % convert to a digital signals
@@ -121,25 +133,45 @@ dutyCycleTime = thisTime(all_idx(1):all_idx(end)-1);
 
 clear stimCHANGETimes all_idx idx_up idx_down Stim_CHANGE_binary Stim_ON_binary
 
-%% load duty cycle values for each stim change (OLD VERSION)
-% opts = delimitedTextImportOptions("NumVariables", 3);
-% % Specify range and delimiter
-% opts.Delimiter = ",";
-% opts.VariableTypes = ["string", "double", "double"];
-% 
-% % ardStimLog = readtable(fullfile('D:\Code\LEDStimulation\Analysis\WhiteNoise','M24077_WhiteNoise_UV_ArduinoStimLog2024-12-19T17_51_48'),opts);
-% ardStimLog = readtable(fullfile('D:\Code\LEDStimulation\Analysis\WhiteNoise','M24077_WhiteNoise_GREEN_ArduinoStimLog2024-12-19T18_23_40'),opts);
-% TOP_idx = find(contains(ardStimLog.Var1, "TOP"));
-% TOP_value = double(regexp(ardStimLog.Var1(TOP_idx), '\d+', 'match'));
-% 
-% reqLumVals = double(ardStimLog.Var1(TOP_idx+1:end)); % last value is -1 to show stimulus finished...
-% if reqLumVals(end)==-1, reqLumVals(end)=[]; end
-% 
-% dutyCycleValues = reqLumVals./TOP_value;
-% 
-% 
-% 
-% clear stimCHANGETimes all_idx idx_up idx_down Stim_CHANGE_binary Stim_ON_binary
+%% load and process wheel data
+
+wheel_tbl = readtable(ExpInfo.WheelFiles{stimIdx});
+wheel_tbl.dist = wheel2unit(wheel_tbl.Wheel,4096, 19.5);
+wheel_tbl.ddist_dt = [nan; diff(wheel_tbl.dist)./diff(wheel_tbl.ArduinoTime/1000)];
+wheel_tbl.ArduinoTime_mid = movmean(wheel_tbl.ArduinoTime/1000,2);
+wheel_tbl(1,:)=[];
+
+syncTimes_bonsai = unique(wheel_tbl.LastSyncPulseTime)/1000;
+
+wheel_tbl.nidqTime = mapTimestampsUsingAsyncPulse(syncTimes_bonsai,syncTimes_nidq,wheel_tbl.ArduinoTime_mid);
+
+%% changepoints analysis to get stationary and locomotion epochs
+
+wheelSpeed = wheel_tbl.ddist_dt;
+wheel_zscoreSpeed = zscore(wheelSpeed);
+wheelTime = wheel_tbl.nidqTime;
+zThresh = 0.005; % moving standard deviations exceeded/fell below an empirical threshold of 0.005
+sampleRate = 120; % of wheel data
+smoothWin = 2; % moving standard deviation of speed (2s in Lohani)
+timeBetween=0.5; % minimum time between off and the next on in seconds
+minDuration=5; % min duration of state epoch
+minLocoSpeed = 3;
+maxStatSpeed = 1;
+preBuffer =0.5; % buffer period to remove from start of epochs
+postBuffer=0.5;
+
+[stationary_intervals, locomotion_intervals] = ...
+    changepointsWheelAnalysis(wheel_zscoreSpeed, wheelSpeed, wheelTime, zThresh, sampleRate,...
+    smoothWin, timeBetween, minDuration, minLocoSpeed, maxStatSpeed,...
+    preBuffer, postBuffer);
+
+
+%% clear unnecessary variables
+
+clear numCells numMatrix nidqidx nidqBinFile NidqSyncChan NidqTime rawStimTbl rowLengths stimCHANGE
+clear stimON StimTable stimTimeIdx thisStimCHANGE thisStimON thisSync thisTime
+clear wheel_zscoreSpeed wheelSpeed wheelTime 
+
 
 %% generate STAs
 tic
@@ -147,7 +179,7 @@ timeWindowBefore = 0.2;
 bufferVal = 0.5; % extra time buffer
 nSampsBefore = ceil(timeWindowBefore * niSampRate);
 
-for iunit = 346:numel(units)
+for iunit = 1:numel(units)
     disp(['Processing Unit ', num2str(iunit)]);
 
     % Extract spike times and apply filtering criteria
@@ -155,45 +187,90 @@ for iunit = 346:numel(units)
     spikeTimes = spikeTimes(spikeTimes > dutyCycleTime(1) + timeWindowBefore + bufferVal);
     spikeTimes = spikeTimes(spikeTimes < dutyCycleTime(end) - timeWindowBefore - bufferVal);
 
-    if ~isempty(spikeTimes)
-    numSpikes = numel(spikeTimes);
+    % sort spikes into stationary and locomotion epochs
+    times = spikeTimes(:);
+    is_within = (times >= stationary_intervals(:,1)') & (times <= stationary_intervals(:,2)');
+    keep_mask = any(is_within, 2);
+    kept_times = times(keep_mask);
+    stat_SpikeTimes = kept_times;
 
-    % Find indices of spike times in dutyCycleTime (vectorized search)
-    [~, spike_idx] = histc(spikeTimes, dutyCycleTime);
+    times = spikeTimes(:);
+    is_within = (times >= locomotion_intervals(:,1)') & (times <= locomotion_intervals(:,2)');
+    keep_mask = any(is_within, 2);
+    kept_times = times(keep_mask);
+    loco_SpikeTimes = kept_times;
 
-    % Generate index ranges for all spikes at once (vectorized)
-    sample_indices = spike_idx - (nSampsBefore - 1) + (0:(nSampsBefore - 1));
 
-    % Ensure indices are within bounds
-    valid_mask = all(sample_indices > 0 & sample_indices <= numel(dutyCycle_ch1), 2);
-    
-    STA = nan(numSpikes, nSampsBefore); % Preallocate for speed
-    % Extract values in one step (vectorized)
-    STA(valid_mask, :) = dutyCycle_ch1(sample_indices(valid_mask, :));
+    if ~isempty(stat_SpikeTimes)
 
-    units(iunit).STA_mean_GREEN = mean(STA,1);
-    units(iunit).STA_sem_GREEN = sem(STA,1);
+        numSpikes = numel(stat_SpikeTimes);
+        % Find indices of spike times in dutyCycleTime (vectorized search)
+        [~, spike_idx] = histc(stat_SpikeTimes, dutyCycleTime);
 
-    % Ensure indices are within bounds
-    valid_mask = all(sample_indices > 0 & sample_indices <= numel(dutyCycle_ch2), 2);
-    
+        % Generate index ranges for all spikes at once (vectorized)
+        sample_indices = spike_idx - (nSampsBefore - 1) + (0:(nSampsBefore - 1));
 
-     STA = nan(numSpikes, nSampsBefore); % Preallocate for speed
-    % Extract values in one step (vectorized)
-    STA(valid_mask, :) = dutyCycle_ch2(sample_indices(valid_mask, :));
+        % Ensure indices are within bounds
+        valid_mask = all(sample_indices > 0 & sample_indices <= numel(dutyCycle_ch1), 2);
 
-    units(iunit).STA_mean_UV = mean(STA,1);
-    units(iunit).STA_sem_UV = sem(STA,1);
+        STA = nan(numSpikes, nSampsBefore); % Preallocate for speed
+        % Extract values in one step (vectorized)
+        STA(valid_mask, :) = dutyCycle_ch1(sample_indices(valid_mask, :));
+
+        units(iunit).STA_mean_GREEN_stat = mean(STA,1);
+        units(iunit).STA_sem_GREEN_stat = sem(STA,1);
+
+        % Ensure indices are within bounds
+        valid_mask = all(sample_indices > 0 & sample_indices <= numel(dutyCycle_ch2), 2);
+
+        STA = nan(numSpikes, nSampsBefore); % Preallocate for speed
+        % Extract values in one step (vectorized)
+        STA(valid_mask, :) = dutyCycle_ch2(sample_indices(valid_mask, :));
+
+        units(iunit).STA_mean_UV_stat = mean(STA,1);
+        units(iunit).STA_sem_UV_stat = sem(STA,1);
 
     else
+        units(iunit).STA_mean_GREEN_stat = nan(1,nSampsBefore);
+        units(iunit).STA_sem_GREEN_stat = nan(1,nSampsBefore);
+        units(iunit).STA_mean_UV_stat = nan(1,nSampsBefore);
+        units(iunit).STA_sem_UV_stat = nan(1,nSampsBefore);
+    end
 
+    if ~isempty(loco_SpikeTimes)
 
-    units(iunit).STA_mean_GREEN = nan(1,nSampsBefore);
-    units(iunit).STA_sem_GREEN = nan(1,nSampsBefore);
-    units(iunit).STA_mean_UV = nan(1,nSampsBefore);
-    units(iunit).STA_sem_UV = nan(1,nSampsBefore);
+        numSpikes = numel(loco_SpikeTimes);
+        % Find indices of spike times in dutyCycleTime (vectorized search)
+        [~, spike_idx] = histc(loco_SpikeTimes, dutyCycleTime);
 
+        % Generate index ranges for all spikes at once (vectorized)
+        sample_indices = spike_idx - (nSampsBefore - 1) + (0:(nSampsBefore - 1));
 
+        % Ensure indices are within bounds
+        valid_mask = all(sample_indices > 0 & sample_indices <= numel(dutyCycle_ch1), 2);
+
+        STA = nan(numSpikes, nSampsBefore); % Preallocate for speed
+        % Extract values in one step (vectorized)
+        STA(valid_mask, :) = dutyCycle_ch1(sample_indices(valid_mask, :));
+
+        units(iunit).STA_mean_GREEN_run = mean(STA,1);
+        units(iunit).STA_sem_GREEN_run = sem(STA,1);
+
+        % Ensure indices are within bounds
+        valid_mask = all(sample_indices > 0 & sample_indices <= numel(dutyCycle_ch2), 2);
+
+        STA = nan(numSpikes, nSampsBefore); % Preallocate for speed
+        % Extract values in one step (vectorized)
+        STA(valid_mask, :) = dutyCycle_ch2(sample_indices(valid_mask, :));
+
+        units(iunit).STA_mean_UV_run = mean(STA,1);
+        units(iunit).STA_sem_UV_run = sem(STA,1);
+
+    else
+        units(iunit).STA_mean_GREEN_run = nan(1,nSampsBefore);
+        units(iunit).STA_sem_GREEN_run = nan(1,nSampsBefore);
+        units(iunit).STA_mean_UV_run = nan(1,nSampsBefore);
+        units(iunit).STA_sem_UV_run = nan(1,nSampsBefore);
     end
 
 end
@@ -207,21 +284,36 @@ toc
 for iunit = 1:numel(units)
     figure, hold on
 
-title(['White noise STA for unit: ', num2str(iunit)])
-xvals = (1:nSampsBefore)./niSampRate;
+    title(['White noise STA for unit: ', num2str(iunit)])
+    xvals = (1:nSampsBefore)./niSampRate;
 
-shadedErrorBar(xvals, units(iunit).STA_mean_UV, units(iunit).STA_sem_UV, 'lineProps', 'm')
-shadedErrorBar(xvals, units(iunit).STA_mean_GREEN, units(iunit).STA_sem_GREEN, 'lineProps', 'g')
+    subplot(211)
+    title('green')
+    shadedErrorBar(xvals, units(iunit).STA_mean_GREEN_stat, units(iunit).STA_sem_GREEN_stat, 'lineProps', 'k')
+    shadedErrorBar(xvals, units(iunit).STA_mean_GREEN_run, units(iunit).STA_sem_GREEN_run, 'lineProps', 'r')
+    
+    ax = gca;
+    ax.XTick = (0:0.02:0.2);
+    ax.XTickLabel = -200:20:0;
+    ylabel('PWM duty cycle')
+    xlabel('Time before spike (ms)')
+    xlim([0 0.2])
+    defaultAxesProperties(gca, true)
 
-ax = gca;
-ax.XTick = (0:0.05:0.2);
-ax.XTickLabel = -200:50:0;
-ylabel('PWM duty cycle')
-xlabel('Time before spike (ms)')
-xlim([0 0.2])
-defaultAxesProperties(gca, true)
-pause
-close
+    subplot(212)
+    title('UV')
+    shadedErrorBar(xvals, units(iunit).STA_mean_UV_stat, units(iunit).STA_sem_UV_stat, 'lineProps', 'k')
+    shadedErrorBar(xvals, units(iunit).STA_mean_UV_run, units(iunit).STA_sem_UV_run, 'lineProps', 'r')
+
+    ax = gca;
+    ax.XTick = (0:0.02:0.2);
+    ax.XTickLabel = -200:20:0;
+    ylabel('PWM duty cycle')
+    xlabel('Time before spike (ms)')
+    xlim([0 0.2])
+    defaultAxesProperties(gca, true)
+    pause
+    close
 
 end
 
