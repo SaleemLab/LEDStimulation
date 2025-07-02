@@ -1,6 +1,6 @@
-Subject = 'M24077';
-Session = '20241219';
-AcquisitionsID = '2';
+Subject = 'M25065';
+Session = '20250528';
+AcquisitionsID = '0';
 BaseDir = 'Z:\ibn-vision\DATA\SUBJECTS';
 % kilosortDir = fullfile(BaseDir,Subject,'ephys',Session,'spike_sorting','probe0','sorters','kilosort3_merged');
 
@@ -9,11 +9,17 @@ BaseDir = 'Z:\ibn-vision\DATA\SUBJECTS';
 
 % nidqDir = 'Z:\ibn-vision\DATA\SUBJECTS\M24019\ephys\20240718\nidq_processed';
 
-%% get wheel data from nidq
-samplingFreq=100; % (resample freq in Hz)
-wheelChans = [3,4]; % NIDQ channels for wheel signal
-wheel = getWheelPos(nidqDir,wheelChans);
-wheel = processNidqWheel(wheel,samplingFreq,'gaussian',0.175); % window size in s
+%% load units
+SorterName = 'kilosort4';
+units = createClusterTable(ephysDir, SorterName);
+units = table2struct(units);
+
+
+%% get wheel data from nidq - now using arduino data
+% samplingFreq=100; % (resample freq in Hz)
+% wheelChans = [3,4]; % NIDQ channels for wheel signal
+% wheel = getWheelPos(nidqDir,wheelChans);
+% wheel = processNidqWheel(wheel,samplingFreq,'gaussian',0.175); % window size in s
 
 %% get stim on times
 stimONChan = [5];
@@ -32,17 +38,10 @@ NidqTime = (1:size(NidqBin,2))./niSampRate;
 
 clear NidqBin
 
-%% load units
-SorterName = 'kilosort3_merged';
-units = createClusterTable(ephysDir, SorterName);
-units = table2struct(units);
-
-
-
 
 %% get stimulus start times for flicker
 
-stimsToCompare = {3} %{3, 4, 11, 12}; % each cell is vector of stim idx from ExpInfo
+stimsToCompare = {1} %{3, 4, 11, 12}; % each cell is vector of stim idx from ExpInfo
 
 for iStimToCompare = 1:numel(stimsToCompare)
 

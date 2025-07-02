@@ -1,8 +1,8 @@
 %% get session info
 
-Subject = 'M25065';
-Session = '20250605';
-AcquisitionsID = '0';
+Subject = 'M25066';
+Session = '20250617';
+AcquisitionsID = '4';
 BaseDir = 'Z:\ibn-vision\DATA\SUBJECTS';
 % kilosortDir = fullfile(BaseDir,Subject,'ephys',Session,'spike_sorting','probe0','sorters','kilosort3_merged');
 
@@ -47,8 +47,10 @@ NidqTime = (1:size(NidqBin,2))./niSampRate;
 
 clear NidqBin
 
+
+
 %% get stimulus change times
-stimIdx = 1;
+stimIdx = 11;
 
 if stimIdx<height(ExpInfo)
     nidqidx = [ExpInfo.smp_nidq(stimIdx):ExpInfo.smp_nidq(stimIdx+1)];
@@ -101,6 +103,7 @@ idx_up = find(diff(Stim_CHANGE_binary)==1)+1;
 idx_down = find(diff(Stim_CHANGE_binary)==-1)+1;
 all_idx = sort([idx_up, idx_down, stimOFFidx]);
 stimCHANGETimes = thisTime(all_idx);
+
 
 %% load and process arduino stim file
 stimFile = ExpInfo.ArduinoStimFiles{stimIdx};
@@ -281,16 +284,20 @@ toc
 
 %% plot STAs
 
-for iunit = 1:numel(units)
+goodUnits = units([units.rp_contamination]<0.1 & ...
+                  [units.amplitude_median]<-50 & ...
+                  [units.amplitude_cutoff]<0.1);
+
+for iunit = 1:numel(goodUnits)
     figure, hold on
 
-    title(['White noise STA for unit: ', num2str(iunit)])
+    sgtitle(['White noise STA for good unit: ', num2str(iunit)])
     xvals = (1:nSampsBefore)./niSampRate;
 
     subplot(211)
     title('green')
-    shadedErrorBar(xvals, units(iunit).STA_mean_GREEN_stat, units(iunit).STA_sem_GREEN_stat, 'lineProps', 'k')
-    shadedErrorBar(xvals, units(iunit).STA_mean_GREEN_run, units(iunit).STA_sem_GREEN_run, 'lineProps', 'r')
+    shadedErrorBar(xvals, goodUnits(iunit).STA_mean_GREEN_stat, goodUnits(iunit).STA_sem_GREEN_stat, 'lineProps', 'k')
+    shadedErrorBar(xvals, goodUnits(iunit).STA_mean_GREEN_run, goodUnits(iunit).STA_sem_GREEN_run, 'lineProps', 'r')
     
     ax = gca;
     ax.XTick = (0:0.02:0.2);
@@ -302,8 +309,8 @@ for iunit = 1:numel(units)
 
     subplot(212)
     title('UV')
-    shadedErrorBar(xvals, units(iunit).STA_mean_UV_stat, units(iunit).STA_sem_UV_stat, 'lineProps', 'k')
-    shadedErrorBar(xvals, units(iunit).STA_mean_UV_run, units(iunit).STA_sem_UV_run, 'lineProps', 'r')
+    shadedErrorBar(xvals, goodUnits(iunit).STA_mean_UV_stat, goodUnits(iunit).STA_sem_UV_stat, 'lineProps', 'k')
+    shadedErrorBar(xvals, goodUnits(iunit).STA_mean_UV_run, goodUnits(iunit).STA_sem_UV_run, 'lineProps', 'r')
 
     ax = gca;
     ax.XTick = (0:0.02:0.2);
