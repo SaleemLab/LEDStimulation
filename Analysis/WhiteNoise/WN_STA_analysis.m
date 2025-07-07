@@ -16,7 +16,7 @@ units = createClusterTable(ephysDir, SorterName);
 units = table2struct(units);
 
 %%
-stimIdx=11; % choose the stimulus based on ExpInfo (gkey+1)
+stimIdx=1; % choose the stimulus based on ExpInfo (gkey+1)
 output = processStimulusData(stimIdx, ExpInfo, nidqDir);
 
 %% load and process wheel data
@@ -63,8 +63,6 @@ tic
 nidqMetaFile = dir(fullfile(nidqDir, '*.meta'));
 NidqMeta = ReadMeta(fullfile(nidqMetaFile.folder, nidqMetaFile.name));
 niSampRate = str2double(NidqMeta.niSampRate);
-%% generate STAs
-tic
 timeWindowBefore = 0.2;
 bufferVal = 0.5; % extra time buffer
 nSampsBefore = ceil(timeWindowBefore * niSampRate);
@@ -108,7 +106,10 @@ toc
 
 goodUnits = units([units.rp_contamination]<0.1 & ...
                   [units.amplitude_median]<-50 & ...
-                  [units.amplitude_cutoff]<0.1);
+                  [units.amplitude_cutoff]<0.1 & ...
+                  [units.firing_rate]>=3);
+
+nGood = numel(goodUnits)
 
 for iunit = 1:numel(goodUnits)
     figure, hold on
