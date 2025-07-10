@@ -181,7 +181,7 @@ bin_edges = [first_edge, midpoints, last_edge];
 
 
 %%
-iunit = 439;
+iunit = 421;
 sp = histcounts(units(iunit).spike_times, bin_edges);
 
 sp=sp(:);
@@ -214,8 +214,8 @@ title('eigenvalues');
 
 %%
 % Take first two filters, map to correct space
-k1 = covInvsqrt*u(:,end); 
-k2 = covInvsqrt*u(:,end);
+k1 = covInvsqrt*u(:,1); 
+k2 = covInvsqrt*u(:,2);
 k1 = k1./norm(k1); % Normalize amplitude
 k2 = k2./norm(k2);
 
