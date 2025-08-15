@@ -1281,20 +1281,16 @@
             <WindowState>Normal</WindowState>
           </DialogSettings>
           <DialogSettings>
-            <Visible>true</Visible>
+            <Visible>false</Visible>
             <Location>
-              <X>346</X>
-              <Y>80</Y>
+              <X>200</X>
+              <Y>212</Y>
             </Location>
             <Size>
               <Width>764</Width>
               <Height>284</Height>
             </Size>
             <WindowState>Normal</WindowState>
-            <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
-            <VisualizerSettings>
-              <ObjectTextVisualizer />
-            </VisualizerSettings>
           </DialogSettings>
           <DialogSettings>
             <Visible>false</Visible>
@@ -1364,7 +1360,7 @@
             </Location>
             <Size>
               <Width>765</Width>
-              <Height>220</Height>
+              <Height>84</Height>
             </Size>
             <WindowState>Normal</WindowState>
             <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
@@ -1958,7 +1954,7 @@
         <VisualizerTypeName>Bonsai.Design.Visualizers.TimeSeriesVisualizer</VisualizerTypeName>
         <VisualizerSettings>
           <TimeSeriesVisualizer>
-            <Capacity>640</Capacity>
+            <Capacity>6400</Capacity>
             <Min>-2</Min>
             <Max>50</Max>
             <AutoScale>false</AutoScale>
@@ -3635,8 +3631,8 @@
               <BarGraphVisualizer>
                 <Capacity>0</Capacity>
                 <Min>0</Min>
-                <Max>1.1</Max>
-                <AutoScale>true</AutoScale>
+                <Max>25</Max>
+                <AutoScale>false</AutoScale>
               </BarGraphVisualizer>
             </VisualizerSettings>
           </DialogSettings>
@@ -3655,8 +3651,8 @@
           <DialogSettings>
             <Visible>true</Visible>
             <Location>
-              <X>684</X>
-              <Y>726</Y>
+              <X>679</X>
+              <Y>731</Y>
             </Location>
             <Size>
               <Width>416</Width>
@@ -3667,9 +3663,9 @@
             <VisualizerSettings>
               <BarGraphVisualizer>
                 <Capacity>0</Capacity>
-                <Min>-1</Min>
-                <Max>1</Max>
-                <AutoScale>true</AutoScale>
+                <Min>0</Min>
+                <Max>25</Max>
+                <AutoScale>false</AutoScale>
               </BarGraphVisualizer>
             </VisualizerSettings>
           </DialogSettings>

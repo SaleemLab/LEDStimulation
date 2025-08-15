@@ -40,7 +40,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="cv:VideoWriter">
-                <cv:FileName>D:\\Data\test\20250603\tf_tuning_hab_test_FaceVideo.avi</cv:FileName>
+                <cv:FileName>D:\\Data\M25066\20250710\BalancedSteps_M25066_FaceVideo.avi</cv:FileName>
                 <cv:Suffix>Timestamp</cv:Suffix>
                 <cv:Buffered>true</cv:Buffered>
                 <cv:Overwrite>false</cv:Overwrite>
@@ -73,7 +73,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="cv:VideoWriter">
-                <cv:FileName>D:\\Data\test\20250603\tf_tuning_hab_test_BodyVideo.avi</cv:FileName>
+                <cv:FileName>D:\\Data\M25066\20250710\BalancedSteps_M25066_BodyVideo.avi</cv:FileName>
                 <cv:Suffix>Timestamp</cv:Suffix>
                 <cv:Buffered>true</cv:Buffered>
                 <cv:Overwrite>false</cv:Overwrite>
@@ -214,7 +214,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>tf_tuning_hab</Value>
+                <Value>SinewaveFlicker</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="ExternalizedMapping">
@@ -222,7 +222,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>test</Value>
+                <Value>M25070</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="SubscribeSubject">
@@ -358,7 +358,7 @@ def generate():
                     </PropertyMappings>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>D:\\Data\test\20250603\tf_tuning_hab_test_WheelLog.csv</io:FileName>
+                    <io:FileName>D:\\Data\M25066\20250710\BalancedSteps_M25066_WheelLog.csv</io:FileName>
                     <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
@@ -409,7 +409,7 @@ def generate():
                     </PropertyMappings>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>D:\\Data\test\20250603\tf_tuning_hab_test_Video.csv</io:FileName>
+                    <io:FileName>D:\\Data\M25066\20250710\BalancedSteps_M25066_Video.csv</io:FileName>
                     <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
@@ -527,7 +527,7 @@ Item2 as ArduinoTime)</scr:Expression>
                     </PropertyMappings>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>D:\\Data\test\20250603\tf_tuning_hab_test_Trial.csv</io:FileName>
+                    <io:FileName>D:\\Data\M25066\20250710\BalancedSteps_M25066_Trial.csv</io:FileName>
                     <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
@@ -612,7 +612,7 @@ Item2 as ArduinoTime)</scr:Expression>
 Item2 as BonsaiTime)</scr:Expression>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>D:\\Data\test\20250603\tf_tuning_hab_test_ArduinoStim.csv</io:FileName>
+                    <io:FileName>D:\\Data\M25066\20250710\BalancedSteps_M25066_ArduinoStim.csv</io:FileName>
                     <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
@@ -1251,51 +1251,53 @@ Item5 as BonsaiTime)
               <Combinator xsi:type="p1:RandSampleFromIndexedDistribution">
                 <p1:ProbabilityDistributions>
                   <p1:ArrayOfFloat>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
                     <p1:float>0</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
-                    <p1:float>5.26315832</p1:float>
+                    <p1:float>10</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>10</p1:float>
+                    <p1:float>10</p1:float>
+                    <p1:float>10</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>10</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>10</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>10</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>10</p1:float>
+                    <p1:float>10</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>10</p1:float>
                   </p1:ArrayOfFloat>
                   <p1:ArrayOfFloat>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
-                    <p1:float>5</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>12.5</p1:float>
+                    <p1:float>12.5</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>12.5</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>12.5</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>12.5</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>12.5</p1:float>
+                    <p1:float>12.5</p1:float>
+                    <p1:float>12.5</p1:float>
                   </p1:ArrayOfFloat>
                 </p1:ProbabilityDistributions>
-                <p1:DistributionIndex>0</p1:DistributionIndex>
+                <p1:DistributionIndex>1</p1:DistributionIndex>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
@@ -1641,48 +1643,50 @@ Item5 as BonsaiTime)
                     <Combinator xsi:type="p1:IncrementStateDependentTrialCounter">
                       <p1:TrialCounterArray>
                         <p1:ArrayOfInt>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>1</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
+                          <p1:int>17</p1:int>
+                          <p1:int>16</p1:int>
+                          <p1:int>17</p1:int>
+                          <p1:int>16</p1:int>
+                          <p1:int>16</p1:int>
+                          <p1:int>16</p1:int>
+                          <p1:int>17</p1:int>
+                          <p1:int>16</p1:int>
+                          <p1:int>17</p1:int>
+                          <p1:int>16</p1:int>
+                          <p1:int>17</p1:int>
+                          <p1:int>17</p1:int>
+                          <p1:int>16</p1:int>
+                          <p1:int>17</p1:int>
+                          <p1:int>17</p1:int>
+                          <p1:int>16</p1:int>
+                          <p1:int>16</p1:int>
+                          <p1:int>17</p1:int>
+                          <p1:int>17</p1:int>
+                          <p1:int>17</p1:int>
+                          <p1:int>16</p1:int>
                         </p1:ArrayOfInt>
                         <p1:ArrayOfInt>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
-                          <p1:int>0</p1:int>
+                          <p1:int>19</p1:int>
+                          <p1:int>18</p1:int>
+                          <p1:int>18</p1:int>
+                          <p1:int>19</p1:int>
+                          <p1:int>19</p1:int>
+                          <p1:int>18</p1:int>
+                          <p1:int>19</p1:int>
+                          <p1:int>18</p1:int>
+                          <p1:int>19</p1:int>
+                          <p1:int>19</p1:int>
+                          <p1:int>19</p1:int>
+                          <p1:int>19</p1:int>
+                          <p1:int>19</p1:int>
+                          <p1:int>19</p1:int>
+                          <p1:int>18</p1:int>
+                          <p1:int>19</p1:int>
+                          <p1:int>19</p1:int>
+                          <p1:int>19</p1:int>
+                          <p1:int>18</p1:int>
+                          <p1:int>18</p1:int>
+                          <p1:int>18</p1:int>
                         </p1:ArrayOfInt>
                       </p1:TrialCounterArray>
                     </Combinator>
@@ -1949,7 +1953,7 @@ def process(value):
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:RepeatCount">
-                      <rx:Count>20</rx:Count>
+                      <rx:Count>21</rx:Count>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="Combinator">
@@ -2259,7 +2263,7 @@ def process(value):
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="rx:Take">
-                            <rx:Count>20</rx:Count>
+                            <rx:Count>21</rx:Count>
                           </Combinator>
                         </Expression>
                         <Expression xsi:type="Combinator">
@@ -2294,7 +2298,7 @@ def process(value):
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="rx:Take">
-                            <rx:Count>19</rx:Count>
+                            <rx:Count>20</rx:Count>
                           </Combinator>
                         </Expression>
                         <Expression xsi:type="Combinator">
