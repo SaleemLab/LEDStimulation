@@ -40,7 +40,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="cv:VideoWriter">
-                <cv:FileName>D:\\Data\M25070\20250815\FrozenWhiteNoise_M25070_FaceVideo.avi</cv:FileName>
+                <cv:FileName>D:\\Data\M25070\20250912\WhiteNoise_M25070_FaceVideo.avi</cv:FileName>
                 <cv:Suffix>Timestamp</cv:Suffix>
                 <cv:Buffered>true</cv:Buffered>
                 <cv:Overwrite>false</cv:Overwrite>
@@ -73,7 +73,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="cv:VideoWriter">
-                <cv:FileName>D:\\Data\M25070\20250815\FrozenWhiteNoise_M25070_BodyVideo.avi</cv:FileName>
+                <cv:FileName>D:\\Data\M25070\20250912\WhiteNoise_M25070_BodyVideo.avi</cv:FileName>
                 <cv:Suffix>Timestamp</cv:Suffix>
                 <cv:Buffered>true</cv:Buffered>
                 <cv:Overwrite>false</cv:Overwrite>
@@ -121,7 +121,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="io:CreateSerialPort">
                 <io:Name>ArduinoSerial</io:Name>
-                <io:PortName>COM3</io:PortName>
+                <io:PortName>COM10</io:PortName>
                 <io:BaudRate>1000000</io:BaudRate>
                 <io:Encoding>us-ascii</io:Encoding>
                 <io:Parity>None</io:Parity>
@@ -214,7 +214,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>FrozenWhiteNoise</Value>
+                <Value>WhiteNoise</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="ExternalizedMapping">
@@ -409,7 +409,7 @@ def generate():
                     </PropertyMappings>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>D:\\Data\M25070\20250815\FrozenWhiteNoise_M25070_Video.csv</io:FileName>
+                    <io:FileName>D:\\Data\M25070\20250912\WhiteNoise_M25070_Video.csv</io:FileName>
                     <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
@@ -1192,7 +1192,7 @@ Item5 as BonsaiTime)
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Delay">
-                <rx:DueTime>PT1M</rx:DueTime>
+                <rx:DueTime>PT10S</rx:DueTime>
               </Combinator>
             </Expression>
             <Expression xsi:type="Unit" />
@@ -1684,7 +1684,7 @@ Item5 as BonsaiTime)
                     <Property Name="FileName" DisplayName="DistsFileName" />
                   </Expression>
                   <Expression xsi:type="io:CsvReader">
-                    <io:FileName>StimulusCSVfiles\gaussianWhiteNoise\dists_fwn.csv</io:FileName>
+                    <io:FileName>StimulusCSVfiles\gaussianWhiteNoise\dists_wn40mins.csv</io:FileName>
                     <io:ScanPattern>%f,%f</io:ScanPattern>
                     <io:SkipRows>1</io:SkipRows>
                   </Expression>
@@ -1753,7 +1753,7 @@ Item5 as BonsaiTime)
                     <Property Name="FileName" DisplayName="StimFileName" />
                   </Expression>
                   <Expression xsi:type="io:CsvReader">
-                    <io:FileName>StimulusCSVfiles\gaussianWhiteNoise\stimuli_fwn.csv</io:FileName>
+                    <io:FileName>StimulusCSVfiles\gaussianWhiteNoise\stimuli_wn40mins.csv</io:FileName>
                     <io:ScanPattern />
                     <io:SkipRows>1</io:SkipRows>
                   </Expression>
@@ -2307,7 +2307,7 @@ def process(value):
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="io:CreateSerialPort">
           <io:Name>ArdPWM</io:Name>
-          <io:PortName>COM7</io:PortName>
+          <io:PortName>COM12</io:PortName>
           <io:BaudRate>115200</io:BaudRate>
           <io:Encoding>us-ascii</io:Encoding>
           <io:Parity>None</io:Parity>
@@ -2364,7 +2364,7 @@ def process(value):
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="IntProperty">
-                <Value>0</Value>
+                <Value>1</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="scr:ExpressionTransform">
