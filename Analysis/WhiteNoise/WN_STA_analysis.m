@@ -181,7 +181,7 @@ bin_edges = [first_edge, midpoints, last_edge];
 
 
 %%
-iunit = 439;
+for iunit = 1:numel(units);
 sp = histcounts(units(iunit).spike_times, bin_edges);
 
 sp=sp(:);
@@ -195,7 +195,7 @@ n=nkt;
 
 % You can try setting the ridge parameter to values above 1, 
 % and getting smoother (but biased) results -- easiest to see w/ STA
-ridgeparam = 0;
+ridgeparam = 0.000005;
 covInv = inv(rawcov+ridgeparam*eye(n));
 covInvsqrt = sqrtm(covInv);
 
@@ -211,20 +211,35 @@ wstc = covInvsqrt*stc*covInvsqrt;  % Compute "whitened" STC
 figure(1);
 plot(diag(s), 'o'); % examine eigenvalues
 title('eigenvalues');
+iunit
+
+pause
+close
+end
 
 %%
 % Take first two filters, map to correct space
 k1 = covInvsqrt*u(:,end); 
-k2 = covInvsqrt*u(:,end);
+k2 = covInvsqrt*u(:,end-1);
+k3 = covInvsqrt*u(:,end-2);
+k4 = covInvsqrt*u(:,end-3);
 k1 = k1./norm(k1); % Normalize amplitude
 k2 = k2./norm(k2);
+k3 = k3./norm(k3);
+k4 = k4./norm(k4);
+
 
 figure(2); 
-subplot(211)
+subplot(511)
 plot(sta/norm(sta))
-subplot(212)
-plot(1:n, [k1 k2], '--');
-title('filters and filter estimates');
+subplot(512)
+plot(1:n, [k1], '-');
+subplot(513)
+plot(1:n, [k2], '-');
+subplot(514)
+plot(1:n, [k3], '-');
+subplot(515)
+plot(1:n, [k4], '-');
 
 
 
