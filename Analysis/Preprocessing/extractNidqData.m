@@ -1,32 +1,28 @@
 function nidq = extractNidqData(ExpInfo, igkey, nidqDir, nidq_channels, nidq_1hz_file, nidq_tprime_file, doPlot)
-%extractNidqData Extracts and thresholds digital NIDQ data for a specific stimulus.
+%extractNidqData Extracts, thresholds, and analyzes NIDQ data for a specific stimulus.
 %
 %   This function reads a segment of a NIDQ binary file corresponding to a
 %   given experimental key. It dynamically extracts specified channels,
-%   calculates a binary threshold for each using a robust quantile method,
-%   and optionally maps the time base to an external reference. An
-%   optional plotting feature is included for data visualization.
+%   calculates a binary threshold, maps the time base, and finds the times
+%   of rising edges on the asynchronous pulse channel.
 %
 %   SYNTAX:
 %   nidq = extractNidqData(ExpInfo, igkey, nidqDir, nidq_channels)
-%   nidq = extractNidqData(ExpInfo, igkey, nidqDir, nidq_channels, nidq_1hz_file, nidq_tprime_file)
 %   nidq = extractNidqData(..., doPlot)
 %
 %   INPUTS:
-%   ExpInfo         - Structure containing experiment information, including
-%                     sample and time stamps for each stimulus.
+%   ExpInfo         - Structure containing experiment information.
 %   igkey           - Scalar integer specifying which stimulus to extract.
 %   nidqDir         - String path to the directory with NIDQ .meta and .bin files.
 %   nidq_channels   - Structure where each field name is a desired output name
-%                     (e.g., 'stimON') and its value is the channel number.
+%                     (e.g., 'asyncPulse') and its value is the channel number.
 %   nidq_1hz_file   - (Optional) Path to NIDQ pulse times file for time mapping.
 %   nidq_tprime_file - (Optional) Path to imec0 reference times file for time mapping.
-%   doPlot          - (Optional) Logical flag (true/false) to generate a plot
-%                     of the extracted channels. Defaults to false.
+%   doPlot          - (Optional) Logical flag (true/false) to plot channels. Defaults to false.
 %
 %   OUTPUT:
-%   nidq            - Structure containing the extracted and thresholded data,
-%                     along with time vectors.
+%   nidq            - Structure containing the extracted data, time vectors,
+%                     and the calculated asynchronous pulse times.
 
 %% 1. Argument Handling
 if nargin < 7
@@ -83,6 +79,8 @@ for i = 1:length(channel_fields)
     end
 end
 
+clear NidqBin;
+
 %% 5. Generate NIDQ Time Vector
 first_channel_name = channel_fields{1};
 nSampActual = size(nidq.(first_channel_name), 2);
@@ -130,6 +128,26 @@ if doPlot
     % Label the x-axis on the last subplot and link all axes
     xlabel(xLabelText);
     linkaxes(ax, 'x');
+end
+
+%% 8. Find Asynchronous Pulse Times
+if isfield(nidq, 'asyncPulse')
+    % Find indices where the signal goes from 0 to 1
+    rising_edge_indices = find(diff(nidq.asyncPulse) == 1) + 1;
+
+    % Get the timestamps for these events using the NIDQ time base
+    nidq.asyncPulseTimes_nidq = nidq.time(rising_edge_indices);
+
+    % Get timestamps using the imec0 time base, if it exists
+    if ~isempty(nidq.imecTime)
+        nidq.asyncPulseTimes_imec = nidq.imecTime(rising_edge_indices);
+    else
+        nidq.asyncPulseTimes_imec = [];
+    end
+else
+    % If asyncPulse wasn't requested, create empty fields for consistency
+    nidq.asyncPulseTimes_nidq = [];
+    nidq.asyncPulseTimes_imec = [];
 end
 
 end
