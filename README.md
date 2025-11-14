@@ -16,7 +16,8 @@
 |              | 5mm magnets                           | [Link](https://www.amazon.co.uk/Magnet-Expert%C2%AE-5mm-thick-Neodymium/dp/B00TACMMP0/ref=sr_1_6?s=kitchen)                      | 8        | –               |
 |              |                                       | –                                                                                                  | –        | –               |
 | **LEDs and connectors**|                             | -                                                                                                  |         |                 |
-|              | Custom LED PCBs                       | [repo link](https://github.com/SaleemLab/LEDStimulation/tree/main/Hardware/LED_board)              | –       | –               |
+|              | Green LEDs                            | [LCSC link](https://www.lcsc.com/product-detail/C2843870.html?s_z=n_C2843870)              | –       | –               |
+|              | UV LEDs                               | [LCSC link](https://www.lcsc.com/product-detail/C2843870.html?s_z=n_C2843870)              | –       | –               |
 |              | Right-angled female pin headers       | –                                                                                                  | –        | –               |
 |              | Right-angled male pin headers         | –                                                                                                  | –       | –               |
 |              | red-black wire                        | –                                                                                                  | –      | –               |
@@ -30,8 +31,6 @@
 |              | Mosfet source drain capacitor (100nF) | –                                                                                                  | 2        | –               |
 
 
-
-https://www.amazon.co.uk/Magnet-Expert%C2%AE-5mm-thick-Neodymium/dp/B00TACMMP0/ref=sr_1_6?s=kitchen
 
 # Stimuli
 
