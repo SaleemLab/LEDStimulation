@@ -2,6 +2,7 @@ Subject = 'M25065';
 Session = '20250528';
 AcquisitionsID = '0';
 BaseDir = 'Z:\ibn-vision\DATA\SUBJECTS';
+SorterName = 'kilosort4'; % for spike-sorting
 
 [ExpInfo, ephysDir, nidqDir, bonsaiDir] = getExpInfo(BaseDir, Subject, Session,AcquisitionsID);
 
@@ -35,6 +36,7 @@ stimBlocksToProcess(4).properties = {'contrast', '10^2'};
 
 %% Initialize a cell array to hold the trial structs from each block
 all_trials_cell = cell(length(stimBlocksToProcess), 1);
+all_wheel_cell = cell(length(stimBlocksToProcess), 1);
 doPlot = false; % Disable plotting within the loop
 
 %% Loop over each defined stimulus block
@@ -53,9 +55,11 @@ for i = 1:length(stimBlocksToProcess)
     g_idx = find(ExpInfo.gKey == current_igkey);
     this_trialParamsCSVfile = ExpInfo.TrialParamsFiles{g_idx};
     trials = crateTrialsStruct_flicker(nidq, this_trialParamsCSVfile);
+    [trials.gkey]=deal(current_igkey);
     
     %% Process the wheel data file
     wheel_tbl = readtable(ExpInfo.WheelFiles{g_idx});
+    wheel_tbl.gkey = ones(height(wheel_tbl), 1) * current_igkey;
     wheel_tbl.dist = wheel2unit(wheel_tbl.Wheel,4096, 19.5);
     wheel_tbl.ddist_dt = [nan; diff(wheel_tbl.dist)./diff(wheel_tbl.ArduinoTime/1000)];
     wheel_tbl.ArduinoTime_mid = movmean(wheel_tbl.ArduinoTime/1000,2);
@@ -64,7 +68,7 @@ for i = 1:length(stimBlocksToProcess)
     wheel_tbl.imecTime = mapTimestampsUsingAsyncPulse(syncTimes_bonsai,nidq.asyncPulseTimes_imec,wheel_tbl.ArduinoTime_mid);
     
     % Smooth the wheel speed
-    sigma = 0.035; % 35 milliseconds
+    sigma = 0.035; % standard deviation of gaussian in seconds 
     wheel_tbl.smthSpeed = smoothDataWithGaussian(wheel_tbl.ddist_dt, wheel_tbl.imecTime, sigma);
     
     %% Align wheel data with each trial
@@ -81,6 +85,7 @@ for i = 1:length(stimBlocksToProcess)
     
     %% Store the completed trials struct for this block
     all_trials_cell{i} = trials;
+    all_wheel_cell{i} = wheel_tbl;
     
     fprintf('--- Finished block %d. Found %d matched trials. ---\n\n', current_igkey, length(trials));
 
@@ -91,3 +96,13 @@ end
 all_trials = [all_trials_cell{:}];
 
 fprintf('=== Processing complete. Total of %d trials loaded. ===\n', length(all_trials));
+
+trials = all_trials; clear all_trials;
+wheel = all_wheel_cell;
+
+%% load units
+units = createClusterTable(ephysDir, SorterName);
+units = table2struct(units);
+
+
+%%
