@@ -41,6 +41,7 @@ Based on the firmware configuration, connect your hardware to the Arduino Leonar
 *   **Precise Timing:** Waveform updates are driven by hardware interrupts (Timer3) rather than software `delay()` loops, ensuring stable temporal frequencies.
 *   **Gamma Correction:** Implements Look-Up Tables (LUTs) stored in PROGMEM to linearize LED output.
 *   **Fast RNG:** Uses `xorshift32` for high-speed random number generation required by white noise stimuli, approximating a Gaussian distribution via the Central Limit Theorem.
+*   **Sinewave LUT** Uses a look-up table to generate approximate sinusoidal flicker.
 
 ## Installation
 
