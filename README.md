@@ -122,7 +122,7 @@ sdt, sdt, DutyA, DutyB, Duration
 
 ## Firmware Architecture & Timer Configuration
 
-To achieve high-precision timing and smooth luminance gradients, the firmware directly manipulates the ATmega32u4 hardware timers.
+To achieve high-precision timing and smooth luminance gradients, the firmware directly manipulates the ATmega32u4 hardware timers. In future Timer3 may be configured similarly to Timer1 to allow for 3-channel stimulation (e.g. R,G,B), and Timer4 set for hardware interupt-based stimulus pacing.
 
 ### Timer1: High-Resolution PWM Generation
 Timer1 is configured for **16-bit Phase Correct PWM** to drive the LED channels without visible digital stepping.
