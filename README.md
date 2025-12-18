@@ -50,7 +50,7 @@ Based on the firmware configuration, connect your hardware to the Arduino Leonar
 3.  Upload the sketch.
 4.  Open the Serial Monitor or your preferred interface software (e.g., Bonsai).
 
-## Practical User Guide: Serial API
+## Serial API
 
 The device is controlled via a serial interface. Send commands as comma-separated ASCII strings terminated by a carriage return (`\r`) or newline.
 
