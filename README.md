@@ -104,7 +104,7 @@ fs, Fmin, Fmax, SweepFactor, PhaseA, PhaseB, ContrastA, ContrastB
 ### 6. Timed luminance step
 Performs a luminance step for a fixed duration before returning to baseline
 ```text
-sdt, sdt, DutyA, DutyB, Time
+sdt, sdt, DutyA, DutyB, Duration
 ```
 *   **DutyA/B:** Duty cycle value for each chromatic channel.
 
