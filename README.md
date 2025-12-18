@@ -159,6 +159,42 @@ Thorlabs powermeter or photodiode. Must have UV sensitivity and calibration data
 Typical photodiode setup not possible since we are using a high frequency PWM which is ~16bit.
 
 
+## Performance Characteristics
+
+Based on standard engineering documentation practices, "Performance Characteristics" or "Validation & Testing" would be excellent headings.
+
+Here is a draft for that section, incorporating the calculations and limitations we discussed earlier regarding the 1\mu s switching time and its impact on the 10\text{kHz} signal.
+
+---
+
+## **Performance Characteristics**
+
+This section details the temporal dynamics, switching limits, and linearity of the stimulation circuit.
+
+### **1. Switching Dynamics**
+
+The circuit utilizes a low-side MOSFET topology with a Source-Drain snubber capacitor to dampen ringing. While this ensures signal stability, it introduces a finite transition time during PWM switching events.
+
+* **Rise/Fall Time:** Measured at approximately **1 \mu s** (10% to 90% amplitude).
+* **Impact on PWM Fidelity:**
+* For a standard stimulation frequency of **10 kHz**, the total period is 100 \mu s.
+* A 1 \mu s rise time represents **1%** of the total period.
+* Since a full PWM cycle includes both a rising and falling edge, approximately **2%** of the duty cycle is consumed by transition states. This effectively limits the minimum resolvable duty cycle to >2% for linear operation.
+
+### **2. Linearity & Resolution**
+
+The device uses 16-bit PWM (Timer1) for high-resolution intensity control. However, the effective resolution is constrained by the physical switching speed described above.
+
+* **Dead Zone:** At extremely low duty cycles (specifically those requiring pulse widths < 1 \mu s), the MOSFET may not fully saturate, leading to non-linear luminance output.
+* **Correction:** A gamma-correction Look-Up Table (LUT) is implemented in firmware to linearize the output and compensate for these low-end non-linearities.
+
+### **3. Thermal Stability**
+
+* **Mode of Operation:** The MOSFET is driven in its linear (ohmic) region via a potentiometer-scaled gate voltage to limit peak current.
+* **Thermal Drift:** Users should be aware that as the MOSFET temperature increases during prolonged high-intensity operation, the threshold voltage (V_{th}) may shift, potentially altering the peak current slightly. Warm-up calibration is recommended for critical experiments.
+
+  
+
 ## BOM
 
 | Category     | Part                                  | Link                                                                                               | Quantity  | Total Price (£) |
