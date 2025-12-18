@@ -58,7 +58,7 @@ The device is controlled via a serial interface. Send commands as comma-separate
 ### Stimulus Commands
 
 #### 1. Sinusoidal Flicker (`s`)
-Generates drifting gratings or uniform flicker.
+Generates one or two channel sinusoidal flicker. Stimulus duration, frequency, phase and contrast can all be set.
 ```text
 s, Duration, Freq, PhaseA, PhaseB, ContrastA, ContrastB
 ```
@@ -85,35 +85,43 @@ fwn, Duration, UpdateTime, Reps, Seed
 *   **Seed:** Integer seed for the pseudo-random number generator.
 
 #### 4. Switching White Noise (`cs`)
-Alternates between two contrast distributions (e.g., high vs. low variance).
+Alternates between two gaussian distributions (e.g., high vs. low variance, high vs low mean).
 ```text
 cs, UpdateTime, SwitchTime, Reps, Mean1, Cont1, Mean2, Cont2
 ```
 *   **SwitchTime:** Duration (ms) to stay in one state before switching.
 *   **Mean/Cont:** Mean and Contrast parameters for State 1 and State 2.
+*   **Reps:** number of distribution switches to perform.
 
 #### 5. Frequency Chirp / Sweep (`fs`)
-Performs an exponential frequency sweep.
+Performs an exponential frequency sweep (from Fmin to Fmax to Fmin)
 ```text
 fs, Fmin, Fmax, SweepFactor, PhaseA, PhaseB, ContrastA, ContrastB
 ```
 *   **Fmin/Fmax:** Start and End frequencies in Hz.
 *   **SweepFactor:** Rate of change for the exponential sweep.
 
+### 6. Timed luminance step
+Performs a luminance step for a fixed duration before returning to baseline
+```text
+sdt, sdt, DutyA, DutyB, Time
+```
+*   **DutyA/B:** Duty cycle value for each chromatic channel.
+
+
 ### Configuration Commands
 
 | Command | Syntax | Description |
 | :--- | :--- | :--- |
-| **Set Static Duty** | `sd, DutyA, DutyB` | Sets DC output (0–100%) for manual testing. |
-| **Set Timed Duty** | `sdt, DutyA, DutyB, Time` | Sets DC output for a fixed duration (ms). |
-| **Gamma Calibration** | `gc, Step, Wait, Reps` | Steps through duty cycles to measure monitor gamma. |
-| **Select LUT** | `agc, Index` | Switches Gamma LUTs. `1` = Chx1LUT, `2` = Chx2LUT. |
+| **Set Static Duty** | `sd, DutyA, DutyB` | Sets DC output (0–100%) |
+| **Gamma Calibration** | `gc, Step, Wait, Reps` | Steps through duty cycles to measure gamma response curve. |
+| **Select LUT** | `agc, Index` | Switches Gamma LUTs. `1` = Chx1LUT, `2` = Chx2LUT. Can be autotoggled based on potentiometer settings|
 | **Toggle Channel** | `useChA, 1/0` | Enables (`1`) or disables (`0`) Channel A/B output. |
-| **Read Analog** | `ana` | Streams data from A0/A1. Send "done" to stop. |
+| **Read Analog** | `ana` | Streams data from A0/A1 for configuring potentiometer values. Send "done" to stop. |
 
 ## Firmware Architecture & Timer Configuration
 
-To achieve high-precision timing and smooth luminance gradients, the firmware bypasses standard Arduino `analogWrite()` and `delay()` functions. Instead, it directly manipulates the ATmega32u4 hardware timers.
+To achieve high-precision timing and smooth luminance gradients, the firmware directly manipulates the ATmega32u4 hardware timers.
 
 ### Timer1: High-Resolution PWM Generation
 Timer1 is configured for **16-bit Phase Correct PWM** to drive the LED channels without visible digital stepping.
