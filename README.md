@@ -4,6 +4,9 @@ This project implements a high-precision, large-field LED stimulator designed fo
 
 This ReadME is a WIP.
 
+https://github.com/user-attachments/assets/08af2269-a270-4899-ae75-62786a714254
+
+
 ## System Overview
 
 The stimulator runs on an **Arduino Leonardo (ATmega32u4)**. It utilizes a hybrid control mechanism to manage LED brightness:
