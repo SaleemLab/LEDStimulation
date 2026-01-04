@@ -5,6 +5,7 @@ This project implements a high-precision, large-field LED stimulator designed fo
 This ReadME is a WIP.
 
 https://github.com/user-attachments/assets/08af2269-a270-4899-ae75-62786a714254
+
 example stimulus - 2hz antiphase (green/UV) sinusoidal flicker 
 
 ## System Overview
