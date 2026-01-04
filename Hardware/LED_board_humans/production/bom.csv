@@ -1,0 +1,8 @@
+﻿Designator,Footprint,Quantity,Value,LCSC Part #
+"D1, D10, D11, D2, D3, D9",LED-SMD_L3.5-W2.8_RED,6,LED,C2843870
+"D13, D14, D15, D5, D6, D7",LED-SMD_L3.5-W2.8-FD_WHITE-1,6,LED,C2843877
+"H1, H2, H3, H4",MountingHole_3.2mm_M3,4,MountingHole,
+J1,PinSocket_1x02_P2.54mm_Horizontal,1,Green bank 1,
+J2,PinSocket_1x02_P2.54mm_Horizontal,1,UV bank 1,
+J3,PinSocket_1x02_P2.54mm_Horizontal,1,Green bank 2,
+J4,PinSocket_1x02_P2.54mm_Horizontal,1,UV bank 2,
