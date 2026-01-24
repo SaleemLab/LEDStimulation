@@ -163,14 +163,6 @@ Thorlabs powermeter or photodiode. Must have UV sensitivity and calibration data
 Typical photodiode setup not possible since we are using a high frequency PWM which is ~16bit.
 
 
-## Performance Characteristics
-
-Based on standard engineering documentation practices, "Performance Characteristics" or "Validation & Testing" would be excellent headings.
-
-Here is a draft for that section, incorporating the calculations and limitations we discussed earlier regarding the 1\mu s switching time and its impact on the 10\text{kHz} signal.
-
----
-
 ## **Performance Characteristics**
 
 This section details the temporal dynamics, switching limits, and linearity of the stimulation circuit.
