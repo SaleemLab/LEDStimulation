@@ -510,15 +510,15 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
      float envFrequency = atof(serialVals[3]);
     Serial.println("Stim: Sinusoidal env");
     Serial.flush();
-       Serial.print("Stim duration: ");
-        Serial.println(stimulusDuration);
-       Serial.flush();
-       Serial.print("Frequency: ");
-       Serial.println(frequency);
-       Serial.flush();
-       Serial.print("Envelope freq: ");
-       Serial.println(envFrequency);
-       Serial.flush();
+    Serial.print("Stim duration: ");
+    Serial.println(stimulusDuration);
+    Serial.flush();
+    Serial.print("Frequency: ");
+    Serial.println(frequency);
+    Serial.flush();
+    Serial.print("Envelope freq: ");
+    Serial.println(envFrequency);
+    Serial.flush();
 
     SineContrastConv(stimulusDuration, frequency, envFrequency);
 
