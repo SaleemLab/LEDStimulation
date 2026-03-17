@@ -502,25 +502,29 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     //  Serial.flush();
 
     SwitchingWhiteNoise(updateTime, switchTime, nReps, meanVal1, contrastVal1, meanVal2, contrastVal2);
-     }
-    else if (FirstChar == "se")  // sinusoidal flicker with contrast envelope
-    {
-     long stimulusDuration = atof(serialVals[1]);
-     float frequency = atof(serialVals[2]);
-     float envFrequency = atof(serialVals[3]);
+    } else if (FirstChar == "se")  // sinusoidal flicker with contrast envelope
+  {
+    long stimulusDuration = atof(serialVals[1]);
+    float frequency = atof(serialVals[2]);
+    float envFrequency = atof(serialVals[3]);
+    float maxContrastA = atof(serialVals[4]); 
+    float maxContrastB = atof(serialVals[5]); 
+
     Serial.println("Stim: Sinusoidal env");
     Serial.flush();
     Serial.print("Stim duration: ");
     Serial.println(stimulusDuration);
-    Serial.flush();
     Serial.print("Frequency: ");
     Serial.println(frequency);
-    Serial.flush();
     Serial.print("Envelope freq: ");
     Serial.println(envFrequency);
+    Serial.print("Contrast A: ");
+    Serial.println(maxContrastA);
+    Serial.print("Contrast B: ");
+    Serial.println(maxContrastB);
     Serial.flush();
 
-    SineContrastConv(stimulusDuration, frequency, envFrequency);
+    SineContrastConv(stimulusDuration, frequency, envFrequency, maxContrastA, maxContrastB);
 
   } else if (FirstChar == "fs")  // frequencySweep stimulus
   {
@@ -722,90 +726,100 @@ void sinewaveInterrupt() {
 }
 
 /////////////////////////////////// SINE WAVE FLICKER WITH CONTRAST ENVELOPE //////////////////////////
-void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFreq) {
+void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFreq, float maxContrastA, float maxContrastB) {
 
-// first do some calculations to find the update interval and step size for Timer3 interrupts
-// Calculate the PWM cycle time in microseconds
-  float pwmCycleTime = (2.0 * TOP) / (float)(CLOCK_FREQ / prescaler);  // Time per PWM cycle in seconds
-  pwmCycleTime *= 1e6;                                                 // Convert seconds to microseconds
+  // Store the user's requested maximum contrasts globally
+  contrastMultA = maxContrastA;
+  contrastMultB = maxContrastB;
 
-// Calculate the base update interval for the sinewave frequency
- float baseUpdateInterval = 1.0 / (sinewaveFrequency * TABLE_SIZE);  // Time per table update in seconds
- baseUpdateInterval *= 1e6;                                          // Convert to microseconds
+  // Calculate the PWM cycle time in microseconds
+  float pwmCycleTime = (2.0 * TOP) / (float)(CLOCK_FREQ / prescaler); 
+  pwmCycleTime *= 1e6; 
 
-// Find the smallest step size that is a factor of TABLE_SIZE
- stepSize = TABLE_SIZE;  // Start with the maximum possible step size
+  // Calculate the base update interval for the sinewave frequency
+  float baseUpdateInterval = 1.0 / (sinewaveFrequency * TABLE_SIZE); 
+  baseUpdateInterval *= 1e6; 
+
+  // Find the smallest step size that is a factor of TABLE_SIZE
+  stepSize = TABLE_SIZE; 
   for (int i = 1; i <= TABLE_SIZE; i++) {
     if ((TABLE_SIZE % i == 0) && (baseUpdateInterval * i >= pwmCycleTime)) {
       stepSize = i;
-      break;  // Stop at the first valid (smallest) step size
+      break; 
     }
   }
 
   tableIndexA = 0;      // start at beginning of sinewave table
- tableEnvIndex = 191;  // start at 0 contrast
- envCount = 0;         // contrast envelope counter
- contrastMult = 0;
- nEnvCounts = 0;
+  tableIndexB = 0;      // keep B in phase with A (or modify if you want phase control)
+  tableEnvIndex = 191;  // start at 0 contrast
+  envCount = 0;         // contrast envelope counter
+  contrastMult = 0;
+  nEnvCounts = 0;
 
+  // Recalculate the effective update interval based on the step size
+  float updateInterval = baseUpdateInterval * stepSize;
+  float updateFrequency = 1e6 / updateInterval; 
+  nEnvCounts = (int)(sinewaveFrequency / envelopeFreq);
 
-// Recalculate the effective update interval based on the step size
- float updateInterval = baseUpdateInterval * stepSize;
-//Serial.print("req update: ");
-//Serial.println(updateInterval);
- float updateFrequency = 1e6 / updateInterval;  // update frequency for timer3 interrupt
- nEnvCounts = (int)(sinewaveFrequency / envelopeFreq);
-
-// Configure timer3 interrupt to updateFrequency
- configureTimer3Interrupt(updateFrequency);
- PORTC |= (1 << PORTC6);     // Stim on pin 5
- long startTime = millis();  // Record the start time
-// set timer3 interrupt callback function to play the sinewave
+  // Configure timer3 interrupt to updateFrequency
+  configureTimer3Interrupt(updateFrequency);
+  PORTC |= (1 << PORTC6);     // Stim on pin 5
+  long startTime = millis();  // Record the start time
+  
+  // set timer3 interrupt callback function to play the sinewave
   setTimer3Callback(sinewaveEnvelopeInterrupt);
 
-// Loop until the specified duration has elapsed
- while (millis() - startTime < duration) {
+  // Loop until the specified duration has elapsed
+  while (millis() - startTime < duration) {
     delayMicroseconds(1);  //wait for time to end
   }
+  
   stopTimer3Interrupt();    // finish playing sinewave
- PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW by changing register directly
- PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
- Serial.println("-1");
- Serial.flush();
- if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
- if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default}
+  PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW
+  PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
+  Serial.println("-1");
+  Serial.flush();
+  
+  if (useChA) { setChA(TopLumi / 2); }  
+  if (useChB) { setChB(TopLumi / 2); }  
 }
 
 
 // sinewave contrast envelope interrupt function
 void sinewaveEnvelopeInterrupt() {
-unsigned long startTime = micros();
-// Update PWM duty cycle with the next sine wave value
-  uint16_t ocrVal = MidLumi + ((sineWaveTable[tableIndexA] - MidLumi) * (contrastMult));
+  unsigned long startTime = micros();
+  
+  // Multiply the current envelope state by the max limits for each channel
+  float currentContrastA = contrastMult * contrastMultA;
+  float currentContrastB = contrastMult * contrastMultB;
 
- if (useChA) { setChA(ocrVal); }  //
-  if (useChB) { setChB(ocrVal); }  //
+  // Calculate OCR values independently
+  uint16_t ocrValA = MidLumi + ((sineWaveTable[tableIndexA] - MidLumi) * currentContrastA);
+  uint16_t ocrValB = MidLumi + ((sineWaveTable[tableIndexB] - MidLumi) * currentContrastB);
 
-// update sinewave table index based on interrupt frequency
- tableIndexA = tableIndexA + stepSize;
- if (tableIndexA >= TABLE_SIZE) tableIndexA -= TABLE_SIZE;  // wrap table index
+  if (useChA) { setChA(ocrValA); }  
+  if (useChB) { setChB(ocrValB); }  
 
+  // update sinewave table index based on interrupt frequency
+  tableIndexA = tableIndexA + stepSize;
+  if (tableIndexA >= TABLE_SIZE) tableIndexA -= TABLE_SIZE;  // wrap table index
+  
+  tableIndexB = tableIndexB + stepSize;
+  if (tableIndexB >= TABLE_SIZE) tableIndexB -= TABLE_SIZE;  // wrap table index
 
- //update counter for contrast envelope
- envCount = envCount + 1;
- if (envCount > nEnvCounts - 1)  // check if time to update contrast value
- {
-  envCount = 0;                       // reset
-   tableEnvIndex = tableEnvIndex + 1;  // incremenet contrast LUT index
+  //update counter for contrast envelope
+  envCount = envCount + 1;
+  if (envCount > nEnvCounts - 1)  // check if time to update contrast value
+  {
+    envCount = 0;                       // reset
+    tableEnvIndex = tableEnvIndex + 1;  // incremenet contrast LUT index
 
-   if (tableEnvIndex >= TABLE_SIZE) {
-    PORTD ^= (1 << PIND4);        // Toggle Pin 4 if envelope cycle finished
-     tableEnvIndex -= TABLE_SIZE;  // wrap tableEnvIndex
+    if (tableEnvIndex >= TABLE_SIZE) {
+      PORTD ^= (1 << PIND4);        // Toggle Pin 4 if envelope cycle finished
+      tableEnvIndex -= TABLE_SIZE;  // wrap tableEnvIndex
+    }
+    contrastMult = sineWaveTable[tableEnvIndex] / float(TopLumi);  // update contrast multiplier
   }
-   contrastMult = sineWaveTable[tableEnvIndex] / float(TopLumi);  // update contrast multiplier
- }
-unsigned long duration = micros() - startTime; // Measure execution time
-//Serial.println(duration); // Print execution time
 }
 
 ///////////////////////////////////  FREQUENCY SWEEP FUNCTIONS//////////////////////////////////
