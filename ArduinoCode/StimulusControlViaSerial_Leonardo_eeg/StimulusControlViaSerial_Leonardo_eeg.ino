@@ -5,10 +5,10 @@
 #define FWN_TABLE_SIZE 375                 // Number of samples in the wavetable
 #define TARGET_RECONFIG_INTERVAL_US 1000L  // FOR FREQUENCY SWEEP 1000 microseconds = 1 millisecond
 
-volatile unsigned long printSequenceNum = 0; // for serial debugging 
+volatile unsigned long printSequenceNum = 0;  // for serial debugging
 
 // --- Faster PRNG (xorshift32) ---
-uint32_t xorshift32_state = 1; // Seed with a non-zero value.
+uint32_t xorshift32_state = 1;  // Seed with a non-zero value.
 
 uint32_t fast_rand32() {
   xorshift32_state ^= (xorshift32_state << 13);
@@ -236,221 +236,6 @@ const uint16_t PROGMEM ChA2LUT[1041] = {
   1030
 };
 
-const uint16_t PROGMEM ChB1LUT[1041] = {
-  0, 6, 11, 13, 15, 17, 19, 21, 23, 24,
-  26, 27, 29, 30, 32, 33, 34, 36, 37, 38,
-  39, 41, 42, 43, 44, 45, 46, 48, 49, 50,
-  51, 52, 54, 55, 56, 57, 59, 60, 61, 62,
-  63, 65, 66, 67, 68, 69, 70, 71, 72, 74,
-  75, 76, 77, 79, 80, 81, 82, 83, 85, 86,
-  87, 88, 90, 91, 92, 93, 95, 96, 97, 98,
-  99, 100, 101, 103, 104, 105, 106, 107, 109, 110,
-  111, 112, 113, 115, 116, 117, 118, 119, 120, 121,
-  122, 123, 125, 126, 127, 128, 130, 131, 132, 133,
-  135, 136, 137, 138, 140, 141, 142, 143, 145, 146,
-  147, 148, 149, 150, 151, 153, 154, 155, 156, 157,
-  158, 160, 161, 162, 163, 164, 166, 167, 168, 169,
-  170, 171, 172, 174, 175, 176, 177, 178, 179, 180,
-  182, 183, 184, 185, 186, 187, 189, 190, 191, 192,
-  193, 194, 195, 196, 198, 199, 200, 201, 202, 204,
-  205, 206, 207, 208, 210, 211, 212, 213, 214, 216,
-  217, 218, 219, 220, 221, 223, 224, 225, 226, 227,
-  228, 229, 230, 232, 233, 234, 235, 236, 238, 239,
-  240, 241, 242, 243, 244, 245, 246, 248, 249, 250,
-  251, 252, 253, 254, 255, 257, 258, 259, 260, 261,
-  262, 264, 265, 266, 267, 268, 270, 271, 272, 273,
-  274, 275, 276, 277, 278, 279, 280, 281, 283, 284,
-  285, 286, 287, 288, 290, 291, 292, 293, 294, 296,
-  297, 298, 299, 300, 301, 303, 304, 305, 306, 307,
-  308, 309, 310, 311, 312, 313, 315, 316, 317, 318,
-  319, 320, 321, 323, 324, 325, 326, 327, 328, 329,
-  330, 331, 332, 333, 334, 335, 336, 338, 339, 340,
-  341, 342, 343, 345, 346, 347, 348, 349, 351, 352,
-  353, 354, 355, 356, 357, 358, 359, 360, 361, 362,
-  363, 364, 365, 366, 368, 369, 370, 371, 372, 373,
-  375, 376, 377, 378, 379, 380, 381, 382, 383, 384,
-  385, 386, 387, 388, 389, 390, 391, 392, 394, 395,
-  396, 397, 398, 399, 400, 401, 403, 404, 405, 406,
-  407, 408, 409, 410, 411, 412, 413, 414, 415, 416,
-  417, 418, 419, 420, 421, 423, 424, 425, 426, 427,
-  428, 429, 430, 431, 432, 433, 434, 435, 435, 436,
-  438, 439, 440, 441, 442, 443, 444, 445, 447, 448,
-  449, 450, 451, 452, 453, 454, 455, 456, 457, 458,
-  459, 460, 461, 462, 463, 464, 465, 466, 467, 468,
-  469, 470, 471, 472, 473, 474, 476, 477, 478, 479,
-  480, 481, 482, 483, 484, 485, 486, 486, 487, 488,
-  489, 491, 492, 493, 494, 495, 496, 497, 498, 499,
-  501, 502, 503, 504, 505, 506, 507, 508, 509, 510,
-  511, 512, 512, 513, 514, 515, 516, 517, 518, 519,
-  520, 521, 522, 523, 525, 526, 527, 528, 529, 530,
-  531, 532, 533, 534, 535, 535, 536, 537, 538, 539,
-  540, 541, 542, 543, 544, 545, 546, 547, 548, 549,
-  550, 551, 552, 553, 555, 556, 557, 558, 559, 560,
-  561, 562, 563, 563, 564, 565, 566, 567, 568, 569,
-  570, 571, 572, 573, 574, 575, 576, 577, 578, 579,
-  580, 581, 582, 583, 584, 585, 586, 587, 587, 588,
-  589, 590, 591, 592, 593, 594, 595, 596, 597, 598,
-  599, 600, 601, 602, 603, 604, 605, 606, 607, 608,
-  608, 609, 610, 611, 612, 613, 614, 615, 616, 616,
-  617, 618, 619, 620, 621, 622, 622, 623, 624, 625,
-  626, 627, 628, 629, 630, 631, 632, 633, 634, 635,
-  636, 636, 637, 638, 639, 640, 641, 642, 643, 643,
-  644, 645, 646, 647, 648, 649, 650, 651, 652, 653,
-  654, 655, 656, 657, 658, 659, 660, 661, 662, 663,
-  664, 665, 666, 667, 667, 668, 669, 670, 671, 671,
-  672, 673, 674, 675, 675, 676, 677, 678, 679, 680,
-  681, 682, 683, 684, 685, 686, 687, 688, 689, 690,
-  691, 691, 692, 693, 694, 695, 696, 697, 698, 699,
-  699, 700, 701, 702, 703, 704, 705, 706, 707, 708,
-  708, 709, 710, 711, 712, 713, 714, 715, 716, 717,
-  718, 719, 720, 721, 721, 722, 723, 724, 725, 726,
-  727, 728, 728, 729, 730, 731, 732, 733, 734, 735,
-  736, 737, 738, 739, 740, 740, 741, 742, 743, 743,
-  744, 745, 746, 746, 747, 748, 749, 749, 750, 751,
-  752, 753, 754, 755, 756, 757, 758, 759, 759, 760,
-  761, 762, 763, 764, 765, 765, 766, 767, 768, 769,
-  770, 771, 771, 772, 773, 774, 775, 776, 777, 778,
-  779, 779, 780, 781, 782, 783, 784, 785, 786, 787,
-  788, 790, 791, 791, 792, 793, 794, 795, 796, 797,
-  798, 799, 800, 801, 802, 803, 803, 804, 805, 806,
-  807, 808, 809, 810, 811, 812, 813, 814, 814, 815,
-  816, 817, 818, 819, 820, 821, 821, 822, 823, 824,
-  824, 825, 826, 827, 827, 828, 829, 830, 830, 831,
-  832, 833, 834, 835, 836, 837, 838, 838, 839, 840,
-  841, 842, 843, 844, 845, 846, 846, 847, 848, 849,
-  850, 851, 851, 852, 853, 854, 855, 856, 857, 857,
-  858, 859, 860, 861, 862, 863, 863, 864, 865, 866,
-  867, 867, 868, 869, 870, 871, 871, 872, 873, 874,
-  875, 875, 876, 877, 878, 879, 879, 880, 881, 882,
-  883, 884, 884, 885, 886, 887, 888, 889, 890, 891,
-  892, 893, 894, 895, 896, 897, 898, 899, 900, 900,
-  901, 902, 903, 904, 905, 906, 907, 907, 908, 909,
-  910, 910, 911, 912, 913, 913, 914, 915, 916, 917,
-  917, 918, 919, 920, 921, 922, 922, 923, 924, 925,
-  926, 927, 927, 928, 929, 930, 931, 931, 932, 933,
-  934, 934, 935, 936, 937, 938, 939, 939, 940, 941,
-  942, 943, 944, 944, 945, 946, 947, 948, 948, 949,
-  950, 951, 951, 952, 953, 954, 954, 955, 956, 957,
-  957, 958, 959, 960, 960, 961, 962, 963, 963, 964,
-  965, 966, 967, 967, 968, 969, 970, 970, 971, 972,
-  972, 973, 974, 975, 975, 976, 977, 978, 978, 979,
-  980, 980, 981, 982, 983, 983, 984, 985, 985, 986,
-  987, 987, 988, 989, 989, 990, 991, 992, 992, 993,
-  994, 994, 995, 996, 996, 997, 998, 999, 999, 1000,
-  1001, 1001, 1002, 1003, 1003, 1004, 1005, 1005, 1006, 1007,
-  1007, 1008, 1009, 1009, 1010, 1011, 1011, 1012, 1012, 1013,
-  1014, 1014, 1015, 1016, 1016, 1017, 1018, 1018, 1019, 1020,
-  1021, 1022, 1023, 1023, 1024, 1025, 1026, 1027, 1028, 1029,
-  1030
-};
-
-const uint16_t PROGMEM ChB2LUT[1041] = {
-  0, 31, 42, 44, 47, 49, 52, 54, 56, 58,
-  60, 62, 64, 66, 68, 70, 72, 74, 75, 76,
-  78, 79, 81, 82, 83, 85, 86, 87, 88, 90,
-  91, 92, 93, 95, 96, 98, 99, 100, 102, 103,
-  105, 106, 107, 108, 109, 110, 111, 112, 113, 114,
-  116, 119, 121, 124, 125, 126, 127, 128, 128, 129,
-  130, 131, 131, 132, 133, 134, 134, 135, 136, 137,
-  138, 139, 140, 141, 141, 142, 143, 144, 145, 147,
-  149, 151, 154, 156, 157, 158, 158, 159, 160, 161,
-  161, 162, 163, 164, 164, 165, 166, 167, 168, 170,
-  171, 172, 174, 175, 176, 177, 178, 179, 180, 181,
-  182, 183, 184, 185, 185, 186, 187, 188, 189, 190,
-  190, 191, 192, 193, 194, 195, 195, 196, 197, 198,
-  199, 200, 200, 201, 202, 203, 204, 204, 205, 206,
-  207, 208, 210, 212, 215, 217, 219, 219, 220, 221,
-  222, 223, 223, 224, 225, 226, 226, 227, 228, 229,
-  229, 230, 231, 232, 232, 233, 234, 235, 236, 236,
-  237, 238, 239, 239, 240, 242, 243, 244, 245, 246,
-  247, 248, 249, 250, 251, 252, 253, 255, 256, 257,
-  258, 259, 261, 262, 263, 264, 265, 267, 268, 269,
-  270, 271, 272, 272, 273, 274, 274, 275, 276, 277,
-  277, 278, 279, 279, 280, 281, 282, 283, 284, 285,
-  286, 287, 288, 289, 290, 291, 292, 294, 296, 298,
-  300, 302, 303, 303, 304, 305, 306, 307, 308, 309,
-  310, 310, 311, 312, 313, 314, 315, 316, 316, 317,
-  318, 319, 320, 321, 321, 322, 323, 324, 325, 326,
-  327, 328, 329, 330, 331, 332, 333, 334, 335, 336,
-  337, 338, 339, 339, 340, 341, 342, 343, 344, 345,
-  345, 346, 347, 348, 349, 349, 350, 351, 352, 353,
-  353, 355, 357, 358, 360, 362, 364, 365, 365, 366,
-  367, 368, 368, 369, 370, 370, 371, 372, 373, 373,
-  374, 375, 376, 377, 378, 379, 381, 382, 383, 384,
-  385, 386, 387, 388, 389, 390, 391, 392, 393, 394,
-  395, 395, 396, 397, 398, 399, 400, 401, 402, 403,
-  403, 404, 405, 406, 407, 408, 408, 409, 410, 411,
-  412, 412, 413, 414, 415, 415, 417, 419, 421, 423,
-  425, 427, 427, 428, 429, 430, 431, 431, 432, 433,
-  434, 435, 436, 436, 437, 438, 439, 440, 440, 441,
-  442, 443, 444, 445, 445, 446, 447, 448, 449, 450,
-  451, 453, 454, 455, 456, 457, 458, 459, 460, 461,
-  462, 463, 464, 465, 466, 466, 467, 468, 469, 470,
-  471, 472, 473, 474, 475, 476, 477, 478, 479, 480,
-  481, 481, 482, 483, 484, 485, 485, 486, 487, 488,
-  489, 490, 491, 492, 493, 494, 495, 496, 497, 498,
-  500, 501, 501, 502, 503, 504, 505, 506, 507, 508,
-  509, 510, 511, 512, 513, 514, 515, 516, 517, 518,
-  519, 520, 521, 522, 523, 524, 525, 526, 526, 527,
-  528, 529, 530, 531, 532, 533, 534, 535, 536, 537,
-  538, 539, 540, 541, 542, 543, 545, 546, 547, 548,
-  549, 550, 551, 552, 553, 554, 554, 555, 556, 556,
-  557, 558, 559, 559, 560, 561, 562, 563, 565, 566,
-  567, 569, 570, 571, 572, 573, 574, 575, 576, 576,
-  577, 578, 579, 579, 580, 581, 582, 583, 584, 585,
-  586, 587, 588, 589, 590, 591, 592, 593, 594, 595,
-  595, 596, 597, 598, 599, 599, 600, 601, 602, 602,
-  603, 604, 605, 606, 607, 608, 608, 609, 610, 611,
-  612, 613, 613, 614, 615, 616, 617, 618, 619, 620,
-  620, 621, 622, 623, 624, 625, 626, 627, 628, 629,
-  630, 631, 632, 633, 634, 635, 635, 636, 637, 638,
-  639, 640, 641, 642, 642, 643, 644, 645, 646, 646,
-  647, 648, 649, 649, 650, 651, 651, 652, 653, 654,
-  654, 655, 656, 658, 660, 661, 663, 664, 666, 667,
-  668, 669, 669, 670, 671, 672, 673, 674, 675, 676,
-  677, 678, 679, 679, 680, 681, 682, 683, 684, 685,
-  686, 686, 687, 689, 690, 691, 692, 693, 694, 695,
-  696, 697, 698, 699, 700, 700, 701, 702, 703, 703,
-  704, 705, 706, 706, 707, 709, 710, 712, 713, 715,
-  717, 718, 719, 719, 720, 721, 721, 722, 723, 723,
-  724, 725, 726, 726, 727, 728, 728, 729, 730, 731,
-  732, 733, 734, 734, 735, 736, 737, 738, 739, 740,
-  741, 742, 743, 744, 746, 747, 748, 749, 750, 751,
-  751, 752, 753, 754, 755, 755, 756, 757, 758, 759,
-  759, 760, 761, 761, 762, 763, 763, 764, 765, 765,
-  766, 767, 767, 768, 769, 769, 770, 772, 774, 776,
-  778, 780, 780, 781, 782, 782, 783, 784, 784, 785,
-  785, 786, 787, 787, 788, 788, 789, 790, 790, 792,
-  793, 795, 796, 798, 799, 801, 802, 802, 803, 804,
-  804, 805, 806, 807, 807, 808, 809, 809, 810, 811,
-  812, 813, 813, 814, 815, 816, 817, 818, 818, 819,
-  820, 821, 822, 823, 824, 825, 826, 827, 828, 829,
-  830, 831, 832, 833, 834, 835, 836, 837, 838, 839,
-  840, 841, 842, 843, 844, 845, 846, 847, 848, 849,
-  849, 850, 851, 852, 853, 854, 854, 855, 856, 856,
-  857, 858, 858, 859, 860, 861, 861, 862, 863, 863,
-  865, 866, 867, 868, 869, 871, 872, 873, 874, 875,
-  876, 876, 877, 878, 879, 880, 881, 881, 882, 883,
-  884, 885, 885, 886, 887, 887, 888, 888, 889, 890,
-  890, 891, 892, 892, 893, 894, 894, 895, 896, 897,
-  898, 899, 900, 901, 902, 903, 904, 905, 906, 907,
-  907, 908, 909, 910, 911, 912, 913, 914, 915, 916,
-  916, 917, 917, 918, 919, 919, 920, 921, 921, 922,
-  923, 923, 924, 925, 925, 926, 927, 928, 929, 930,
-  931, 931, 932, 933, 934, 935, 936, 937, 938, 939,
-  940, 940, 941, 942, 943, 944, 945, 946, 947, 947,
-  948, 948, 949, 949, 950, 951, 951, 952, 952, 953,
-  954, 954, 955, 955, 956, 957, 957, 958, 959, 960,
-  961, 962, 963, 964, 965, 966, 967, 968, 969, 970,
-  971, 971, 972, 973, 974, 975, 976, 976, 977, 978,
-  979, 979, 980, 981, 981, 982, 982, 983, 984, 984,
-  985, 986, 986, 987, 988, 989, 990, 991, 992, 993,
-  994, 995, 996, 997, 998, 999, 1000, 1000, 1001, 1001,
-  1002, 1003, 1003, 1004, 1005, 1005, 1006, 1007, 1007, 1008,
-  1008, 1009, 1010, 1010, 1011, 1011, 1012, 1013, 1013, 1014,
-  1014, 1015, 1015, 1016, 1016, 1017, 1018, 1018, 1019, 1021,
-  1030
-};
 
 const uint16_t *currentChALUT;
 const uint16_t *currentChBLUT;
@@ -491,6 +276,7 @@ volatile int envCount = 0;       // contrast envelope counter
 volatile int nEnvCounts = 1;
 volatile float contrastMult = 0;
 volatile uint16_t contrastMultInt = 0;
+volatile unsigned int completedCycles = 0; // Tracks full sine wave cycles
 
 // white noise parameters
 volatile float target_mean;  // Desired mean of the final output
@@ -552,7 +338,7 @@ void setup() {
 
   // set default LUTs to "1"
   currentChALUT = ChA1LUT;
-  currentChBLUT = ChB1LUT;
+  currentChBLUT = ChA1LUT;
 
 
   Serial.begin(115200);
@@ -716,25 +502,29 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     //  Serial.flush();
 
     SwitchingWhiteNoise(updateTime, switchTime, nReps, meanVal1, contrastVal1, meanVal2, contrastVal2);
- // } 
-  //else if (FirstChar == "se")  // sinusoidal flicker with contrast envelope
-  //{
-   // long stimulusDuration = atof(serialVals[1]);
-   // float frequency = atof(serialVals[2]);
-   // float envFrequency = atof(serialVals[3]);
-    //Serial.println("Stim: Sinusoidal env");
-    //Serial.flush();
-    //   Serial.print("Stim duration: ");
-    //    Serial.println(stimulusDuration);
-    //   Serial.flush();
-    //   Serial.print("Frequency: ");
-    //   Serial.println(frequency);
-    //   Serial.flush();
-    //   Serial.print("Envelope freq: ");
-    //   Serial.println(envFrequency);
-    //   Serial.flush();
+    } else if (FirstChar == "se")  // sinusoidal flicker with contrast envelope
+  {
+    long stimulusDuration = atof(serialVals[1]);
+    float frequency = atof(serialVals[2]);
+    float envFrequency = atof(serialVals[3]);
+    float maxContrastA = atof(serialVals[4]); 
+    float maxContrastB = atof(serialVals[5]); 
 
-   // SineContrastConv(stimulusDuration, frequency, envFrequency);
+    Serial.println("Stim: Sinusoidal env");
+    Serial.flush();
+    Serial.print("Stim duration: ");
+    Serial.println(stimulusDuration);
+    Serial.print("Frequency: ");
+    Serial.println(frequency);
+    Serial.print("Envelope freq: ");
+    Serial.println(envFrequency);
+    Serial.print("Contrast A: ");
+    Serial.println(maxContrastA);
+    Serial.print("Contrast B: ");
+    Serial.println(maxContrastB);
+    Serial.flush();
+
+    SineContrastConv(stimulusDuration, frequency, envFrequency, maxContrastA, maxContrastB);
 
   } else if (FirstChar == "fs")  // frequencySweep stimulus
   {
@@ -748,13 +538,19 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
 
     FrequencySweep(fmin, fmax, sweepFactorPerSec,
                    phaseA, phaseB, contrastA, contrastB);
+  } else if (FirstChar == "sfs")  // stepped frequency sweep
+  {
+    float startFreq = atof(serialVals[1]);
+    float endFreq = atof(serialVals[2]);
+    float stepFreq = atof(serialVals[3]);
+    int cyclesPerFreq = atoi(serialVals[4]);
+    float phaseA = atof(serialVals[5]);
+    float phaseB = atof(serialVals[6]);
+    float contrastA = atof(serialVals[7]);
+    float contrastB = atof(serialVals[8]);
 
-  //} 
-  //else if (FirstChar == "st")  // Set TopLuminance
-  //{
-   // float TopMultiplier = atof(serialVals[1]);
+    SteppedFrequencySweep(startFreq, endFreq, stepFreq, cyclesPerFreq, phaseA, phaseB, contrastA, contrastB);
 
-   // SetTopLumi(TopMultiplier);
 
   } else if (FirstChar == "sd")  // Set duty cycle of both channels
   {
@@ -813,13 +609,13 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     uint8_t lutIndex = atoi(serialVals[1]);
     if (lutIndex == 1) {
       currentChALUT = ChA1LUT;
-      currentChBLUT = ChB1LUT;
+      currentChBLUT = ChA1LUT;
       Serial.print(F("LUT 1 SELECTED"));
       Serial.print("\n");
 
     } else if (lutIndex == 2) {
       currentChALUT = ChA2LUT;
-      currentChBLUT = ChB2LUT;
+      currentChBLUT = ChA2LUT;
       Serial.print(F("LUT 2 SELECTED"));
       Serial.print("\n");
     }
@@ -919,6 +715,7 @@ void sinewaveInterrupt() {
   if (tableIndexA >= TABLE_SIZE) {
     PORTD ^= (1 << PIND4);      // Toggle Pin 4 if sine wave cycle finished
     tableIndexA -= TABLE_SIZE;  // wrap table
+    completedCycles++;          // increment completed cycles counter
   }
 
   // Update the table index (wrap around if necessary)
@@ -929,93 +726,169 @@ void sinewaveInterrupt() {
 }
 
 /////////////////////////////////// SINE WAVE FLICKER WITH CONTRAST ENVELOPE //////////////////////////
-//void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFreq) {
+void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFreq, float maxContrastA, float maxContrastB) {
 
-  // first do some calculations to find the update interval and step size for Timer3 interrupts
+  // Store the user's requested maximum contrasts globally
+  contrastMultA = maxContrastA;
+  contrastMultB = maxContrastB;
+
   // Calculate the PWM cycle time in microseconds
-//  float pwmCycleTime = (2.0 * TOP) / (float)(CLOCK_FREQ / prescaler);  // Time per PWM cycle in seconds
-//  pwmCycleTime *= 1e6;                                                 // Convert seconds to microseconds
+  float pwmCycleTime = (2.0 * TOP) / (float)(CLOCK_FREQ / prescaler); 
+  pwmCycleTime *= 1e6; 
 
   // Calculate the base update interval for the sinewave frequency
- // float baseUpdateInterval = 1.0 / (sinewaveFrequency * TABLE_SIZE);  // Time per table update in seconds
- // baseUpdateInterval *= 1e6;                                          // Convert to microseconds
+  float baseUpdateInterval = 1.0 / (sinewaveFrequency * TABLE_SIZE); 
+  baseUpdateInterval *= 1e6; 
 
   // Find the smallest step size that is a factor of TABLE_SIZE
- // stepSize = TABLE_SIZE;  // Start with the maximum possible step size
-//  for (int i = 1; i <= TABLE_SIZE; i++) {
-//    if ((TABLE_SIZE % i == 0) && (baseUpdateInterval * i >= pwmCycleTime)) {
-//      stepSize = i;
-//      break;  // Stop at the first valid (smallest) step size
-//    }
-//  }
+  stepSize = TABLE_SIZE; 
+  for (int i = 1; i <= TABLE_SIZE; i++) {
+    if ((TABLE_SIZE % i == 0) && (baseUpdateInterval * i >= pwmCycleTime)) {
+      stepSize = i;
+      break; 
+    }
+  }
 
-//  tableIndexA = 0;      // start at beginning of sinewave table
- // tableEnvIndex = 191;  // start at 0 contrast
- // envCount = 0;         // contrast envelope counter
- // contrastMult = 0;
- // nEnvCounts = 0;
-
+  tableIndexA = 0;      // start at beginning of sinewave table
+  tableIndexB = 0;      // keep B in phase with A (or modify if you want phase control)
+  tableEnvIndex = 191;  // start at 0 contrast
+  envCount = 0;         // contrast envelope counter
+  contrastMult = 0;
+  nEnvCounts = 0;
 
   // Recalculate the effective update interval based on the step size
- // float updateInterval = baseUpdateInterval * stepSize;
-  //Serial.print("req update: ");
-  //Serial.println(updateInterval);
- // float updateFrequency = 1e6 / updateInterval;  // update frequency for timer3 interrupt
- // nEnvCounts = (int)(sinewaveFrequency / envelopeFreq);
+  float updateInterval = baseUpdateInterval * stepSize;
+  float updateFrequency = 1e6 / updateInterval; 
+  nEnvCounts = (int)(sinewaveFrequency / envelopeFreq);
 
   // Configure timer3 interrupt to updateFrequency
- // configureTimer3Interrupt(updateFrequency);
- // PORTC |= (1 << PORTC6);     // Stim on pin 5
- // long startTime = millis();  // Record the start time
+  configureTimer3Interrupt(updateFrequency);
+  PORTC |= (1 << PORTC6);     // Stim on pin 5
+  long startTime = millis();  // Record the start time
+  
   // set timer3 interrupt callback function to play the sinewave
-//  setTimer3Callback(sinewaveEnvelopeInterrupt);
+  setTimer3Callback(sinewaveEnvelopeInterrupt);
 
   // Loop until the specified duration has elapsed
- // while (millis() - startTime < duration) {
-//    delayMicroseconds(1);  //wait for time to end
-//  }
-//  stopTimer3Interrupt();    // finish playing sinewave
- // PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW by changing register directly
- // PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
- // Serial.println("-1");
- // Serial.flush();
- // if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
- // if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default}
-//}
+  while (millis() - startTime < duration) {
+    delayMicroseconds(1);  //wait for time to end
+  }
+  
+  stopTimer3Interrupt();    // finish playing sinewave
+  PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW
+  PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
+  Serial.println("-1");
+  Serial.flush();
+  
+  if (useChA) { setChA(TopLumi / 2); }  
+  if (useChB) { setChB(TopLumi / 2); }  
+}
 
 
 // sinewave contrast envelope interrupt function
-//void sinewaveEnvelopeInterrupt() {
-  //unsigned long startTime = micros();
-  // Update PWM duty cycle with the next sine wave value
-//  uint16_t ocrVal = MidLumi + ((sineWaveTable[tableIndexA] - MidLumi) * (contrastMult));
+void sinewaveEnvelopeInterrupt() {
+  unsigned long startTime = micros();
+  
+  // Multiply the current envelope state by the max limits for each channel
+  float currentContrastA = contrastMult * contrastMultA;
+  float currentContrastB = contrastMult * contrastMultB;
 
- // if (useChA) { setChA(ocrVal); }  //
-//  if (useChB) { setChB(ocrVal); }  //
+  // Calculate OCR values independently
+  uint16_t ocrValA = MidLumi + ((sineWaveTable[tableIndexA] - MidLumi) * currentContrastA);
+  uint16_t ocrValB = MidLumi + ((sineWaveTable[tableIndexB] - MidLumi) * currentContrastB);
+
+  if (useChA) { setChA(ocrValA); }  
+  if (useChB) { setChB(ocrValB); }  
 
   // update sinewave table index based on interrupt frequency
- // tableIndexA = tableIndexA + stepSize;
- // if (tableIndexA >= TABLE_SIZE) tableIndexA -= TABLE_SIZE;  // wrap table index
+  tableIndexA = tableIndexA + stepSize;
+  if (tableIndexA >= TABLE_SIZE) tableIndexA -= TABLE_SIZE;  // wrap table index
+  
+  tableIndexB = tableIndexB + stepSize;
+  if (tableIndexB >= TABLE_SIZE) tableIndexB -= TABLE_SIZE;  // wrap table index
 
+  //update counter for contrast envelope
+  envCount = envCount + 1;
+  if (envCount > nEnvCounts - 1)  // check if time to update contrast value
+  {
+    envCount = 0;                       // reset
+    tableEnvIndex = tableEnvIndex + 1;  // incremenet contrast LUT index
 
-  // update counter for contrast envelope
- // envCount = envCount + 1;
- // if (envCount > nEnvCounts - 1)  // check if time to update contrast value
- // {
-  //  envCount = 0;                       // reset
- //   tableEnvIndex = tableEnvIndex + 1;  // incremenet contrast LUT index
-
- //   if (tableEnvIndex >= TABLE_SIZE) {
-  //    PORTD ^= (1 << PIND4);        // Toggle Pin 4 if envelope cycle finished
- //     tableEnvIndex -= TABLE_SIZE;  // wrap tableEnvIndex
-  //  }
- //   contrastMult = sineWaveTable[tableEnvIndex] / float(TopLumi);  // update contrast multiplier
- // }
-  //unsigned long duration = micros() - startTime; // Measure execution time
-  //Serial.println(duration); // Print execution time
-//}
+    if (tableEnvIndex >= TABLE_SIZE) {
+      PORTD ^= (1 << PIND4);        // Toggle Pin 4 if envelope cycle finished
+      tableEnvIndex -= TABLE_SIZE;  // wrap tableEnvIndex
+    }
+    contrastMult = sineWaveTable[tableEnvIndex] / float(TopLumi);  // update contrast multiplier
+  }
+}
 
 ///////////////////////////////////  FREQUENCY SWEEP FUNCTIONS//////////////////////////////////
+
+void SteppedFrequencySweep(float startFreq, float endFreq, float stepFreq, int cyclesPerFreq, float phaseA, float phaseB, float contrastA, float contrastB) {
+
+  // Set initial phase and contrast
+  tableIndexA = (int)(phaseA * (float)TABLE_SIZE) % TABLE_SIZE;
+  tableIndexB = (int)(phaseB * (float)TABLE_SIZE) % TABLE_SIZE;
+  contrastMultA = contrastA;
+  contrastMultB = contrastB;
+
+  PORTC |= (1 << PORTC6);  // set Pin 5 HIGH
+  PORTD |= (1 << PIND4);   // set Pin 4 HIGH
+
+  float currentFreq = startFreq;
+  bool sweepingUp = startFreq <= endFreq;
+  stepFreq = abs(stepFreq); 
+
+  // Set the callback function once
+  setTimer3Callback(sinewaveInterrupt);
+
+  while ((sweepingUp && currentFreq <= endFreq) || (!sweepingUp && currentFreq >= endFreq)) {
+    
+    // 1. Calculate the timer math for the current frequency
+    float pwmCycleTime = (2.0 * TOP) / (float)(CLOCK_FREQ / prescaler) * 1e6;
+    float baseUpdateInterval = (1.0 / (currentFreq * TABLE_SIZE)) * 1e6;
+
+    stepSize = TABLE_SIZE;
+    for (int i = 1; i <= TABLE_SIZE; i++) {
+      if ((TABLE_SIZE % i == 0) && (baseUpdateInterval * i >= pwmCycleTime)) {
+        stepSize = i;
+        break;
+      }
+    }
+
+    float updateInterval = baseUpdateInterval * stepSize;
+    float updateFrequency = 1e6 / updateInterval;
+
+    // 2. Reset cycle counter BEFORE configuring the new timer speed
+    completedCycles = 0; 
+    
+    // 3. Apply the new frequency (changes how fast the interrupt fires)
+    configureTimer3Interrupt(updateFrequency);
+
+    // 4. Wait for EXACTLY 'cyclesPerFreq' wrap-arounds
+    while (completedCycles < cyclesPerFreq) {
+      // The microcontroller just hangs out here.
+      // All the precision work is happening in the background via Timer 3.
+      delayMicroseconds(1); 
+    }
+
+    // 5. Step the frequency for the next loop
+    if (sweepingUp) {
+      currentFreq += stepFreq;
+    } else {
+      currentFreq -= stepFreq;
+    }
+  }
+
+  // Cleanup after sweep is done
+  stopTimer3Interrupt();
+  PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is LOW
+  PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is LOW
+  Serial.print("-1\n");
+
+  if (useChA) { setChA(TopLumi / 2); } 
+  if (useChB) { setChB(TopLumi / 2); } 
+}
 
 /**
  * Outputs a sine wave with an approximated exponential frequency sweep for one full cycle.
@@ -1235,7 +1108,7 @@ float generateGaussianCLT() {
   long sum_random = 0;
   for (int i = 0; i < N; i++) {
     // sum_random += random(RANDOM_UPPER_BOUND); // Original
-    sum_random += fast_rand32() & (RANDOM_UPPER_BOUND - 1); // Faster core PRNG (RANDOM_UPPER_BOUND must be power of 2, e.g. 1024)
+    sum_random += fast_rand32() & (RANDOM_UPPER_BOUND - 1);  // Faster core PRNG (RANDOM_UPPER_BOUND must be power of 2, e.g. 1024)
   }
   float gaussian_approx_zero_mean_unit_variance =
     ((float)sum_random - SUM_EXPECTED_MEAN) * NORMALIZE_SCALE_FACTOR;
@@ -1386,7 +1259,6 @@ void whiteNoiseInterrupt() {
   //Serial.print(",");
 
   printSequenceNum++;
-
 }
 
 
@@ -1402,7 +1274,7 @@ void frozenWhiteNoise(int updateTime, long duration, long nReps, int randSeedNum
   Serial.print("LD: ");
   Serial.print(totalDuration);
   Serial.print("\n");
-  xorshift32_state = randSeedNum; // for reproducible random sequence across different stimulus blocks
+  xorshift32_state = randSeedNum;  // for reproducible random sequence across different stimulus blocks
 
 
   float frac_target_mean = 0.5;
@@ -1496,19 +1368,19 @@ void setChB(uint16_t ocrValue) {
 //    TopMultiplier = 1;
 //  }
 
-  // get new TOP value to use
+// get new TOP value to use
 //  TopLumi = float(TOP) * TopMultiplier;
 //  MidLumi = TopLumi / 2;
 
-  // Generate the sine wave LUT based on the Timer1 config
- // generateSineWaveTable(TopLumi);
+// Generate the sine wave LUT based on the Timer1 config
+// generateSineWaveTable(TopLumi);
 
-  // initialise random number to 50% duty cyle
- // randNumber = TopLumi / 2;
+// initialise random number to 50% duty cyle
+// randNumber = TopLumi / 2;
 
-  // Set pin 9 to 50% duty cycle as default
- // if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
- // if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
+// Set pin 9 to 50% duty cycle as default
+// if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
+// if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
 //}
 
 
@@ -1642,21 +1514,17 @@ void readAnalogVals() {
         Serial.println("Stopped reading analog values.");
       }
       // automatically set appropriate gamma correction
-      if (analogValue0<420)
-      {
+      if (analogValue0 < 420) {
         currentChALUT = ChA2LUT;
-        currentChBLUT = ChB2LUT;
+        currentChBLUT = ChA2LUT;
         Serial.print(F("LUT 2 SELECTED"));
         Serial.print("\n");
-      } 
-      else 
-      {
+      } else {
         currentChALUT = ChA1LUT;
-        currentChBLUT = ChB1LUT;
+        currentChBLUT = ChA1LUT;
         Serial.print(F("LUT 1 SELECTED"));
         Serial.print("\n");
       }
-
     }
   }
 }
@@ -1800,6 +1668,8 @@ void configureTimer3Interrupt(float frequency) {
     case 1024: TCCR3B |= (1 << CS32) | (1 << CS30); break;
   }
 
+  // reset the timer counter
+  TCNT3 = 0;
   // Set the compare match value
   OCR3A = compareValue;
 

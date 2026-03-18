@@ -1,5 +1,197 @@
-# LED stimulator
+# Full-Field LED Visual Stimulator
 
+This project implements a high-precision, large-field LED stimulator designed for visual neuroscience applications. It drives dual-channel LED arrays (e.g., Green for M-cones/rods and UV for S-cones) to produce precise temporal stimulation patterns such as sinusoidal flickers, Gaussian white noise (including contrast and mean switching adaptation paradigms), luminance steps and frequency chirps.
+
+This ReadME is a WIP.
+
+https://github.com/user-attachments/assets/08af2269-a270-4899-ae75-62786a714254
+
+example stimulus - 2hz antiphase (green/UV) sinusoidal flicker 
+
+## System Overview
+
+The stimulator runs on an **Arduino Leonardo (ATmega32u4)**. It utilizes a hybrid control mechanism to manage LED brightness:
+1.  **Fast PWM Signal:** Generates temporal patterns using high-frequency digital switching.
+2.  **Analog Dimming:** Uses a potentiometer to scale the gate voltage, forcing the driving MOSFETs to operate in the linear (ohmic) region. This acts as an adjustable current limiter for setting peak luminance.
+
+## Hardware Setup
+
+### Circuit Design
+The system uses a low-side switching topology.
+*   **LED Load:** Parallel strings of 3 LEDs, each with a current-limiting resistor.
+*   **Switching:** N-channel MOSFETs (one per chromatic channel).
+*   **Protection:**
+    *   **Snubber Capacitor:** Placed across the MOSFET (Source-Drain) to dampen high-frequency ringing.
+    *   **Gate Resistor:** 100$\Omega$ between Arduino and Gate to limit inrush current.
+    *   **Pull-down Resistor:** 10k$\Omega$ from Gate to Ground to ensure the MOSFET stays off during boot.
+ 
+[ciruit schematic]
+
+### Pinout Configuration
+Based on the firmware configuration, connect your hardware to the Arduino Leonardo as follows:
+
+| Component | Arduino Pin | Description |
+| :--- | :--- | :--- |
+| **Channel A (LEDs)** | **Pin 9** | PWM Output (Driven by Timer1) |
+| **Channel B (LEDs)** | **Pin 10** | PWM Output (Driven by Timer1) |
+| **Indicator** | **Pin 4** | Toggles state to indicate stimulus change events |
+| **Stimulus Status** | **Pin 5** | HIGH when stimulus is active, LOW otherwise |
+| **Sensors** | **A0 / A1** | For setting the potentiometer values |
+
+## Firmware Features
+
+*   **Dual-Channel Control:** Independent modulation of Channel A and Channel B.
+*   **High-Resolution PWM:** Uses 16-bit Phase Correct PWM (Timer1) to prevent visible digital stepping.
+*   **Precise Timing:** Waveform updates are driven by hardware interrupts (Timer3) rather than software `delay()` loops, ensuring stable temporal frequencies.
+*   **Gamma Correction:** Implements Look-Up Tables (LUTs) stored in PROGMEM to linearize LED output.
+*   **Fast RNG:** Uses `xorshift32` for high-speed random number generation required by white noise stimuli, approximating a Gaussian distribution via the Central Limit Theorem.
+*   **Sinewave LUT** Uses a look-up table to generate approximate sinusoidal flicker.
+
+## Installation
+
+1.  Open the firmware source code in the Arduino IDE.
+2.  Select **Arduino Leonardo** as the board.
+3.  Upload the sketch.
+4.  Open the Serial Monitor or your preferred interface software (e.g., Bonsai).
+
+## Serial API
+
+The device is controlled via a serial interface. Send commands as comma-separated ASCII strings terminated by a carriage return (`\r`) or newline.
+
+**Baud Rate:** `115200`.
+
+### Stimulus Commands
+
+#### 1. Sinusoidal Flicker (`s`)
+Generates one or two channel sinusoidal flicker. Stimulus duration, frequency, phase and contrast can all be set.
+```text
+s, Duration, Freq, PhaseA, PhaseB, ContrastA, ContrastB
+```
+*   **Duration:** Stimulus length in milliseconds.
+*   **Freq:** Temporal frequency in Hz.
+*   **PhaseA/B:** Phase offset (0.0–1.0, where 1.0 = $2\pi$).
+*   **ContrastA/B:** Modulation depth (0.0–1.0).
+
+#### 2. Gaussian White Noise (`wn`)
+Generates random luminance values based on a Gaussian distribution.
+```text
+wn, Duration, UpdateTime, MeanFrac, StdFrac
+```
+*   **UpdateTime:** Duration (ms) of each noise "frame".
+*   **MeanFrac:** Center luminance level (0.0–1.0).
+*   **StdFrac:** Standard deviation (sets the contrast).
+
+#### 3. Frozen White Noise (`fwn`)
+Plays a deterministic, repeatable sequence of Gaussian noise.
+```text
+fwn, Duration, UpdateTime, Reps, Seed
+```
+*   **Reps:** Number of times to loop the sequence.
+*   **Seed:** Integer seed for the pseudo-random number generator.
+
+#### 4. Switching White Noise (`cs`)
+Alternates between two gaussian distributions (e.g., high vs. low variance, high vs low mean).
+```text
+cs, UpdateTime, SwitchTime, Reps, Mean1, Cont1, Mean2, Cont2
+```
+*   **SwitchTime:** Duration (ms) to stay in one state before switching.
+*   **Mean/Cont:** Mean and Contrast parameters for State 1 and State 2.
+*   **Reps:** number of distribution switches to perform.
+
+#### 5. Frequency Chirp / Sweep (`fs`)
+Performs an exponential frequency sweep (from Fmin to Fmax to Fmin)
+```text
+fs, Fmin, Fmax, SweepFactor, PhaseA, PhaseB, ContrastA, ContrastB
+```
+*   **Fmin/Fmax:** Start and End frequencies in Hz.
+*   **SweepFactor:** Rate of change for the exponential sweep.
+
+### 6. Timed luminance step
+Performs a luminance step for a fixed duration before returning to baseline
+```text
+sdt, sdt, DutyA, DutyB, Duration
+```
+*   **DutyA/B:** Duty cycle value for each chromatic channel.
+
+
+### Configuration Commands
+
+| Command | Syntax | Description |
+| :--- | :--- | :--- |
+| **Set Static Duty** | `sd, DutyA, DutyB` | Sets DC output (0–100%) |
+| **Gamma Calibration** | `gc, Step, Wait, Reps` | Steps through duty cycles to measure gamma response curve. |
+| **Select LUT** | `agc, Index` | Switches Gamma LUTs. `1` = Chx1LUT, `2` = Chx2LUT. Can be autotoggled based on potentiometer settings|
+| **Toggle Channel** | `useChA, 1/0` | Enables (`1`) or disables (`0`) Channel A/B output. |
+| **Read Analog** | `ana` | Streams data from A0/A1 for configuring potentiometer values. Send "done" to stop. |
+
+## Firmware Architecture & Timer Configuration
+
+To achieve high-precision timing and smooth luminance gradients, the firmware directly manipulates the ATmega32u4 hardware timers. In future Timer3 may be configured similarly to Timer1 to allow for 3-channel stimulation (e.g. R,G,B), and Timer4 set for hardware interupt-based stimulus pacing.
+
+### Timer1: High-Resolution PWM Generation
+Timer1 is configured for **16-bit Phase Correct PWM** to drive the LED channels without visible digital stepping.
+
+*   **Mode Configuration:** The Waveform Generation Mode (WGM) is set to Mode 10 (Phase Correct PWM, TOP = ICR1). This is achieved by setting the `WGM13` bit in `TCCR1B` and clearing `WGM12`, `WGM11`, and `WGM10`.
+*   **Frequency Control:** The base frequency is determined by the `ICR1` register (Input Capture Register), which acts as the TOP value. The firmware dynamically calculates the optimal Prescaler (1, 8, 64, 256, or 1024) and `ICR1` value to approximate the target frequency (default ~7.68 kHz) while maximizing 16-bit resolution.
+*   **Output Channels:**
+    *   **Channel A (Pin 9):** Controlled by `OCR1A` (Output Compare Register). `COM1A1` is set to enable PWM output.
+    *   **Channel B (Pin 10):** Controlled by `OCR1B`. `COM1B1` is set to enable PWM output.
+
+### Timer3: Precision Stimulus Pacing
+Timer3 drives the temporal updates of the stimulus (e.g., moving to the next point in a sine wave or generating the next white noise frame). It operates independently of the main loop.
+
+*   **Mode Configuration:** Configured in **CTC Mode** (Clear Timer on Compare). The `WGM32` bit is set in `TCCR3B`.
+*   **Interrupt-Driven:** The `OCIE3A` bit in `TIMSK3` is set to enable interrupts. When the timer counter matches the value in `OCR3A`, the `TIMER3_COMPA_vect` ISR fires.
+*   **Dynamic Callbacks:** To support different stimulus types without rewriting the ISR, the firmware uses a function pointer (`timer3Callback`). The ISR executes whichever function (e.g., `sinewaveInterrupt`, `whiteNoiseInterrupt`) is currently assigned to this pointer.
+
+### Summary of Register Settings
+
+| Timer | Mode | Key Registers | Function |
+| :--- | :--- | :--- | :--- |
+| **Timer1** | 16-bit Phase Correct PWM | `TCCR1A`, `TCCR1B`, `ICR1` | Generates the carrier frequency for LED brightness. |
+| **Timer3** | CTC (Clear Timer on Compare) | `TCCR3B`, `OCR3A`, `TIMSK3` | Triggers hardware interrupts to update stimulus waveforms. |
+
+
+
+## Calibration
+1) Determining potentiomter setting for specific luminance levels (can be measured in estimated photoisomerisations/s)
+2) Generating gamma correction LUTs.
+
+Thorlabs powermeter or photodiode. Must have UV sensitivity and calibration data.
+
+## Synchronisation
+Typical photodiode setup not possible since we are using a high frequency PWM which is ~16bit.
+
+
+## **Performance Characteristics**
+
+This section details the temporal dynamics, switching limits, and linearity of the stimulation circuit.
+
+### **1. Switching Dynamics**
+
+The circuit utilizes a low-side MOSFET topology with a Source-Drain snubber capacitor to dampen ringing. While this ensures signal stability, it introduces a finite transition time during PWM switching events.
+
+* **Rise/Fall Time:** Measured at approximately **1 \mu s** (10% to 90% amplitude).
+* **Impact on PWM Fidelity:**
+* For a standard stimulation frequency of **10 kHz**, the total period is 100 \mu s.
+* A 1 \mu s rise time represents **1%** of the total period.
+* Since a full PWM cycle includes both a rising and falling edge, approximately **2%** of the duty cycle is consumed by transition states. This effectively limits the minimum resolvable duty cycle to >2% for linear operation.
+
+### **2. Linearity & Resolution**
+
+The device uses 16-bit PWM (Timer1) for high-resolution intensity control. However, the effective resolution is constrained by the physical switching speed described above.
+
+* **Dead Zone:** At extremely low duty cycles (specifically those requiring pulse widths < 1 \mu s), the MOSFET may not fully saturate, leading to non-linear luminance output.
+* **Correction:** A gamma-correction Look-Up Table (LUT) is implemented in firmware to linearize the output and compensate for these low-end non-linearities.
+
+### **3. Thermal Stability**
+
+* **Mode of Operation:** The MOSFET is driven in its linear (ohmic) region via a potentiometer-scaled gate voltage to limit peak current.
+* **Thermal Drift:** Users should be aware that as the MOSFET temperature increases during prolonged high-intensity operation, the threshold voltage (V_{th}) may shift, potentially altering the peak current slightly. Warm-up calibration is recommended for critical experiments.
+
+  
+
+## BOM
 
 | Category     | Part                                  | Link                                                                                               | Quantity  | Total Price (£) |
 |--------------|----------------------------------------|---------------------------------------------------------------------------------------------------|----------|-----------------|
@@ -16,7 +208,8 @@
 |              | 5mm magnets                           | [Link](https://www.amazon.co.uk/Magnet-Expert%C2%AE-5mm-thick-Neodymium/dp/B00TACMMP0/ref=sr_1_6?s=kitchen)                      | 8        | –               |
 |              |                                       | –                                                                                                  | –        | –               |
 | **LEDs and connectors**|                             | -                                                                                                  |         |                 |
-|              | Custom LED PCBs                       | [repo link](https://github.com/SaleemLab/LEDStimulation/tree/main/Hardware/LED_board)              | –       | –               |
+|              | Green LEDs                            | [LCSC link](https://www.lcsc.com/product-detail/C2843870.html?s_z=n_C2843870)              | –       | –               |
+|              | UV LEDs                               | [LCSC link](https://www.lcsc.com/product-detail/C2843870.html?s_z=n_C2843870)              | –       | –               |
 |              | Right-angled female pin headers       | –                                                                                                  | –        | –               |
 |              | Right-angled male pin headers         | –                                                                                                  | –       | –               |
 |              | red-black wire                        | –                                                                                                  | –      | –               |
@@ -31,116 +224,3 @@
 
 
 
-https://www.amazon.co.uk/Magnet-Expert%C2%AE-5mm-thick-Neodymium/dp/B00TACMMP0/ref=sr_1_6?s=kitchen
-
-
-
-
-
-
-
-
-
-
-# LEDStimulation
-
-![LedDriverCircuit_dev](https://github.com/user-attachments/assets/55d41437-afe3-4cde-a057-3e388293bc60)
-
-
-## Reference Voltage Generation for LED Current Control
-
-To provide a stable and noise-immune analog reference voltage (**V<sub>ref</sub>**) for constant current LED regulation, a dedicated signal conditioning circuit was designed. This reference signal is shared across multiple OPA2197-based constant current driver circuits, each controlling a high-side P-MOSFET and current sense resistor to regulate individual LED lines.
-
-A 5 V PWM signal generated by a microcontroller (10-bit resolution, 10 kHz frequency) was passed through a **first-order RC low-pass filter** consisting of a 10 kΩ resistor (R1) and a 1 µF capacitor (C1), yielding a cutoff frequency of approximately 16 Hz. This filter attenuated high-frequency switching noise and converted the PWM waveform into a smooth analog voltage.
-
-To limit the control range to a maximum of approximately **0.25 V**, corresponding to **10 mA LED current** through a 25 Ω sense resistor, the filtered signal was scaled using a **passive resistor divider** (R2 = 10 kΩ, R3 = 1 kΩ). The resulting voltage range was approximately 0–0.45 V.
-
-This attenuated signal was then fed into a **rail-to-rail input/output buffer op-amp** (OPA391, Texas Instruments) configured as a unity-gain voltage follower. The buffer provided a **low-impedance drive** capable of supporting multiple LED driver op-amp inputs without introducing loading effects or voltage droop. The buffer output was routed in parallel to the non-inverting inputs of all OPA2197 LED driver circuits, ensuring synchronized and consistent current setpoints across all channels.
-
-This configuration provided a clean, scalable, and stable reference voltage, suitable for low-current (<10 mA) LED stimulation applications requiring precise current regulation and global brightness modulation.
-
-### V<sub>ref</sub> Generation Circuit Components
-
-| Label | Component             | Value / Part Number   | Description                                                                 |
-|-------|------------------------|------------------------|-----------------------------------------------------------------------------|
-| R1    | Resistor               | 10 kΩ                  | Forms RC filter with C1 to smooth PWM signal into analog voltage            |
-| C1    | Capacitor              | 1 µF                   | RC low-pass filter capacitor (PWM smoothing)                                |
-| R2    | Resistor               | 10 kΩ                  | Voltage divider top resistor (scaling 5 V to ~0.45 V)                        |
-| R3    | Resistor               | 1 kΩ                   | Voltage divider bottom resistor                                             |
-| U1    | Op-Amp (buffer)        | OPA391 (TI)            | Unity-gain buffer, RRIO, low offset, drives multiple V<sub>ref</sub> loads  |
-| V<sub>in</sub> | PWM or DAC Source     | 5 V PWM or DAC         | From microcontroller (e.g. Arduino, STM32)                                  |
-| V<sub>ref</sub> Out | Analog Reference Voltage | 0–0.25 V              | Output to multiple OPA2197 current source channels                          |
-
-
-
-## Constant Current LED Driver Design
-
-Each LED channel was driven by a high-side linear constant current source composed of a precision op-amp (`OPA2197ID`, Texas Instruments) and a P-channel MOSFET (`DMP2035U-7`, Diodes Inc.). This circuit regulates current through the LED by comparing a reference voltage (`V_ref`) to the voltage across a 25 Ω current sense resistor.
-
-The P-MOSFET’s source was connected to a regulated 12 V supply. The drain supplied current through an LED, which was returned to ground via a low-side N-channel PWM switch. The source and the top of the sense resistor were connected to the **inverting input** of the op-amp. The **non-inverting input** received a shared `V_ref` voltage, buffered from either a PWM+filter circuit or DAC.
-
-The op-amp output controlled the MOSFET’s gate through a 100 Ω gate resistor, adjusting the gate-to-source voltage (`V_GS`) to maintain:
-
-`V_ref = V_sense = I_LED × R_sense`
-
-A compensation capacitor (47 pF) was connected between the op-amp’s output and inverting input to ensure loop stability and minimize overshoot when LED current was modulated rapidly. This configuration maintained a constant LED current set by:
-
-`I_LED = V_ref / 25Ω`
-
-The use of the `OPA2197`, with its 10 V/µs slew rate and rail-to-rail I/O, ensured fast loop response suitable for integration with a 10 kHz global PWM modulation signal. This ensured that each LED line delivered precise, low-noise current from 0 to 10 mA, independent of load voltage variation or supply ripple.
-
-
-### Constant Current LED Driver Components
-
-| Label  | Component              | Value / Part Number    | Description                                                                 |
-|--------|------------------------|-------------------------|-----------------------------------------------------------------------------|
-| Rsense | Resistor               | 25 Ω, 1%                | Senses current: V = I × R; 0–10 mA range using 0–0.25 V V<sub>ref</sub>     |
-| Q1     | P-MOSFET               | DMP2035U-7              | High-side current control element, logic-level, low R<sub>ds(on)</sub>      |
-| U2     | Op-Amp                 | OPA2197 (TI)            | Precision RRIO op-amp regulates current via feedback                        |
-| Rg     | Gate resistor          | 100 Ω                   | Limits gate current, dampens switching transients                          |
-| Cc     | Feedback capacitor     | 47 pF                   | Miller compensation for op-amp stability                                    |
-| V<sub>ref</sub> | Analog input         | 0–0.25 V                | Sets current: I = V<sub>ref</sub> / Rsense                                  |
-| Supply | Power Source           | 12 V DC                 | Supply for LED and driver circuitry                                         |
-
-
-## Global PWM Modulation for LED Lines
-
-To enable synchronized temporal light modulation across all LED channels, a low-side switching circuit was implemented using a logic-level N-channel MOSFET (`IRLB8721`). This transistor gated the shared cathode return path of all LED lines, allowing current flow only when its gate was driven high.
-
-The gate of the N-MOSFET was controlled by a 10 kHz PWM signal generated by a microcontroller (Arduino Uno), with programmable duty cycle and waveform shape. When the PWM signal was high, the MOSFET turned on, completing the current path to ground for all active LED channels. When the PWM signal was low, the MOSFET turned off, interrupting the current flow and extinguishing all LEDs simultaneously.
-
-This approach enabled precise control of stimulation patterns such as square pulses, sine wave envelopes, or complex light waveforms while maintaining independently regulated constant current through each LED line. The constant current sources responded quickly to each PWM transition due to the high slew rate of the `OPA2197` op-amps, which ensured current settling within 1–2 µs at the start of each pulse.
-
-A small gate resistor (100 Ω) was optionally included to limit inrush current during switching transitions and suppress EMI. The MOSFET's low R<sub>ds(on)</sub> ensured minimal voltage drop and power dissipation, allowing for efficient modulation across multiple LED lines.
-
-### Global PWM LED Modulation Components
-
-| Label  | Component              | Value / Part Number   | Description                                                               |
-|--------|------------------------|------------------------|---------------------------------------------------------------------------|
-| Q2     | N-MOSFET               | IRLB8721               | Logic-level, low R<sub>ds(on)</sub> MOSFET; switches cathode path for all LEDs |
-| PWM    | MCU Output             | 10 kHz PWM             | Microcontroller PWM output for global modulation                          |
-| Gate R | Gate resistor (optional) | 100 Ω                | Reduces EMI and ringing during fast switching                             |
-| Q2 cap| Capacitor across the source/drain of Q2 | 10uF  | Reduces EMI and ringing during fast switching                             |
-| Supply | System Ground          | —                      | All constant current circuits return here through the N-MOSFET switch     |
-
-
-
-
-# Stimuli
-
-| Stimulus Category        | Stimulus Type                 | Chroma              | Luminance            | Parameters / Notes                                  |
-| :----------------------- | :---------------------------- | :------------------ | :------------------- | :-------------------------------------------------- |
-| **LED Stimuli** | Sine wave flicker             | green, UV, green+UV | $2 \times 10^3$, $2 \times 10^2$ |                                                     |
-|                          | Sine wave envelope            | green, UV           | $2 \times 10^3$, $2 \times 10^2$ | (2p + verify on ephys)                             |
-|                          | Full-field flash              | UV, green, UV+green | $2 \times 10^3$, $2 \times 10^2$ | (slow square wave)                                |
-|                          | White noise                   | green, UV, (maybe combined?) | $2 \times 10^3$     |                                                     |
-|                          | Frozen white noise            | green, UV, (maybe combined?) | $2 \times 10^3$     |                                                     |
-|                          | Contrast Adaptation           | green, UV                     | $2 \times 10^3$     | Periods: 4,8,16,32s    Contrast levels: 10 vs 100?                                                |
-|                          | Luminance Adaptation            | green, UV,          | $2 \times 10^3$     |       $2 \times 10^1$ to  $2 \times 10^3$, 5% or 10% contrast super-imposed                                        |
-| **Screen Stimuli** | Sparse Noise                  |                     |                      |                                                     |
-|                          | Dot field speed tuning        |                     |                      | Speeds: 0, 16, 32, 64, 128, 256; Direction: naso-temporal |
-|                          | Dot field fast speed changes  |                     |                      | Speeds: 0, 16, 32, 64, 128, 256; Times: 0.5s, 0.25s, 0.15s |
-|                          | Dot field motion coherence    |                     |                      | Speeds: 32 deg/s; Direction: nasal vs temporal; Coherence: [Specify Coherence Values Here] |
-|                          | Dot corridor - speed differences |                     |                      | Contra speeds: 32 deg/s, 128 deg/s; Speed diffs: -8, -4, -2, -1.5, 1, 1.5, 2, 4, 8 |
-|                          | Dot corridor - asymmetric flow |                     |                      | Contra speeds: 32 deg/s, 128 deg/s; Conditions: translation, rotation, orthogonal, stationary, incoherent, monocular (blank) |
-|                          | Gratings/plaids               |                     |                      |                                                     |

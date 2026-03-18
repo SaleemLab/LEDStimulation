@@ -7,7 +7,7 @@ measurementDevice = 'S121C'; % 'PDA100A2, S130VC, S120VC
 load('PDA100A2_gainTable.mat')
 
 
-CalibrationFolder = 'C:\Users\saleemlab\Documents\GitHub\LEDStimulation\Calibration';
+CalibrationFolder = 'd:\Code\LEDStimulation\Calibration';
 
 %% Define constants
 
@@ -117,8 +117,8 @@ LEDs(2).spect_nw_norm = UV_power_pad./max(UV_power_pad);
 
 figure, hold on
 for iPR=1:2
-    plot(wavelengths_nm, PRs(iPR).spect,'color', PRs(iPR).col);
-    plot(wavelengths_nm, LEDs(iPR).spect_nw_norm, 'Color', PRs(iPR).col, 'LineStyle', ':')
+    plot(wavelengths_nm, PRs(iPR).spect,'color', PRs(iPR).col, 'LineWidth',2);
+    plot(wavelengths_nm, LEDs(iPR).spect_nw_norm, 'Color', PRs(iPR).col, 'LineWidth',2,'LineStyle', ':')
 end
 xlabel('wavelength (nm)'), ylabel('Rel. sensitivity'), 
 legend({PRs(1).name, LEDs(1).name, PRs(2).name, LEDs(2).name});
