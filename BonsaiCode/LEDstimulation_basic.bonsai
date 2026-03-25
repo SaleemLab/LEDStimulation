@@ -10,6 +10,7 @@
                  xmlns:num="clr-namespace:Bonsai.Numerics;assembly=Bonsai.Numerics"
                  xmlns:p2="clr-namespace:Bonsai.Numerics.Distributions;assembly=Bonsai.Numerics"
                  xmlns:viz="clr-namespace:Bonsai.Design.Visualizers;assembly=Bonsai.Design.Visualizers"
+                 xmlns:al="clr-namespace:Bonsai.Audio;assembly=Bonsai.Audio"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
     <Nodes>
@@ -45,7 +46,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>D:\</Value>
+                <Value>C:\Users\Saleem Lab\Documents\LEDStimulation\BonsaiCode</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
@@ -603,7 +604,7 @@ Item2 as BonsaiTime)</scr:Expression>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Delay">
-                <rx:DueTime>PT2S</rx:DueTime>
+                <rx:DueTime>PT5S</rx:DueTime>
               </Combinator>
             </Expression>
             <Expression xsi:type="Unit" />
@@ -611,12 +612,18 @@ Item2 as BonsaiTime)</scr:Expression>
               <Combinator xsi:type="p1:RandSampleFromIndexedDistribution">
                 <p1:ProbabilityDistributions>
                   <p1:ArrayOfFloat>
-                    <p1:float>50</p1:float>
-                    <p1:float>50</p1:float>
+                    <p1:float>25</p1:float>
+                    <p1:float>25</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>25</p1:float>
+                    <p1:float>25</p1:float>
                   </p1:ArrayOfFloat>
                   <p1:ArrayOfFloat>
-                    <p1:float>50</p1:float>
-                    <p1:float>50</p1:float>
+                    <p1:float>20</p1:float>
+                    <p1:float>20</p1:float>
+                    <p1:float>20</p1:float>
+                    <p1:float>20</p1:float>
+                    <p1:float>20</p1:float>
                   </p1:ArrayOfFloat>
                 </p1:ProbabilityDistributions>
                 <p1:DistributionIndex>0</p1:DistributionIndex>
@@ -790,10 +797,16 @@ Item2 as BonsaiTime)</scr:Expression>
                     <Combinator xsi:type="p1:IncrementStateDependentTrialCounter">
                       <p1:TrialCounterArray>
                         <p1:ArrayOfInt>
-                          <p1:int>0</p1:int>
-                          <p1:int>1</p1:int>
+                          <p1:int>2</p1:int>
+                          <p1:int>2</p1:int>
+                          <p1:int>3</p1:int>
+                          <p1:int>2</p1:int>
+                          <p1:int>2</p1:int>
                         </p1:ArrayOfInt>
                         <p1:ArrayOfInt>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
                           <p1:int>0</p1:int>
                           <p1:int>0</p1:int>
                         </p1:ArrayOfInt>
@@ -878,7 +891,7 @@ Item2 as BonsaiTime)</scr:Expression>
                     <Property Name="FileName" DisplayName="DistsFileName" />
                   </Expression>
                   <Expression xsi:type="io:CsvReader">
-                    <io:FileName>StimulusCSVfiles\sinusoidalFlicker\dists_sinewave_test.csv</io:FileName>
+                    <io:FileName>StimulusCSVfiles\sinusoidalFlicker\dists_4hzenvelope_singlePanel.csv</io:FileName>
                     <io:ScanPattern>%f,%f</io:ScanPattern>
                     <io:SkipRows>1</io:SkipRows>
                   </Expression>
@@ -947,7 +960,7 @@ Item2 as BonsaiTime)</scr:Expression>
                     <Property Name="FileName" DisplayName="StimFileName" />
                   </Expression>
                   <Expression xsi:type="io:CsvReader">
-                    <io:FileName>StimulusCSVfiles\sinusoidalFlicker\stimuli_sinewave_test.csv</io:FileName>
+                    <io:FileName>StimulusCSVfiles\sinusoidalFlicker\stimuli_4hzenvelope_singlePanel.csv</io:FileName>
                     <io:ScanPattern />
                     <io:SkipRows>1</io:SkipRows>
                   </Expression>
@@ -1022,7 +1035,7 @@ def process(value):
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:RepeatCount">
-                      <rx:Count>2</rx:Count>
+                      <rx:Count>5</rx:Count>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="Combinator">
@@ -1332,7 +1345,7 @@ def process(value):
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="rx:Take">
-                            <rx:Count>2</rx:Count>
+                            <rx:Count>5</rx:Count>
                           </Combinator>
                         </Expression>
                         <Expression xsi:type="Combinator">
@@ -1367,7 +1380,7 @@ def process(value):
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="rx:Take">
-                            <rx:Count>1</rx:Count>
+                            <rx:Count>4</rx:Count>
                           </Combinator>
                         </Expression>
                         <Expression xsi:type="Combinator">
@@ -1642,6 +1655,42 @@ def process(value):
       <Expression xsi:type="rx:BehaviorSubject">
         <Name>CurrentState</Name>
       </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="Combinator">
+          <Combinator xsi:type="wie:KeyDown">
+            <wie:Filter>V</wie:Filter>
+            <wie:SuppressRepetitions>false</wie:SuppressRepetitions>
+          </Combinator>
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="Combinator">
+          <Combinator xsi:type="al:AudioReader">
+            <al:FileName>C:\Users\Saleem Lab\Downloads\mixkit-on-or-off-light-switch-tap-2585.wav</al:FileName>
+            <al:BufferLength>10</al:BufferLength>
+            <al:SampleRate>0</al:SampleRate>
+          </Combinator>
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="Combinator">
+          <Combinator xsi:type="rx:WithLatestFrom" />
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="MemberSelector">
+          <Selector>Item2</Selector>
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="Combinator">
+          <Combinator xsi:type="al:AudioPlayback">
+            <al:DeviceName>Generic Software on Speakers/Headphones (Realtek Audio)</al:DeviceName>
+            <al:SampleRate>44100</al:SampleRate>
+            <al:State>Playing</al:State>
+          </Combinator>
+        </Builder>
+      </Expression>
     </Nodes>
     <Edges>
       <Edge From="0" To="1" Label="Source1" />
@@ -1663,6 +1712,10 @@ def process(value):
       <Edge From="21" To="22" Label="Source1" />
       <Edge From="23" To="24" Label="Source1" />
       <Edge From="25" To="26" Label="Source1" />
+      <Edge From="27" To="29" Label="Source1" />
+      <Edge From="28" To="29" Label="Source2" />
+      <Edge From="29" To="30" Label="Source1" />
+      <Edge From="30" To="31" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>

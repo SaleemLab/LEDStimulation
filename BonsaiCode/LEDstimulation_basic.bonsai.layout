@@ -32,8 +32,8 @@
         <Y>3</Y>
       </Location>
       <Size>
-        <Width>1506</Width>
-        <Height>895</Height>
+        <Width>952</Width>
+        <Height>583</Height>
       </Size>
       <WindowState>Normal</WindowState>
     </EditorDialogSettings>
@@ -358,8 +358,8 @@
         <Y>3</Y>
       </Location>
       <Size>
-        <Width>1506</Width>
-        <Height>895</Height>
+        <Width>952</Width>
+        <Height>583</Height>
       </Size>
       <WindowState>Normal</WindowState>
     </EditorDialogSettings>
@@ -430,8 +430,8 @@
             <Y>3</Y>
           </Location>
           <Size>
-            <Width>1506</Width>
-            <Height>895</Height>
+            <Width>952</Width>
+            <Height>583</Height>
           </Size>
           <WindowState>Normal</WindowState>
         </EditorDialogSettings>
@@ -588,8 +588,8 @@
             <Y>3</Y>
           </Location>
           <Size>
-            <Width>1506</Width>
-            <Height>895</Height>
+            <Width>952</Width>
+            <Height>583</Height>
           </Size>
           <WindowState>Normal</WindowState>
         </EditorDialogSettings>
@@ -824,8 +824,8 @@
         <Y>3</Y>
       </Location>
       <Size>
-        <Width>1506</Width>
-        <Height>895</Height>
+        <Width>952</Width>
+        <Height>583</Height>
       </Size>
       <WindowState>Normal</WindowState>
     </EditorDialogSettings>
@@ -1435,8 +1435,8 @@
   <DialogSettings>
     <Visible>true</Visible>
     <Location>
-      <X>782</X>
-      <Y>551</Y>
+      <X>844</X>
+      <Y>528</Y>
     </Location>
     <Size>
       <Width>336</Width>
@@ -1486,12 +1486,12 @@
     <EditorDialogSettings>
       <Visible>false</Visible>
       <Location>
-        <X>1254</X>
-        <Y>254</Y>
+        <X>52</X>
+        <Y>52</Y>
       </Location>
       <Size>
-        <Width>1276</Width>
-        <Height>697</Height>
+        <Width>316</Width>
+        <Height>239</Height>
       </Size>
       <WindowState>Normal</WindowState>
     </EditorDialogSettings>
@@ -1574,8 +1574,8 @@
         <Y>3</Y>
       </Location>
       <Size>
-        <Width>1506</Width>
-        <Height>895</Height>
+        <Width>952</Width>
+        <Height>583</Height>
       </Size>
       <WindowState>Normal</WindowState>
     </EditorDialogSettings>
@@ -1610,8 +1610,8 @@
             <Y>3</Y>
           </Location>
           <Size>
-            <Width>1506</Width>
-            <Height>895</Height>
+            <Width>952</Width>
+            <Height>583</Height>
           </Size>
           <WindowState>Normal</WindowState>
         </EditorDialogSettings>
@@ -2008,8 +2008,8 @@
             <Y>3</Y>
           </Location>
           <Size>
-            <Width>1506</Width>
-            <Height>895</Height>
+            <Width>952</Width>
+            <Height>583</Height>
           </Size>
           <WindowState>Normal</WindowState>
         </EditorDialogSettings>
@@ -2185,8 +2185,8 @@
           <DialogSettings>
             <Visible>true</Visible>
             <Location>
-              <X>66</X>
-              <Y>673</Y>
+              <X>104</X>
+              <Y>104</Y>
             </Location>
             <Size>
               <Width>416</Width>
@@ -2216,25 +2216,16 @@
             <WindowState>Normal</WindowState>
           </DialogSettings>
           <DialogSettings>
-            <Visible>true</Visible>
+            <Visible>false</Visible>
             <Location>
-              <X>765</X>
-              <Y>672</Y>
+              <X>502</X>
+              <Y>103</Y>
             </Location>
             <Size>
               <Width>416</Width>
               <Height>279</Height>
             </Size>
             <WindowState>Normal</WindowState>
-            <VisualizerTypeName>Bonsai.Design.Visualizers.BarGraphVisualizer</VisualizerTypeName>
-            <VisualizerSettings>
-              <BarGraphVisualizer>
-                <Capacity>0</Capacity>
-                <Min>-1</Min>
-                <Max>1</Max>
-                <AutoScale>true</AutoScale>
-              </BarGraphVisualizer>
-            </VisualizerSettings>
           </DialogSettings>
         </EditorVisualizerLayout>
       </DialogSettings>
@@ -2327,8 +2318,8 @@
   <DialogSettings>
     <Visible>true</Visible>
     <Location>
-      <X>471</X>
-      <Y>820</Y>
+      <X>177</X>
+      <Y>462</Y>
     </Location>
     <Size>
       <Width>336</Width>
@@ -2339,6 +2330,66 @@
     <VisualizerSettings>
       <ObjectTextVisualizer />
     </VisualizerSettings>
+  </DialogSettings>
+  <DialogSettings>
+    <Visible>false</Visible>
+    <Location>
+      <X>0</X>
+      <Y>0</Y>
+    </Location>
+    <Size>
+      <Width>0</Width>
+      <Height>0</Height>
+    </Size>
+    <WindowState>Normal</WindowState>
+  </DialogSettings>
+  <DialogSettings>
+    <Visible>false</Visible>
+    <Location>
+      <X>0</X>
+      <Y>0</Y>
+    </Location>
+    <Size>
+      <Width>0</Width>
+      <Height>0</Height>
+    </Size>
+    <WindowState>Normal</WindowState>
+  </DialogSettings>
+  <DialogSettings>
+    <Visible>false</Visible>
+    <Location>
+      <X>0</X>
+      <Y>0</Y>
+    </Location>
+    <Size>
+      <Width>0</Width>
+      <Height>0</Height>
+    </Size>
+    <WindowState>Normal</WindowState>
+  </DialogSettings>
+  <DialogSettings>
+    <Visible>false</Visible>
+    <Location>
+      <X>0</X>
+      <Y>0</Y>
+    </Location>
+    <Size>
+      <Width>0</Width>
+      <Height>0</Height>
+    </Size>
+    <WindowState>Normal</WindowState>
+  </DialogSettings>
+  <DialogSettings>
+    <Visible>false</Visible>
+    <Location>
+      <X>0</X>
+      <Y>0</Y>
+    </Location>
+    <Size>
+      <Width>0</Width>
+      <Height>0</Height>
+    </Size>
+    <WindowState>Normal</WindowState>
   </DialogSettings>
   <DialogSettings>
     <Visible>false</Visible>
