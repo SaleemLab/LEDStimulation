@@ -3,15 +3,19 @@
   <WindowState>Maximized</WindowState>
   <EditorTheme>Light</EditorTheme>
   <DesktopBounds>
-    <X>1555</X>
-    <Y>-21</Y>
+    <X>788</X>
+    <Y>-27</Y>
     <Width>1917</Width>
     <Height>595</Height>
   </DesktopBounds>
   <RecentlyUsedFiles>
     <RecentlyUsedFile>
-      <Timestamp>2026-03-18T15:27:37.2867621+00:00</Timestamp>
+      <Timestamp>2026-03-18T16:12:04.7661374+00:00</Timestamp>
       <Name>D:\Code\LEDStimulation\BonsaiCode\LEDstimulation_task_wip.bonsai</Name>
+    </RecentlyUsedFile>
+    <RecentlyUsedFile>
+      <Timestamp>2026-03-18T15:39:25.2030951+00:00</Timestamp>
+      <Name>D:\Code\AnimalBehaviouralTasks\DotCorridorTask\BonsaiWorkflows\DotCorridor_training.bonsai</Name>
     </RecentlyUsedFile>
     <RecentlyUsedFile>
       <Timestamp>2026-03-18T15:18:18.5344625+00:00</Timestamp>
@@ -104,10 +108,6 @@
     <RecentlyUsedFile>
       <Timestamp>2024-12-17T14:12:30.9243584+00:00</Timestamp>
       <Name>C:\Users\saleemlab\Documents\GitHub\LEDStimulation\BonsaiCode\WhiteNoiseStimulus.bonsai</Name>
-    </RecentlyUsedFile>
-    <RecentlyUsedFile>
-      <Timestamp>2024-12-12T17:10:58.6462545+00:00</Timestamp>
-      <Name>C:\Users\saleemlab\Documents\GitHub\LEDStimulation\BonsaiCode\FrozenWhiteNoiseStimulus.bonsai</Name>
     </RecentlyUsedFile>
   </RecentlyUsedFiles>
 </EditorSettings>
