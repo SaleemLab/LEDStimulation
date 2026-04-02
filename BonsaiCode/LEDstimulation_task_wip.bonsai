@@ -28,7 +28,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>sine_env</Value>
+                <Value>sine</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="ExternalizedMapping">
@@ -36,7 +36,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>leo</Value>
+                <Value>edd</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="SubscribeSubject">
@@ -249,7 +249,7 @@ Item2 as Response,
 Item3 as BonsaiTime)</scr:Expression>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>C:\\Data\leo\20260330\sine_env_leo_Trial.csv</io:FileName>
+                    <io:FileName>C:\\Data\edd\20260402\sine_edd_Trial.csv</io:FileName>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
                     <io:Suffix>Timestamp</io:Suffix>
@@ -331,7 +331,7 @@ Item3 as BonsaiTime)</scr:Expression>
 Item2 as BonsaiTime)</scr:Expression>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>C:\\Data\leo\20260330\sine_env_leo_ArduinoStim.csv</io:FileName>
+                    <io:FileName>C:\\Data\edd\20260402\sine_edd_ArduinoStim.csv</io:FileName>
                     <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
@@ -715,17 +715,17 @@ Item2 as BonsaiTime)</scr:Expression>
               <Combinator xsi:type="p1:RandSampleFromIndexedDistribution">
                 <p1:ProbabilityDistributions>
                   <p1:ArrayOfFloat>
-                    <p1:float>1</p1:float>
-                    <p1:float>1</p1:float>
-                    <p1:float>1</p1:float>
-                    <p1:float>1</p1:float>
-                    <p1:float>1</p1:float>
-                    <p1:float>1</p1:float>
-                    <p1:float>1</p1:float>
-                    <p1:float>1</p1:float>
-                    <p1:float>1</p1:float>
-                    <p1:float>1</p1:float>
-                    <p1:float>1</p1:float>
+                    <p1:float>25</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>25</p1:float>
+                    <p1:float>25</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>0</p1:float>
+                    <p1:float>25</p1:float>
+                    <p1:float>0</p1:float>
                   </p1:ArrayOfFloat>
                   <p1:ArrayOfFloat>
                     <p1:float>9.090909</p1:float>
@@ -2707,17 +2707,17 @@ Item5 as RightVel)</scr:Expression>
                     <Combinator xsi:type="p1:IncrementStateDependentTrialCounter">
                       <p1:TrialCounterArray>
                         <p1:ArrayOfInt>
-                          <p1:int>17</p1:int>
-                          <p1:int>2</p1:int>
-                          <p1:int>2</p1:int>
-                          <p1:int>1</p1:int>
-                          <p1:int>1</p1:int>
-                          <p1:int>1</p1:int>
-                          <p1:int>1</p1:int>
-                          <p1:int>1</p1:int>
-                          <p1:int>1</p1:int>
-                          <p1:int>1</p1:int>
-                          <p1:int>1</p1:int>
+                          <p1:int>11</p1:int>
+                          <p1:int>12</p1:int>
+                          <p1:int>12</p1:int>
+                          <p1:int>12</p1:int>
+                          <p1:int>12</p1:int>
+                          <p1:int>11</p1:int>
+                          <p1:int>11</p1:int>
+                          <p1:int>12</p1:int>
+                          <p1:int>12</p1:int>
+                          <p1:int>11</p1:int>
+                          <p1:int>12</p1:int>
                         </p1:ArrayOfInt>
                         <p1:ArrayOfInt>
                           <p1:int>0</p1:int>
@@ -2887,7 +2887,7 @@ Item5 as RightVel)</scr:Expression>
                     <Property Name="FileName" DisplayName="StimFileName" />
                   </Expression>
                   <Expression xsi:type="io:CsvReader">
-                    <io:FileName>StimulusCSVfiles\TaskFiles\stimuli_flickerTaskEnvelope6Hz1000.csv</io:FileName>
+                    <io:FileName>StimulusCSVfiles\TaskFiles\stimuli_flickerTask.csv</io:FileName>
                     <io:ScanPattern />
                     <io:SkipRows>1</io:SkipRows>
                   </Expression>
@@ -3082,7 +3082,7 @@ def process(value):
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="p1:UpdateProbDistArray">
-                      <p1:scalingFactor>1E+21</p1:scalingFactor>
+                      <p1:scalingFactor>9999</p1:scalingFactor>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="rx:Condition">

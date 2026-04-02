@@ -1,23 +1,10 @@
-#include <math.h>  //
+#include <math.h>  
 
 #define CLOCK_FREQ 16000000                // Arduino Leonardo clock frequency (16 MHz)
 #define TABLE_SIZE 256                     // Number of samples in the wavetable
-#define FWN_TABLE_SIZE 375                 // Number of samples in the wavetable
 #define TARGET_RECONFIG_INTERVAL_US 1000L  // FOR FREQUENCY SWEEP 1000 microseconds = 1 millisecond
 
 volatile unsigned long printSequenceNum = 0;  // for serial debugging
-
-// --- Faster PRNG (xorshift32) ---
-uint32_t xorshift32_state = 1;  // Seed with a non-zero value.
-
-uint32_t fast_rand32() {
-  xorshift32_state ^= (xorshift32_state << 13);
-  xorshift32_state ^= (xorshift32_state >> 17);
-  xorshift32_state ^= (xorshift32_state << 5);
-  return xorshift32_state;
-}
-
-
 
 // gamma-correction LUTS
 const uint16_t PROGMEM ChA1LUT[1041] = {
@@ -234,11 +221,8 @@ const uint16_t PROGMEM ChA2LUT[1041] = {
     1012, 1013, 1013, 1014, 1015, 1016, 1016, 1017, 1018, 1018, 
     1019};
 
-
-
 const uint16_t *currentChALUT;
 const uint16_t *currentChBLUT;
-
 
 // PWM variables
 long prescaler;
@@ -246,7 +230,6 @@ uint16_t TOP;  // set by the clock
 long TopLumi;  // use to limit max luminance
 long MidLumi;
 long desiredPWMFrequency = 7680;  // 7680?
-//float dutyCycle;
 
 // channel selection
 bool useChA = true;
@@ -257,8 +240,8 @@ const byte numChars = 50;
 char receivedChars[numChars];  // an array to store the received data
 bool newData = false;
 
-// stimulus selection char
-String FirstChar;
+// stimulus selection char -- NO MORE STRING DYNAMIC MEMORY
+char* FirstChar;
 
 // Array to hold the wavetable
 uint16_t sineWaveTable[TABLE_SIZE];
@@ -267,55 +250,20 @@ uint16_t sineWaveTable[TABLE_SIZE];
 volatile int stepSize = 1;
 volatile int tableIndexA = 0;  //for sinewave table
 volatile int tableIndexB = 0;  //for sinewave table
-volatile float contrastMultA;
-volatile float contrastMultB;
+volatile uint16_t contrastMultIntA = 256;
+volatile uint16_t contrastMultIntB = 256;
 volatile int tableEnvIndex = 0;  // for sinewave table contrast envelope
 volatile int envCount = 0;       // contrast envelope counter
-// contrast-envelope counter and contrast multiplier
 volatile int nEnvCounts = 1;
-volatile float contrastMult = 0;
 volatile uint16_t contrastMultInt = 0;
 volatile unsigned int completedCycles = 0; // Tracks full sine wave cycles
 
-// white noise parameters
-volatile float target_mean;  // Desired mean of the final output
-volatile float target_std;   // Desired standard deviation of the final output
-
-volatile uint16_t finalRandNumber_A = 0;  // Final output value 1
-volatile uint16_t finalRandNumber_B = 0;  // Final output value 2
-volatile float map_float_min;
-volatile float map_float_max;
-volatile float mapped_float_A;
-volatile float mapped_float_B;
-
-const int CLT_N = 10;                 // Number of uniform samples for Central Limit Theorem
-                                      // Higher N => better Gaussian approximation, but slower.
-                                      // (N >= 10 or 12 is common)
-const int RANDOM_UPPER_BOUND = 1024;  // The argument 'M' for random(M). Generates [0, M-1]. Now using fast_rand32(), so must be power of 2 (e.g. 1024)
-// --- Derived Constants (calculated once for efficiency) ---
-// Pre-calculate values needed for N(0,1) generation based on configuration
-const float UNIFORM_MEAN = (float)(RANDOM_UPPER_BOUND - 1) / 2.0;
-const float SUM_EXPECTED_MEAN = (float)CLT_N * UNIFORM_MEAN;
-// Variance of U[0, M-1] = (M^2 - 1) / 12
-const double UNIFORM_VARIANCE = (pow((double)RANDOM_UPPER_BOUND, 2) - 1.0) / 12.0;
-// Variance of Sum = N * Var(U)
-const double SUM_VARIANCE = (double)CLT_N * UNIFORM_VARIANCE;
-// Std Dev of Sum = sqrt(Var(Sum))
-const double SUM_STD_DEV = sqrt(SUM_VARIANCE);
-// Scale factor to achieve N(0,1) = 1 / Std Dev of Sum
-const float NORMALIZE_SCALE_FACTOR = (SUM_STD_DEV > 0) ? (1.0 / (float)SUM_STD_DEV) : 0.0;
-
-//update time and PWM value
-volatile long updateTime;
-volatile long randNumber = 0;
-volatile int currentDist;
-
-// array for frozen white noise values
-volatile uint16_t frozenWhiteNoiseTable[FWN_TABLE_SIZE];  // max number of values (8ms update time for a 3s stimulus)
-volatile int tableIndexFWN = 0;                           //for sinewave table
-
-// flicker state
-volatile bool toggleState = false;  // Flag to track the current state
+// --- Raised Cosine Temporal Window Variables ---
+uint16_t raisedCosineLUT[64]; // REDUCED TO 64 FOR MEMORY
+volatile unsigned long currentTick = 0;
+volatile unsigned long fadeInterrupts = 0;
+volatile unsigned long fadeOutStartInterrupt = 0;
+volatile uint32_t envStep = 0; // DDS phase step
 
 
 void setup() {
@@ -328,23 +276,21 @@ void setup() {
   PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW by changing register directly
   PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
 
-  // Check fixed derived constants for white noise generation
-  if (NORMALIZE_SCALE_FACTOR == 0.0) {
-    Serial.println("ERROR: Normalization scale factor is zero. Halting.");
-    while (1)
-      ;
-  }
+  Serial.begin(115200);
 
   // set default LUTs to "1"
   currentChALUT = ChA1LUT;
   currentChBLUT = ChA1LUT;
 
-
-  Serial.begin(115200);
-
+  // Generate the Reduced Raised Cosine Envelope LUT (0 to 256 scale)
+  for (int i = 0; i < 64; i++) {
+    float angle = PI * (float)i / 63.0;         
+    float val = (1.0 - cos(angle)) / 2.0;        
+    raisedCosineLUT[i] = (uint16_t)(val * 256.0);
+    if (raisedCosineLUT[i] > 256) raisedCosineLUT[i] = 256; 
+  }
 
   // Constrain the desired PWM frequency to be a multiple of TABLE_SIZE
-  // (probably not important since precision seems low at high frequenies)
   desiredPWMFrequency = constrainFrequency(desiredPWMFrequency);
 
   // Calculate the prescaler and TOP value for the constrained frequency
@@ -359,21 +305,8 @@ void setup() {
   // Generate the sine wave LUT based on the Timer1 config and TopLumi
   generateSineWaveTable(TopLumi);
 
-  // initialise random number to 50% duty cyle for white noise stimuli
-  randomSeed(0);
-  finalRandNumber_A = TopLumi / 2;
-  finalRandNumber_B = TopLumi / 2;
-
-
-
-  if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
-  if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
-
-  //delay(5000);
-  //whiteNoise(10000, 10);
-  //outputSinewave(10,10000);
-
-  //ToggleLEDTest(8000);
+  if (useChA) { setChA(TopLumi / 2); }  
+  if (useChB) { setChB(TopLumi / 2); }  
 }
 
 // loop runs checking for new serial input
@@ -385,10 +318,8 @@ void loop() {
   }
 }
 
-
-
 //////////////////////////////////////// HANDLE SERIAL INPUT //////////////////////////////////////
-void GetSerialInput() {  // part of code taken from http://forum.arduino.cc/index.php?topic=396450.0
+void GetSerialInput() {  
   static byte ndx = 0;
   char endMarker = '\r';
   char rc;
@@ -400,28 +331,26 @@ void GetSerialInput() {  // part of code taken from http://forum.arduino.cc/inde
       if (ndx >= numChars) {
         ndx = numChars - 1;
       }
-    } else {                      // serial message finished
-      receivedChars[ndx] = '\0';  // terminate the string
+    } else {                      
+      receivedChars[ndx] = '\0';  
       ndx = 0;
       newData = true;
     }
   }
 }
 
-void ActionSerial() {  // Actions serial data by choosing appropriate stimulation
-  Serial.print("rc: ");
+void ActionSerial() {  
+  Serial.print(F("rc: "));
   Serial.print(receivedChars);
-  Serial.print("\n");
+  Serial.print(F("\n"));
   char delimiters[] = ",";
   char *token;
   uint8_t idx = 0;
-#define MAX_VALS 50  // max required? freq, duration, contrast, carrier freq?
+#define MAX_VALS 50  
   char *serialVals[MAX_VALS];
   token = strtok(receivedChars, ",");
 
-
   while (token != NULL) {
-    //Serial.println( token );
     if (idx < MAX_VALS)
       serialVals[idx++] = token;
     token = strtok(NULL, ",");
@@ -429,7 +358,8 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
 
   FirstChar = serialVals[0];
 
-  if (FirstChar == "s")  // sinusoidal flicker
+  // REMOVED ALL STRING ALLOCATION, NOW COMPARES FASTER
+  if (strcmp(FirstChar, "s") == 0)  
   {
     long stimulusDuration = atof(serialVals[1]);
     float frequency = atof(serialVals[2]);
@@ -438,70 +368,9 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     float contrastA = atof(serialVals[5]);
     float contrastB = atof(serialVals[6]);
 
-    //Serial.println("Stim: Sinusoidal dimming");
-    //Serial.flush();
-    //Serial.print("Stim duration: ");
-    //Serial.println(stimulusDuration);
-    //Serial.flush();
-    //Serial.print("Frequency: ");
-    //Serial.println(frequency);
-    //Serial.flush();
-
     outputSinewave(frequency, stimulusDuration, phaseA, phaseB, contrastA, contrastB);
 
-  } else if (FirstChar == "wn")  // white noise
-  {
-    long stimulusDuration = atof(serialVals[1]);
-    long updateTime = atof(serialVals[2]);
-    float frac_target_mean = atof(serialVals[3]);
-    float frac_target_std = atof(serialVals[4]);
-    //Serial.println("Stim: White noise");
-    //Serial.print("Stim duration: ");
-    // Serial.println(stimulusDuration);
-    //Serial.flush();
-    // Serial.print("Update time: ");
-    // Serial.println(updateTime);
-    //  Serial.flush();
-    //Serial.println(stimulusDuration);
-    whiteNoise(updateTime, stimulusDuration, frac_target_mean, frac_target_std);
-
-  } else if (FirstChar == "fwn")  // frozen white noise
-  {
-    long stimulusDuration = atof(serialVals[1]);
-    int updateTime = atof(serialVals[2]);
-    int nReps = atof(serialVals[3]);
-    int randSeedNum = atof(serialVals[4]);
-    //Serial.println("Stim: White noise");
-    //Serial.flush();
-    //  Serial.print("Stim duration: ");
-    //  Serial.println(stimulusDuration);
-    //  Serial.flush();
-    //  Serial.print("Update time: ");
-    //   Serial.println(updateTime);
-    //  Serial.flush();
-
-    frozenWhiteNoise(updateTime, stimulusDuration, nReps, randSeedNum);
-
-  } else if (FirstChar == "cs")  // contrast switching white noise
-  {
-    int updateTime = atof(serialVals[1]);
-    int switchTime = atof(serialVals[2]);
-    int nReps = atof(serialVals[3]);
-    float meanVal1 = atof(serialVals[4]);
-    float contrastVal1 = atof(serialVals[5]);
-    float meanVal2 = atof(serialVals[6]);
-    float contrastVal2 = atof(serialVals[7]);
-    //Serial.println("Stim: White noise");
-    //Serial.flush();
-    //  Serial.print("Stim duration: ");
-    //  Serial.println(stimulusDuration);
-    //  Serial.flush();
-    //  Serial.print("Update time: ");
-    //   Serial.println(updateTime);
-    //  Serial.flush();
-
-    SwitchingWhiteNoise(updateTime, switchTime, nReps, meanVal1, contrastVal1, meanVal2, contrastVal2);
-    } else if (FirstChar == "se")  // sinusoidal flicker with contrast envelope
+  } else if (strcmp(FirstChar, "se") == 0)  
   {
     long stimulusDuration = atof(serialVals[1]);
     float frequency = atof(serialVals[2]);
@@ -509,23 +378,23 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
     float maxContrastA = atof(serialVals[4]); 
     float maxContrastB = atof(serialVals[5]); 
 
-    Serial.println("Stim: Sinusoidal env");
+    Serial.println(F("Stim: Sinusoidal env"));
     Serial.flush();
-    Serial.print("Stim duration: ");
+    Serial.print(F("Stim duration: "));
     Serial.println(stimulusDuration);
-    Serial.print("Frequency: ");
+    Serial.print(F("Frequency: "));
     Serial.println(frequency);
-    Serial.print("Envelope freq: ");
+    Serial.print(F("Envelope freq: "));
     Serial.println(envFrequency);
-    Serial.print("Contrast A: ");
+    Serial.print(F("Contrast A: "));
     Serial.println(maxContrastA);
-    Serial.print("Contrast B: ");
+    Serial.print(F("Contrast B: "));
     Serial.println(maxContrastB);
     Serial.flush();
 
     SineContrastConv(stimulusDuration, frequency, envFrequency, maxContrastA, maxContrastB);
 
-  } else if (FirstChar == "fs")  // frequencySweep stimulus
+  } else if (strcmp(FirstChar, "fs") == 0)  
   {
     float fmin = atof(serialVals[1]);
     float fmax = atof(serialVals[2]);
@@ -537,7 +406,8 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
 
     FrequencySweep(fmin, fmax, sweepFactorPerSec,
                    phaseA, phaseB, contrastA, contrastB);
-  } else if (FirstChar == "sfs")  // stepped frequency sweep
+
+  } else if (strcmp(FirstChar, "sfs") == 0)  
   {
     float startFreq = atof(serialVals[1]);
     float endFreq = atof(serialVals[2]);
@@ -550,15 +420,13 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
 
     SteppedFrequencySweep(startFreq, endFreq, stepFreq, cyclesPerFreq, phaseA, phaseB, contrastA, contrastB);
 
-
-  } else if (FirstChar == "sd")  // Set duty cycle of both channels
+  } else if (strcmp(FirstChar, "sd") == 0)  
   {
     float dutyCycle_A = atof(serialVals[1]);
     float dutyCycle_B = atof(serialVals[2]);
-
     setDutyCycle(dutyCycle_A, dutyCycle_B, TopLumi);
 
-  } else if (FirstChar == "sdt")  // Set duty cycle of both channels for a time period
+  } else if (strcmp(FirstChar, "sdt") == 0)  
   {
     float dutyCycle_A = atof(serialVals[1]);
     float dutyCycle_B = atof(serialVals[2]);
@@ -566,70 +434,54 @@ void ActionSerial() {  // Actions serial data by choosing appropriate stimulatio
 
     setDutyCycleTime(dutyCycle_A, dutyCycle_B, stimulusDuration, TopLumi);
 
-  } else if (FirstChar == "gc")  // do gamma correction routine
+  } else if (strcmp(FirstChar, "gc") == 0)  
   {
     float stepSize = atof(serialVals[1]);
     long waitTime = atof(serialVals[2]);
     int nReps = atof(serialVals[3]);
     cycleDutyCycles(stepSize, waitTime, nReps, TopLumi);
 
-  } else if (FirstChar == "useChB")  // apply gamma correction
+  } else if (strcmp(FirstChar, "useChB") == 0)  
   {
     useChB = atoi(serialVals[1]);
     if (!useChB) {
-      //OCR1B=0;
-      Serial.print(F("ChB OFF"));
-      Serial.print("\n");
+      Serial.print(F("ChB OFF\n"));
     } else {
-      Serial.print(F("ChB ON"));
-      Serial.print("\n");
+      Serial.print(F("ChB ON\n"));
     };
 
-  } else if (FirstChar == "useChA")  // apply gamma correction
+  } else if (strcmp(FirstChar, "useChA") == 0)  
   {
     useChA = atoi(serialVals[1]);
     if (!useChA) {
-      //OCR1A=0;
-      Serial.print(F("ChA OFF"));
-      Serial.print("\n");
+      Serial.print(F("ChA OFF\n"));
     } else {
-      Serial.print(F("ChA ON"));
-      Serial.print("\n");
+      Serial.print(F("ChA ON\n"));
     };
-  }  //else if (FirstChar == "stat") {
-  //getStatus();
 
-  //}
-  else if (FirstChar == "ana") {
+  } else if (strcmp(FirstChar, "ana") == 0) {
     readAnalogVals();
 
-  } else if (FirstChar == "agc")  // apply gamma correction
+  } else if (strcmp(FirstChar, "agc") == 0)  
   {
     uint8_t lutIndex = atoi(serialVals[1]);
     if (lutIndex == 1) {
       currentChALUT = ChA1LUT;
       currentChBLUT = ChA1LUT;
-      Serial.print(F("LUT 1 SELECTED"));
-      Serial.print("\n");
+      Serial.print(F("LUT 1 SELECTED\n"));
 
     } else if (lutIndex == 2) {
       currentChALUT = ChA2LUT;
       currentChBLUT = ChA2LUT;
-      Serial.print(F("LUT 2 SELECTED"));
-      Serial.print("\n");
+      Serial.print(F("LUT 2 SELECTED\n"));
     }
-  } else  // not valid stimulus code
+  } else  
   {
     Serial.print(FirstChar);
-    Serial.print(F(" is an invalid stimulus code - make sure you are using carriage return line ending"));
-    Serial.print("\n");
+    Serial.print(F(" is an invalid stimulus code - make sure you are using carriage return line ending\n"));
   }
-  //memset('\0', receivedChars, sizeof(receivedChars));
   memset(receivedChars, '\0', sizeof(receivedChars));
-  //Serial.print("rc: ");
-  //Serial.println(receivedChars);
 }
-
 
 ///////////////////////////////////// SINEWAVE FLICKER  //////////////////////////////////////
 // Function to generate a sine wave table
@@ -647,8 +499,8 @@ void outputSinewave(float sinewaveFrequency, long duration, float phaseA, float 
   tableIndexA = startIndexA; 
   tableIndexB = (int)(phaseB * (float)TABLE_SIZE) % TABLE_SIZE;
 
-  contrastMultA = contrastA;
-  contrastMultB = contrastB;
+  contrastMultIntA = (uint16_t)(contrastA * 256.0);
+  contrastMultIntB = (uint16_t)(contrastB * 256.0);
 
   // Calculate the PWM cycle time in microseconds
   float pwmCycleTime = (2.0 * TOP) / (float)(CLOCK_FREQ / prescaler); 
@@ -673,54 +525,101 @@ void outputSinewave(float sinewaveFrequency, long duration, float phaseA, float 
 
   configureTimer3Interrupt(updateFrequency); 
 
-  // --- NEW: PRIME THE PWM OUTPUTS TO PREVENT ONSET FLICKER ---
-  // Push the exact mathematical starting point of the wave before turning on the pins
-  float startValA = MidLumi + ((sineWaveTable[tableIndexA] - MidLumi) * contrastMultA);
-  float startValB = MidLumi + ((sineWaveTable[tableIndexB] - MidLumi) * contrastMultB);
-  if (useChA) { setChA(startValA); }
-  if (useChB) { setChB(startValB); }
-  // ---------------------------------------------------------
+  // --- NEW: TEMPORAL WINDOW (RAISED COSINE) SETUP ---
+  long targetCycles = (long)((duration / 1000.0) * sinewaveFrequency);
+  unsigned long totalInterrupts = targetCycles * (TABLE_SIZE / stepSize); 
+  
+  float fadeTimeMs = 100.0; // Exactly 100ms fade in and out
+  fadeInterrupts = updateFrequency * (fadeTimeMs / 1000.0);
+  
+  // Safety clamp: if duration is < 200ms, cap fades to half the duration
+  if (fadeInterrupts > totalInterrupts / 2) {
+    fadeInterrupts = totalInterrupts / 2; 
+  }
+  
+  fadeOutStartInterrupt = totalInterrupts - fadeInterrupts;
+  
+  // Calculate the DDS phase step (Q16.16 integer math format)
+  // This calculates how fast we walk through the 64-value LUT
+  envStep = (63UL << 16) / fadeInterrupts;
+  currentTick = 0;
+  // -------------------------------------------------
+
+  // Prime the PWM outputs at dead-center MidLumi (0% contrast) to prevent hardware pops
+  if (useChA) { setChA(MidLumi); }
+  if (useChB) { setChB(MidLumi); }
+  
+  // Advance index so first interrupt hits step 1
+  tableIndexA = (tableIndexA + stepSize) % TABLE_SIZE;
+  tableIndexB = (tableIndexB + stepSize) % TABLE_SIZE;
 
   PORTC |= (1 << PORTC6);                     // set Pin 5 HIGH
   PORTD |= (1 << PIND4);                      // set Pin 4 HIGH
 
-  // --- NEW: PHASE-LOCKED EXIT LOOP ---
-  completedCycles = 0; // Reset your global counter
+  completedCycles = 0; 
   
-  // Calculate exactly how many full cycles we need based on duration
-  long targetCycles = (long)((duration / 1000.0) * sinewaveFrequency);
+  // Disable Timer0 to prevent jitter during the psychophysics stimulus
+  TIMSK0 &= ~_BV(TOIE0); 
   
   setTimer3Callback(sinewaveInterrupt);
 
-  // Wait for the exact number of sine wave wrap-arounds. No millis() jitter!
+  // Wait for the exact number of sine wave wrap-arounds
   while (completedCycles < targetCycles) {
     delayMicroseconds(1);  
   }
-  // ------------------------------------
 
   stopTimer3Interrupt();    // finish playing sinewave
+  TIMSK0 |= _BV(TOIE0);     // Re-enable Timer0 (millis/micros)
+
   PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW
   PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
-  Serial.print("-1\n");
+  Serial.print(F("-1\n"));
 
   if (useChA) { setChA(TopLumi / 2); }  // Return to 50% background
   if (useChB) { setChB(TopLumi / 2); }  // Return to 50% background
 }
 
 // sinewave interrupt function
+// sinewave interrupt function
 void sinewaveInterrupt() {
-  //static int tableIndexA = 0;  // Start at the beginning of the sine wave table
-  // Update PWM duty cycle with the next sine wave value
+  
+  uint16_t currentEnvelope = 256; // Default to full contrast (256/256 = 1.0)
 
-  //ocrVal = MidLumi + ((sineWaveTable[tableIndexA] - MidLumi) * (contrastA));
-  float ocrValA = MidLumi + ((sineWaveTable[tableIndexA] - MidLumi) * (contrastMultA));
-  float ocrValB = MidLumi + ((sineWaveTable[tableIndexB] - MidLumi) * (contrastMultB));
+  // --- TEMPORAL WINDOW MATH ---
+  if (currentTick < fadeInterrupts) {
+    // Fade In
+    uint32_t phase = currentTick * envStep; 
+    uint16_t envIndex = phase >> 16;
+    if (envIndex > 63) envIndex = 63;
+    currentEnvelope = raisedCosineLUT[envIndex];
+    
+  } else if (currentTick >= fadeOutStartInterrupt) {
+    // Fade Out
+    uint32_t ticksIntoFadeOut = currentTick - fadeOutStartInterrupt;
+    uint32_t phase = ticksIntoFadeOut * envStep;
+    uint16_t shiftPhase = phase >> 16;
+    
+    // Reverse the index and prevent integer underflow
+    uint16_t envIndex = (shiftPhase >= 63) ? 0 : (63 - shiftPhase);
+    currentEnvelope = raisedCosineLUT[envIndex];
+  }
+  currentTick++;
+  // ----------------------------
 
+  // Combine max contrast with envelope contrast
+  // FIXED: Cast to 32-bit (uint32_t) to prevent 256*256 overflow!
+  uint16_t effectiveContrastA = ((uint32_t)contrastMultIntA * currentEnvelope) >> 8;
+  uint16_t effectiveContrastB = ((uint32_t)contrastMultIntB * currentEnvelope) >> 8;
 
-  if (useChA) { setChA(ocrValA); }  //
-  if (useChB) { setChB(ocrValB); }  //
-  //Serial.print(OCR1A);
-  //Serial.print(',');
+  // FAST INTEGER MATH for carrier wave
+  long tempA = (long)sineWaveTable[tableIndexA] - MidLumi;
+  uint16_t ocrValA = MidLumi + ((tempA * effectiveContrastA) >> 8);
+
+  long tempB = (long)sineWaveTable[tableIndexB] - MidLumi;
+  uint16_t ocrValB = MidLumi + ((tempB * effectiveContrastB) >> 8);
+
+  if (useChA) { setChA(ocrValA); }  
+  if (useChB) { setChB(ocrValB); }  
 
   // Update the table index (wrap around if necessary)
   tableIndexA = tableIndexA + stepSize;
@@ -740,9 +639,10 @@ void sinewaveInterrupt() {
 /////////////////////////////////// SINE WAVE FLICKER WITH CONTRAST ENVELOPE //////////////////////////
 void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFreq, float maxContrastA, float maxContrastB) {
 
-  // Store the user's requested maximum contrasts globally
-  contrastMultA = maxContrastA;
-  contrastMultB = maxContrastB;
+  // Store the user's requested maximum contrasts globally as integers
+  contrastMultIntA = (uint16_t)(maxContrastA * 256.0);
+  contrastMultIntB = (uint16_t)(maxContrastB * 256.0);
+  contrastMultInt = 0; 
 
   // Calculate the PWM cycle time in microseconds
   float pwmCycleTime = (2.0 * TOP) / (float)(CLOCK_FREQ / prescaler); 
@@ -765,7 +665,6 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
   tableIndexB = 0;      // keep B in phase with A (or modify if you want phase control)
   tableEnvIndex = 191;  // start at 0 contrast
   envCount = 0;         // contrast envelope counter
-  contrastMult = 0;
   nEnvCounts = 0;
 
   // Recalculate the effective update interval based on the step size
@@ -789,7 +688,7 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
   stopTimer3Interrupt();    // finish playing sinewave
   PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW
   PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
-  Serial.println("-1");
+  Serial.print(F("-1\n"));
   Serial.flush();
   
   if (useChA) { setChA(TopLumi / 2); }  
@@ -799,38 +698,44 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
 
 // sinewave contrast envelope interrupt function
 void sinewaveEnvelopeInterrupt() {
-  unsigned long startTime = micros();
   
-  // Multiply the current envelope state by the max limits for each channel
-  float currentContrastA = contrastMult * contrastMultA;
-  float currentContrastB = contrastMult * contrastMultB;
+  // 1. Combine envelope contrast with max channel contrast
+  // Both are 0-256. Multiply them and divide by 256 to bring back to 0-256 scale.
+  uint16_t currentContrastIntA = ((unsigned long)contrastMultInt * contrastMultIntA) >> 8;
+  uint16_t currentContrastIntB = ((unsigned long)contrastMultInt * contrastMultIntB) >> 8;
 
-  // Calculate OCR values independently
-  uint16_t ocrValA = MidLumi + ((sineWaveTable[tableIndexA] - MidLumi) * currentContrastA);
-  uint16_t ocrValB = MidLumi + ((sineWaveTable[tableIndexB] - MidLumi) * currentContrastB);
+  // 2. Apply to the carrier wave
+  long tempA = (long)sineWaveTable[tableIndexA] - MidLumi;
+  uint16_t ocrValA = MidLumi + ((tempA * currentContrastIntA) >> 8);
+
+  long tempB = (long)sineWaveTable[tableIndexB] - MidLumi;
+  uint16_t ocrValB = MidLumi + ((tempB * currentContrastIntB) >> 8);
 
   if (useChA) { setChA(ocrValA); }  
   if (useChB) { setChB(ocrValB); }  
 
-  // update sinewave table index based on interrupt frequency
+  // update sinewave table index
   tableIndexA = tableIndexA + stepSize;
-  if (tableIndexA >= TABLE_SIZE) tableIndexA -= TABLE_SIZE;  // wrap table index
+  if (tableIndexA >= TABLE_SIZE) tableIndexA -= TABLE_SIZE;  
   
   tableIndexB = tableIndexB + stepSize;
-  if (tableIndexB >= TABLE_SIZE) tableIndexB -= TABLE_SIZE;  // wrap table index
+  if (tableIndexB >= TABLE_SIZE) tableIndexB -= TABLE_SIZE;  
 
-  //update counter for contrast envelope
+  // update counter for contrast envelope
   envCount = envCount + 1;
-  if (envCount > nEnvCounts - 1)  // check if time to update contrast value
+  if (envCount > nEnvCounts - 1)  
   {
-    envCount = 0;                       // reset
-    tableEnvIndex = tableEnvIndex + stepSize;  // incremenet contrast LUT index
+    envCount = 0;                       
+    tableEnvIndex = tableEnvIndex + stepSize;  
 
     if (tableEnvIndex >= TABLE_SIZE) {
-      PORTD ^= (1 << PIND4);        // Toggle Pin 4 if envelope cycle finished
-      tableEnvIndex -= TABLE_SIZE;  // wrap tableEnvIndex
+      PORTD ^= (1 << PIND4);        
+      tableEnvIndex -= TABLE_SIZE;  
     }
-    contrastMult = sineWaveTable[tableEnvIndex] / float(TopLumi);  // update contrast multiplier
+    
+    // FAST INTEGER ENVELOPE CALCULATION
+    // Scale the sineWaveTable value (0 to TopLumi) strictly into our 0-256 contrast range
+    contrastMultInt = ((unsigned long)sineWaveTable[tableEnvIndex] * 256) / TopLumi;  
   }
 }
 
@@ -841,8 +746,8 @@ void SteppedFrequencySweep(float startFreq, float endFreq, float stepFreq, int c
   // Set initial phase and contrast
   tableIndexA = (int)(phaseA * (float)TABLE_SIZE) % TABLE_SIZE;
   tableIndexB = (int)(phaseB * (float)TABLE_SIZE) % TABLE_SIZE;
-  contrastMultA = contrastA;
-  contrastMultB = contrastB;
+  contrastMultIntA = (uint16_t)(contrastA * 256.0);
+  contrastMultIntB = (uint16_t)(contrastB * 256.0);
 
   PORTC |= (1 << PORTC6);  // set Pin 5 HIGH
   PORTD |= (1 << PIND4);   // set Pin 4 HIGH
@@ -879,8 +784,6 @@ void SteppedFrequencySweep(float startFreq, float endFreq, float stepFreq, int c
 
     // 4. Wait for EXACTLY 'cyclesPerFreq' wrap-arounds
     while (completedCycles < cyclesPerFreq) {
-      // The microcontroller just hangs out here.
-      // All the precision work is happening in the background via Timer 3.
       delayMicroseconds(1); 
     }
 
@@ -896,18 +799,12 @@ void SteppedFrequencySweep(float startFreq, float endFreq, float stepFreq, int c
   stopTimer3Interrupt();
   PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is LOW
   PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is LOW
-  Serial.print("-1\n");
+  Serial.print(F("-1\n"));
 
   if (useChA) { setChA(TopLumi / 2); } 
   if (useChB) { setChB(TopLumi / 2); } 
 }
 
-/**
- * Outputs a sine wave with an approximated exponential frequency sweep for one full cycle.
- * The frequency sweeps from fmin to fmax, then back to fmin, using simplified step multiplication.
- * The total duration is calculated based on fmin, fmax, and sweepFactorPerSec using log() once.
- *
- */
 void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
                     float phaseA, float phaseB, float contrastA, float contrastB) {
 
@@ -923,8 +820,8 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
 
   tableIndexA = (int)(phaseA * (float)TABLE_SIZE) % TABLE_SIZE;
   tableIndexB = (int)(phaseB * (float)TABLE_SIZE) % TABLE_SIZE;
-  contrastMultA = contrastA;
-  contrastMultB = contrastB;
+  contrastMultIntA = (uint16_t)(contrastA * 256.0);
+  contrastMultIntB = (uint16_t)(contrastB * 256.0);
 
   float pwmCycleTimeUs = (2.0f * TOP) / (float)(CLOCK_FREQ / prescaler);
   pwmCycleTimeUs *= 1e6f;
@@ -933,12 +830,9 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
   unsigned long timeForOneWaySweepUs = 0;
   bool isSweeping = false;
 
-  // Calculate dt in seconds for frequency update steps
   const float dt_sec_step = (float)TARGET_RECONFIG_INTERVAL_US / 1000000.0f;
-  float step_mult_change_factor = 0.0f;  // This is M * dt
+  float step_mult_change_factor = 0.0f;  
 
-  // Check for valid sweep conditions. sweepFactorPerSec is M from f(t) = f0 * exp(M*t)
-  // Time to sweep from fmin to fmax is t = log(fmax/fmin) / M
   if (sweepFactorPerSec > 0.000001f && fmax > fmin && (fmax / fmin) > 1.000001f) {
     float timeForOneWaySweepSec_calc = log(fmax / fmin) / sweepFactorPerSec;
 
@@ -946,23 +840,22 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
       isSweeping = true;
       timeForOneWaySweepUs = (unsigned long)(timeForOneWaySweepSec_calc * 1000000.0f);
       totalDurationUs = 2 * timeForOneWaySweepUs;
-      step_mult_change_factor = sweepFactorPerSec * dt_sec_step;  // M*dt
+      step_mult_change_factor = sweepFactorPerSec * dt_sec_step; 
 
       if (totalDurationUs == 0 && timeForOneWaySweepSec_calc > 0.0000001f) {
-        totalDurationUs = 2;  // Ensure at least minimal duration if calculated sweep is very short but valid
+        totalDurationUs = 2;  
         if (timeForOneWaySweepUs == 0) timeForOneWaySweepUs = 1;
       } else if (totalDurationUs == 0) {
         isSweeping = false;
       }
     } else {
-      isSweeping = false;  // Calculated time is too short or invalid
+      isSweeping = false;  
     }
   }
 
   if (!isSweeping) {
     totalDurationUs = TARGET_RECONFIG_INTERVAL_US;
-    timeForOneWaySweepUs = totalDurationUs / 2;  // Not strictly used but avoids being zero
-                                                 // For fixed frequency, step_mult_change_factor remains 0, so freq won't change.
+    timeForOneWaySweepUs = totalDurationUs / 2;  
   }
 
   if (totalDurationUs == 0) {
@@ -971,20 +864,15 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
     isSweeping = false;
   }
 
-  float actual_calc_freq = fmin;       // This holds the frequency to be set for the current/next interval
-  bool sweeping_up = true;             // State variable to track sweep direction (more robustly handled by time check)
-  bool just_switched_to_down = false;  // Flag to handle the exact moment of switching to downward sweep
+  float actual_calc_freq = fmin;       
+  bool sweeping_up = true;             
+  bool just_switched_to_down = false;  
 
-  // get initial timer interrupt frequency
   float currentSinewaveFrequency = actual_calc_freq;
-
-  // Clamp and ensure positive frequency before using it for calculations
   if (currentSinewaveFrequency > fmax) currentSinewaveFrequency = fmax;
   if (currentSinewaveFrequency < fmin) currentSinewaveFrequency = fmin;
   if (currentSinewaveFrequency <= 0.0f) currentSinewaveFrequency = 0.0001f;
 
-
-  // --- Recalculate timer parameters based on currentSinewaveFrequency ---
   float sinewaveFreqToUseForCalc = currentSinewaveFrequency;
   float baseUpdateIntervalUs = (1.0f / (sinewaveFreqToUseForCalc * TABLE_SIZE)) * 1e6f;
   int calculatedStepSize = TABLE_SIZE;
@@ -995,34 +883,27 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
     }
   }
 
-  //noInterrupts();
   stepSize = calculatedStepSize;
-  //interrupts();
 
   float effectiveTimerUpdateIntervalUs = baseUpdateIntervalUs * calculatedStepSize;
   float timerInterruptFrequencyHz;
   timerInterruptFrequencyHz = 1e6f / effectiveTimerUpdateIntervalUs;
   configureTimer3Interrupt(timerInterruptFrequencyHz);
 
-  PORTC |= (1 << PORTC6);  // set Pin 5 HIGH
-  PORTD |= (1 << PIND4);   // set pin 4 high initially, toggles every sinewave cycle
+  PORTC |= (1 << PORTC6);  
+  PORTD |= (1 << PIND4);   
   unsigned long startTimeUs = micros();
   setTimer3Callback(sinewaveInterrupt);
 
-  // Main loop
   while (micros() - startTimeUs < totalDurationUs) {
     unsigned long loopIterationStartTimeUs = micros();
 
-    // currentSinewaveFrequency is the frequency for the current Timer3 configuration
     float currentSinewaveFrequency = actual_calc_freq;
 
-    // Clamp and ensure positive frequency before using it for calculations
     if (currentSinewaveFrequency > fmax) currentSinewaveFrequency = fmax;
     if (currentSinewaveFrequency < fmin) currentSinewaveFrequency = fmin;
     if (currentSinewaveFrequency <= 0.0f) currentSinewaveFrequency = 0.0001f;
 
-
-    // --- Recalculate timer parameters based on currentSinewaveFrequency ---
     float sinewaveFreqToUseForCalc = currentSinewaveFrequency;
     float baseUpdateIntervalUs = (1.0f / (sinewaveFreqToUseForCalc * TABLE_SIZE)) * 1e6f;
     int calculatedStepSize = TABLE_SIZE;
@@ -1033,9 +914,7 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
       }
     }
 
-    //noInterrupts();
     stepSize = calculatedStepSize;
-    //interrupts();
 
     float effectiveTimerUpdateIntervalUs = baseUpdateIntervalUs * calculatedStepSize;
     float timerInterruptFrequencyHz;
@@ -1051,19 +930,18 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
       stopTimer3Interrupt();
     }
 
-    // --- Update actual_calc_freq for the NEXT interval ---
     if (isSweeping) {
       unsigned long elapsedTimeTotalUs = loopIterationStartTimeUs - startTimeUs;
 
-      if (elapsedTimeTotalUs < timeForOneWaySweepUs) {  // Sweeping up phase
+      if (elapsedTimeTotalUs < timeForOneWaySweepUs) {  
         actual_calc_freq = actual_calc_freq * (1.0f + step_mult_change_factor);
         if (actual_calc_freq > fmax) {
           actual_calc_freq = fmax;
         }
-        just_switched_to_down = true;  // Reset flag, ready for when down sweep starts
-      } else {                         // Sweeping down phase
-        if (just_switched_to_down) {   // First time entering down sweep based on time
-          actual_calc_freq = fmax;     // Ensure we start down sweep precisely from fmax
+        just_switched_to_down = true;  
+      } else {                         
+        if (just_switched_to_down) {   
+          actual_calc_freq = fmax;     
           just_switched_to_down = false;
         }
         actual_calc_freq = actual_calc_freq * (1.0f - step_mult_change_factor);
@@ -1071,17 +949,14 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
           actual_calc_freq = fmin;
         }
       }
-      // Final safety clamp for actual_calc_freq after multiplication
-      if (actual_calc_freq <= 0.0f) actual_calc_freq = fmin;                                                    // Prevent zero/negative
-      else if (actual_calc_freq > fmax && elapsedTimeTotalUs >= timeForOneWaySweepUs) actual_calc_freq = fmax;  // Cap if overshot fmax during down phase start
+      if (actual_calc_freq <= 0.0f) actual_calc_freq = fmin;                                                  
+      else if (actual_calc_freq > fmax && elapsedTimeTotalUs >= timeForOneWaySweepUs) actual_calc_freq = fmax;  
       else if (actual_calc_freq < fmin) actual_calc_freq = fmin;
 
-
     } else {
-      actual_calc_freq = fmin;  // Fixed frequency, no change
+      actual_calc_freq = fmin;  
     }
 
-    // --- Loop Pacing ---
     unsigned long loopProcessingTimeUs = micros() - loopIterationStartTimeUs;
     if (loopProcessingTimeUs < TARGET_RECONFIG_INTERVAL_US) {
       long delayNeededUs = TARGET_RECONFIG_INTERVAL_US - loopProcessingTimeUs;
@@ -1099,517 +974,177 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
     }
   }
 
-  stopTimer3Interrupt();    // finish playing sinewave
-  PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW by changing register directly
-  PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
-  Serial.print("-1");
-  Serial.print("\n");
+  stopTimer3Interrupt();    
+  PORTD &= ~(1 << PIND4);   
+  PORTC &= ~(1 << PORTC6);  
+  Serial.print(F("-1\n"));
 
-  if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
-  if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
-}
-
-
-
-
-/////////////////////////////////// WHITE NOISE PWM FUNCTIONS //////////////////////////////
-
-// --- Function to generate N(0,1) using CLT ---
-float generateGaussianCLT() {
-  const int N = CLT_N;
-  long sum_random = 0;
-  for (int i = 0; i < N; i++) {
-    // sum_random += random(RANDOM_UPPER_BOUND); // Original
-    sum_random += fast_rand32() & (RANDOM_UPPER_BOUND - 1);  // Faster core PRNG (RANDOM_UPPER_BOUND must be power of 2, e.g. 1024)
-  }
-  float gaussian_approx_zero_mean_unit_variance =
-    ((float)sum_random - SUM_EXPECTED_MEAN) * NORMALIZE_SCALE_FACTOR;
-  return gaussian_approx_zero_mean_unit_variance;
-}
-
-void whiteNoise(long updateTime, long duration, float frac_target_mean, float frac_target_std) {
-
-  //printSequenceNum=1; // for serial debugging
-  float updateFrequency = 1e3 / updateTime;
-  configureTimer3Interrupt(updateFrequency);
-
-  target_mean = TopLumi * frac_target_mean;
-  target_std = TopLumi * frac_target_std;
-
-  // clamping limits
-  map_float_min = (float)0.0;
-  map_float_max = (float)TopLumi;
-
-  Serial.print("TOP: ");
-  Serial.print(TopLumi);
-  Serial.print("\n");
-
-  PORTC |= (1 << PORTC6);     // Stim on pin 5
-  long startTime = millis();  // Record the start time
-
-  // set timer3 interrupt callback function to play the sinewave
-  setTimer3Callback(whiteNoiseInterrupt);
-
-  // Loop until the specified duration has elapsed
-  while (millis() - startTime < duration) {
-    delayMicroseconds(1);  //wait for time to end
-  }
-
-  stopTimer3Interrupt();  // stop white noise
-  delay(updateTime);
-  PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW by changing register directly
-  PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
-  Serial.print("-1");
-  Serial.print("\n");
-  Serial.flush();
-  if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
-  if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
-}
-
-void SwitchingWhiteNoise(long updateTime, unsigned long switchTime, int nReps, float meanVal1, float contrastVal1, float meanVal2, float contrastVal2) {
-
-  float updateFrequency = 1e3 / updateTime;
-  configureTimer3Interrupt(updateFrequency);
-
-  long duration = switchTime * 2 * nReps;
-  Serial.print("switch time:");
-  Serial.print(switchTime);
-  Serial.print("\n");
-  Serial.print("duration:");
-  Serial.print(duration);
-  Serial.print("\n");
-
-  // start with dist1 values
-  target_mean = TopLumi * meanVal1;
-  target_std = TopLumi * contrastVal1;
-  currentDist = 1;
-
-  // clamping limits
-  map_float_min = (float)0.0;
-  map_float_max = (float)TopLumi;
-
-  Serial.print("TOP: ");
-  Serial.print(TopLumi);
-  Serial.print("\n");
-
-  PORTC |= (1 << PORTC6);  // Stim on pin 5
-
-  long startTime = millis();  // Record the start time
-
-  // set timer3 interrupt callback function to play the sinewave
-  setTimer3Callback(whiteNoiseInterrupt);
-
-  unsigned long switchPreviousMillis = millis();  // will store last time distribution switched
-  unsigned long switchCurrentMillis = millis();
-
-  // Loop until the specified duration has elapsed
-  while (millis() - startTime < duration) {
-    delayMicroseconds(1);                                            //wait for time to end
-    switchCurrentMillis = millis();                                  // get current time to check for whether to change distirbution
-    if (switchCurrentMillis - switchPreviousMillis >= switchTime) {  // if time to switch distributions
-                                                                     //Serial.println(switchCurrentMillis);
-
-      switchPreviousMillis = switchCurrentMillis;  // reset switchPreviousMillis
-
-      if (currentDist == 1) {
-        target_mean = TopLumi * meanVal2;
-        target_std = TopLumi * contrastVal2;
-        currentDist = 2;
-        //Serial.println(target_std);
-      } else if (currentDist == 2) {
-        target_mean = TopLumi * meanVal1;
-        target_std = TopLumi * contrastVal1;
-        currentDist = 1;
-        //Serial.println(target_std);
-      }
-
-      PORTC ^= (1 << PORTC6);  //Toggle Pin 5
-    }
-  }
-
-  stopTimer3Interrupt();  // stop white noise
-  delay(updateTime);
-  PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW by changing register directly
-  PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
-  Serial.print("-1");
-  Serial.print("\n");
-  Serial.flush();
-  if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
-  if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
-}
-
-// whitenoise interrupt function
-void whiteNoiseInterrupt() {
-
-  // Update PWM duty cycle with the next random value
-  if (useChA) { setChA(finalRandNumber_A); }
-  if (useChB) { setChB(finalRandNumber_B); }
-
-  if (useChA) {
-    float zA = generateGaussianCLT();
-    float float_gaussian_val_A = target_mean + target_std * zA;
-    if (float_gaussian_val_A < map_float_min) { float_gaussian_val_A = map_float_min; }
-    if (float_gaussian_val_A > map_float_max) { float_gaussian_val_A = map_float_max; }
-    finalRandNumber_A = (uint16_t)float_gaussian_val_A;
-  }
-
-  if (useChB) {
-    float zB = generateGaussianCLT();
-    float float_gaussian_val_B = target_mean + target_std * zB;
-    if (float_gaussian_val_B < map_float_min) { float_gaussian_val_B = map_float_min; }
-    if (float_gaussian_val_B > map_float_max) { float_gaussian_val_B = map_float_max; }
-    finalRandNumber_B = (uint16_t)float_gaussian_val_B;
-  }
-
-  PIND = (1 << PIND4);  // alternate PIN 4 value indicator pin
-  Serial.print(printSequenceNum);
-  Serial.print(",");
-  Serial.print(finalRandNumber_A);
-  Serial.print(",");
-  Serial.print(finalRandNumber_B);
-  Serial.print("\n");
-  //Serial.print(",");
-
-  printSequenceNum++;
-}
-
-
-/////////////////////////////////// FROZEN WHITE NOISE PWM FUNCTIONS //////////////////////////////
-
-void frozenWhiteNoise(int updateTime, long duration, long nReps, int randSeedNum) {
-
-  tableIndexFWN = 0;  // start at beginning of frozen white noise segment
-  float updateFrequency = 1e3 / updateTime;
-  configureTimer3Interrupt(updateFrequency);
-
-  long totalDuration = duration * nReps;
-  Serial.print("LD: ");
-  Serial.print(totalDuration);
-  Serial.print("\n");
-  xorshift32_state = randSeedNum;  // for reproducible random sequence across different stimulus blocks
-
-
-  float frac_target_mean = 0.5;
-  float frac_target_std = 0.2;
-  target_mean = TopLumi * frac_target_mean;
-  target_std = TopLumi * frac_target_std;
-
-  // clamping limits
-  map_float_min = (float)0.0;
-  map_float_max = (float)TopLumi;
-
-  for (int i = 0; i < FWN_TABLE_SIZE; i++) {
-
-    float zA = generateGaussianCLT();
-    float float_gaussian_val_A = target_mean + target_std * zA;
-    if (float_gaussian_val_A < map_float_min) { float_gaussian_val_A = map_float_min; }
-    if (float_gaussian_val_A > map_float_max) { float_gaussian_val_A = map_float_max; }
-    finalRandNumber_A = (uint16_t)float_gaussian_val_A;
-    frozenWhiteNoiseTable[i] = finalRandNumber_A;
-  }
-
-  Serial.print("TOP: ");
-  Serial.print(TopLumi);
-  Serial.print("\n");
-  Serial.flush();
-
-  long startTime = millis();  // Record the start time
-  // set timer3 interrupt callback function to play the sinewave
-  PORTC |= (1 << PORTC6);  // Stim on pin 5
-  setTimer3Callback(frozenWhiteNoiseInterrupt);
-
-  // Loop until the specified duration has elapsed
-  while (millis() - startTime < totalDuration) {
-    delayMicroseconds(1);  //wait for time to end
-  }
-
-  stopTimer3Interrupt();  // stop white noise
-  delay(updateTime);
-  PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW by changing register directly
-  PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
-  Serial.print("-1");
-  Serial.print("\n");
-  Serial.flush();
-  if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
-  if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
-}
-
-// whitenoise interrupt function
-void frozenWhiteNoiseInterrupt() {
-
-  // Update PWM duty cycle with the frozen white noise value
-  if (useChA) { setChA(frozenWhiteNoiseTable[tableIndexFWN]); }
-  if (useChB) { setChB(frozenWhiteNoiseTable[tableIndexFWN]); }
-  PIND = (1 << PIND4);  // alternate PIN 4 value indicator pin
-
-
-  //Serial.print("ti: ");
-  //Serial.println(tableIndexA);
-  Serial.print(frozenWhiteNoiseTable[tableIndexFWN]);
-  //Serial.print(",");
-  Serial.print("\n");
-  Serial.flush();
-
-  // Update the table index (wrap around at actual white noise table size)
-  tableIndexFWN = tableIndexFWN + 1;  // increment table index
-  if (tableIndexFWN >= FWN_TABLE_SIZE) {
-    PORTC ^= (1 << PORTC6);           //Toggle Pin 5 when table finishes
-    tableIndexFWN -= FWN_TABLE_SIZE;  // wrap table
-  }
+  if (useChA) { setChA(TopLumi / 2); }  
+  if (useChB) { setChB(TopLumi / 2); }  
 }
 
 /////////////////////////////////// SOME GENERIC PWM FUNCTIONS ///////////////////////////////////////////
 
-// set gamma-corrected output of channel A (pin 9)
 void setChA(uint16_t ocrValue) {
   OCR1A = pgm_read_word_near(currentChALUT + ocrValue);
 }
 
-// set gamma-corrected output of channel B (pin 10)
 void setChB(uint16_t ocrValue) {
   OCR1B = pgm_read_word_near(currentChBLUT + ocrValue);
 }
 
-// function to artifically lower the max PWM duty cycle. (i.e. TopMultiplier=0.5 means max duty cycle of 50%)
-// other functions will work as normal but scale to this TOP value
-//void SetTopLumi(float TopMultiplier) {
-
-//if (TopMultiplier > 1) {
-//    TopMultiplier = 1;
-//  } else if (TopMultiplier <= 0) {
-//    TopMultiplier = 1;
-//  }
-
-// get new TOP value to use
-//  TopLumi = float(TOP) * TopMultiplier;
-//  MidLumi = TopLumi / 2;
-
-// Generate the sine wave LUT based on the Timer1 config
-// generateSineWaveTable(TopLumi);
-
-// initialise random number to 50% duty cyle
-// randNumber = TopLumi / 2;
-
-// Set pin 9 to 50% duty cycle as default
-// if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
-// if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
-//}
-
-
-// set the duty cycle manually until a new value is requested
 void setDutyCycle(float dutyCyclePercentage_A, float dutyCyclePercentage_B, long TopLumi) {
-  // Constrain the duty cycle percentage between 0% and 100%
   if (dutyCyclePercentage_A < 0.0) dutyCyclePercentage_A = 0.0;
   if (dutyCyclePercentage_A > 100.0) dutyCyclePercentage_A = 100.0;
-  // Calculate the OCR1 value based on the duty cycle and TOP
   uint16_t ocrValueA = (long)((dutyCyclePercentage_A / 100.0) * TopLumi);
 
   if (dutyCyclePercentage_B < 0.0) { dutyCyclePercentage_B = 0.0; };
   if (dutyCyclePercentage_B > 100.0) { dutyCyclePercentage_B = 100.0; }
-  // Calculate the OCR1 value based on the duty cycle and TOP
   uint16_t ocrValueB = (long)((dutyCyclePercentage_B / 100.0) * TopLumi);
 
-  // Set OCR1A to control the duty cycle
-  PORTD ^= (1 << PIND4);  // toggle pin 4 whenever duty cycles are changed
-  //if (useChA)
+  PORTD ^= (1 << PIND4);  
   setChA(ocrValueA);
-  //if (useChB)
   setChB(ocrValueB);
-  //Serial.print(ocrValue);
-  //Serial.print(',');
-  //Serial.println(OCR1A);
 }
 
-
-// set the duty cycle manually until a new value is requested
 void setDutyCycleTime(float dutyCyclePercentage_A, float dutyCyclePercentage_B, long duration, long TopLumi) {
-  // Constrain the duty cycle percentage between 0% and 100%
   if (dutyCyclePercentage_A < 0.0) dutyCyclePercentage_A = 0.0;
   if (dutyCyclePercentage_A > 100.0) dutyCyclePercentage_A = 100.0;
-  // Calculate the OCR1 value based on the duty cycle and TOP
   uint16_t ocrValueA = (long)((dutyCyclePercentage_A / 100.0) * TopLumi);
 
   if (dutyCyclePercentage_B < 0.0) { dutyCyclePercentage_B = 0.0; };
   if (dutyCyclePercentage_B > 100.0) { dutyCyclePercentage_B = 100.0; }
-  // Calculate the OCR1 value based on the duty cycle and TOP
   uint16_t ocrValueB = (long)((dutyCyclePercentage_B / 100.0) * TopLumi);
 
-
-  long startTime = millis();          // Record the start time
-  PORTC |= (1 << PORTC6);             // Stim on pin 5
-  PORTD |= (1 << PIND4);              // match pin 5 on pin 4 for this stimulus
-  if (useChA) { setChA(ocrValueA); }  // Set pin 9 to 50% duty cycle as default
-  if (useChB) { setChB(ocrValueB); }  // Set pin 10 to 50% duty cycle as default
-  // Loop until the specified duration has elapsed
+  long startTime = millis();          
+  PORTC |= (1 << PORTC6);             
+  PORTD |= (1 << PIND4);              
+  if (useChA) { setChA(ocrValueA); }  
+  if (useChB) { setChB(ocrValueB); }  
   while (millis() - startTime < duration) {
-    delayMicroseconds(1);  //wait for time to end
+    delayMicroseconds(1);  
   }
-  PORTD &= ~(1 << PIND4);   // Ensure Pin 4 is set to LOW by changing register directly
-  PORTC &= ~(1 << PORTC6);  // Ensure Pin 5 is set to LOW
-  Serial.print("-1");
-  Serial.print("\n");
+  PORTD &= ~(1 << PIND4);   
+  PORTC &= ~(1 << PORTC6);  
+  Serial.print(F("-1\n"));
   Serial.flush();
-  if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
-  if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
+  if (useChA) { setChA(TopLumi / 2); }  
+  if (useChB) { setChB(TopLumi / 2); }  
 }
 
-
-// Run through duty cycles to perform gamma correction
 void cycleDutyCycles(float stepSize, float waitTime, int nReps, long TopLumi) {
   float dutyCycle = 0;
 
   for (int irep = 0; irep < nReps; irep++) {
     while (dutyCycle <= 1) {
       Serial.print(dutyCycle);
-      Serial.print("\n");
+      Serial.print(F("\n"));
       long ocrValue = (long)(dutyCycle * TopLumi);
-      //OCR1A = ocrValue;
-      if (useChA) { setChA(ocrValue); }  // Set pin 9 to 50% duty cycle as default
-      if (useChB) { setChB(ocrValue); }  // Set pin 10 to 50% duty cycle as default    delay(waitTime);
+      if (useChA) { setChA(ocrValue); }  
+      if (useChB) { setChB(ocrValue); }  
       dutyCycle = dutyCycle + stepSize;
       delay(waitTime);
     }
   }
-  Serial.print("-1");
-  Serial.print("\n");
-  // Set pin 9 to 50% duty cycle as default
-  if (useChA) { setChA(TopLumi / 2); }  // Set pin 9 to 50% duty cycle as default
-  if (useChB) { setChB(TopLumi / 2); }  // Set pin 10 to 50% duty cycle as default
+  Serial.print(F("-1\n"));
+  if (useChA) { setChA(TopLumi / 2); }  
+  if (useChB) { setChB(TopLumi / 2); }  
 }
 
-//void getStatus() {
-//  Serial.print(F("PWM FREQ: "));
-///  Serial.println(desiredPWMFrequency);
-/// Serial.print(F("TOP: "));
-//  Serial.println(TOP);
-// Serial.print(F("TopLumi: "));
-// // Serial.println(TopLumi);
-//  Serial.print(F("Duty cycle: "));
-///  Serial.println(dutyCycle);
-//  Serial.print(F("Current OCR1A: "));
-//  Serial.println(OCR1A);
-//  Serial.print(F("Current OCR1B: "));
-//  Serial.println(OCR1B);
-//}
-
-
 void readAnalogVals() {
-  //setDutyCycle(100, 100, TopLumi);  //set max duty cycle to get clean readings
   bool keepReading = true;
-  const unsigned long interval = 100;  // 100ms interval
+  const unsigned long interval = 100;  
   unsigned long previousMillis = millis();
 
   int analogValue0 = analogRead(A0);
   int analogValue1 = analogRead(A1);
 
   while (keepReading) {
-    // Check if the interval has passed
     unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
       previousMillis = currentMillis;
 
-      // Read and print analog values
       analogValue0 = analogRead(A0);
       analogValue1 = analogRead(A1);
       Serial.print(analogValue0);
-      Serial.print(",");
+      Serial.print(F(","));
       Serial.println(analogValue1);
     }
 
-    // Check if there's serial input
     if (Serial.available() > 0) {
       String input = Serial.readStringUntil('\n');
-      input.trim();  // Remove whitespace and newline characters
+      input.trim();  
 
       if (input.equalsIgnoreCase("done")) {
         keepReading = false;
-        Serial.println("Stopped reading analog values.");
+        Serial.println(F("Stopped reading analog values."));
       }
-      // automatically set appropriate gamma correction
       if (analogValue0 < 420) {
         currentChALUT = ChA2LUT;
         currentChBLUT = ChA2LUT;
-        Serial.print(F("LUT 2 SELECTED"));
-        Serial.print("\n");
+        Serial.print(F("LUT 2 SELECTED\n"));
       } else {
         currentChALUT = ChA1LUT;
         currentChBLUT = ChA1LUT;
-        Serial.print(F("LUT 1 SELECTED"));
-        Serial.print("\n");
+        Serial.print(F("LUT 1 SELECTED\n"));
       }
     }
   }
 }
 
-
-///////////////////////////////////////// BIT REGISTERS ///////////////////////////////////////
-
 ////////////////////// TIMER 1 PWM FREQUENCY CONTROL //////////////////////////////
 
-// Function to calculate the required prescaler and TOP value
 long calculatePrescalerAndTOP(long desiredFrequency, long &prescaler) {
   long TOP = 0;
-
-  // Possible prescaler values: 1, 8, 64, 256, 1024
   long possiblePrescalers[] = { 1, 8, 64, 256, 1024 };
 
-  // Try each prescaler and calculate the corresponding TOP
   for (int i = 0; i < 5; i++) {
     long currentPrescaler = possiblePrescalers[i];
-
-    // Calculate the TOP value
     long calculatedTOP = (CLOCK_FREQ / (2 * currentPrescaler * desiredFrequency)) - 1;
 
-    // Check if the calculated TOP value is within the 16-bit range (0 to 65535)
     if (calculatedTOP >= 0 && calculatedTOP <= 65535) {
       prescaler = currentPrescaler;
       TOP = calculatedTOP;
-      break;  // Stop after finding the first valid prescaler and TOP
+      break;  
     }
   }
-
   return TOP;
 }
 
-// Function to configure Timer1 with the calculated prescaler and TOP value
 void configureTimer1(long prescaler, long TOP) {
   TCCR1A = 0;
   TCCR1B = 0;
 
-  // Set Timer1 in 16-bit Phase Correct PWM mode
-  TCCR1A |= (1 << COM1A1);  // Enable PWM on pin 9 (Channel A)
-  TCCR1A |= (1 << COM1B1);  // Enable PWM on pin 10 (Channel B)
-  TCCR1B |= (1 << WGM13);   // Set WGM13 bit
-  TCCR1B &= ~(1 << WGM12);  // Clear WGM12 bit
-  TCCR1A &= ~(1 << WGM11);  // Clear WGM11 bit
-  TCCR1A &= ~(1 << WGM10);  // Clear WGM10 bit
+  TCCR1A |= (1 << COM1A1);  
+  TCCR1A |= (1 << COM1B1);  
+  TCCR1B |= (1 << WGM13);   
+  TCCR1B &= ~(1 << WGM12);  
+  TCCR1A &= ~(1 << WGM11);  
+  TCCR1A &= ~(1 << WGM10);  
 
-  // Set the prescaler
   switch (prescaler) {
     case 1:
-      TCCR1B |= (1 << CS10);  // Prescaler = 1
+      TCCR1B |= (1 << CS10);  
       break;
     case 8:
-      TCCR1B |= (1 << CS11);  // Prescaler = 8
+      TCCR1B |= (1 << CS11);  
       break;
     case 64:
-      TCCR1B |= (1 << CS11) | (1 << CS10);  // Prescaler = 64
+      TCCR1B |= (1 << CS11) | (1 << CS10);  
       break;
     case 256:
-      TCCR1B |= (1 << CS12);  // Prescaler = 256
+      TCCR1B |= (1 << CS12);  
       break;
     case 1024:
-      TCCR1B |= (1 << CS12) | (1 << CS10);  // Prescaler = 1024
+      TCCR1B |= (1 << CS12) | (1 << CS10);  
       break;
     default:
       break;
   }
 
-  // Set the TOP value
   ICR1 = TOP;
 }
 
-// Function to constrain the frequency to a multiple of TABLE_SIZE
 long constrainFrequency(long frequency) {
   return frequency - (frequency % TABLE_SIZE);
 }
@@ -1617,61 +1152,51 @@ long constrainFrequency(long frequency) {
 
 ////////////////////////////// Timer3 interrupt control /////////////////////////////////
 
-// Define a function pointer for the interrupt handler
-void (*timer3Callback)() = nullptr;  // Initialize to null
+void (*timer3Callback)() = nullptr;  
 
-// Function to set the callback for Timer3
 void setTimer3Callback(void (*callback)()) {
   timer3Callback = callback;
 }
 
-// ISR for Timer3 Compare Match A - run the function each interrupt
 ISR(TIMER3_COMPA_vect) {
   if (timer3Callback) {
-    timer3Callback();  // Call the assigned callback function
+    timer3Callback();  
   }
 }
 
-// Set timer3 frequency and configure for interrupts using CTC mode
 void configureTimer3Interrupt(float frequency) {
 
   long t = micros();
   long prescaler = 0;
   long compareValue = 0;
 
-  // Prescaler options: 1, 8, 64, 256, 1024
   long prescalerOptions[] = { 1, 8, 64, 256, 1024 };
   int prescalerIndex = 0;
 
-  // Iterate through prescaler options to find a valid one
   for (prescalerIndex = 0; prescalerIndex < 5; prescalerIndex++) {
     prescaler = prescalerOptions[prescalerIndex];
     compareValue = (CLOCK_FREQ / (prescaler * frequency)) - 1;
 
-    // Check if compareValue is within the valid 16-bit range
     if (compareValue >= 0 && compareValue <= 65535) {
-      break;  // Found a valid prescaler and compareValue
+      break;  
     }
   }
 
-  // If no valid prescaler is found, set to maximum possible values
   if (compareValue < 0 || compareValue > 65535) {
-    Serial.println("Unable to configure timer for requested frequency. Adjusting to closest possible.");
+    Serial.println(F("Unable to configure timer for requested frequency. Adjusting to closest possible."));
     prescaler = 1024;
     compareValue = 65535;
   }
 
   if (compareValue < 0 || compareValue > 65535) {
-    Serial.println("compare value bug!");
-    compareValue = 65535;  // Ensure it fits in 16 bits
+    Serial.println(F("compare value bug!"));
+    compareValue = 65535;  
   }
 
-  // Set Timer3 to CTC mode
-  TCCR3A = 0;             // Normal operation
-  TCCR3B = (1 << WGM32);  // CTC mode (clear on compare match)
+  TCCR3A = 0;             
+  TCCR3B = (1 << WGM32);  
 
-  // Set the prescaler
-  TCCR3B &= ~(1 << CS32 | 1 << CS31 | 1 << CS30);  // Clear prescaler bits
+  TCCR3B &= ~(1 << CS32 | 1 << CS31 | 1 << CS30);  
   switch (prescaler) {
     case 1: TCCR3B |= (1 << CS30); break;
     case 8: TCCR3B |= (1 << CS31); break;
@@ -1680,27 +1205,15 @@ void configureTimer3Interrupt(float frequency) {
     case 1024: TCCR3B |= (1 << CS32) | (1 << CS30); break;
   }
 
-  // reset the timer counter
   TCNT3 = 0;
-  // Set the compare match value
   OCR3A = compareValue;
 
-  // Clear the Timer3 Compare Match A interrupt flag
-  TIFR3 |= (1 << OCF3A);  // Writing a 1 clears the flag
-
-  // Enable Timer3 Compare Match A interrupt
+  TIFR3 |= (1 << OCF3A);  
   TIMSK3 |= (1 << OCIE3A);
 
-  // Enable global interrupts
   sei();
-
-  //t = micros() - t;
-  //Serial.print("micros: ");
-  //Serial.println(t);
 }
 
-// stop the interrupt function
 void stopTimer3Interrupt() {
-  // Disable the Timer3 interrupt
-  TIMSK3 &= ~(1 << OCIE3A);  // Disable Timer3 Compare Match A interrupt
+  TIMSK3 &= ~(1 << OCIE3A);  
 }
