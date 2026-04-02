@@ -812,7 +812,7 @@ void sinewaveEnvelopeInterrupt() {
   if (envCount > nEnvCounts - 1)  // check if time to update contrast value
   {
     envCount = 0;                       // reset
-    tableEnvIndex = tableEnvIndex + 1;  // incremenet contrast LUT index
+    tableEnvIndex = tableEnvIndex + stepSize;  // incremenet contrast LUT index
 
     if (tableEnvIndex >= TABLE_SIZE) {
       PORTD ^= (1 << PIND4);        // Toggle Pin 4 if envelope cycle finished
