@@ -70,9 +70,6 @@ const byte numChars = 50;
 char receivedChars[numChars];  
 bool newData = false;
 
-// stimulus selection char
-char* FirstChar;
-
 // Array to hold the wavetable
 uint16_t sineWaveTable[TABLE_SIZE];
 
@@ -87,7 +84,6 @@ volatile uint32_t envIncrement = 0;
 
 volatile uint16_t contrastMultIntA = 256;
 volatile uint16_t contrastMultIntB = 256;
-volatile uint16_t contrastMultInt = 0;
 
 // Tracks full sine wave cycles safely up to 4.2 billion
 volatile uint32_t completedCycles = 0; 
@@ -128,7 +124,7 @@ void setup() {
     if (raisedCosineLUT[i] > 256) raisedCosineLUT[i] = 256; 
   }
 
-  // Calculate the prescaler and TOP value for the constrained frequency
+  // Calculate the prescaler and TOP value
   TOP = calculatePrescalerAndTOP(desiredPWMFrequency, prescaler);
 
   // Store the exact mathematical frequency the hardware actually achieved for DDS math
@@ -193,7 +189,7 @@ void ActionSerial() {
     token = strtok(NULL, ",");
   }
 
-  FirstChar = serialVals[0];
+  char *FirstChar = serialVals[0];
 
   // s, durationMs, freqA, freqB, phaseA, phaseB, contrastA, contrastB
   if (strcmp(FirstChar, "s") == 0)  
@@ -443,7 +439,6 @@ void SineContrastConv(float duration, float freqA, float freqB, float envelopeFr
 
   contrastMultIntA = (uint16_t)(maxContrastA * 256.0);
   contrastMultIntB = (uint16_t)(maxContrastB * 256.0);
-  contrastMultInt = 0; 
 
   phaseAccumulatorA = 0;
   phaseAccumulatorB = 0;
@@ -516,7 +511,7 @@ void sinewaveEnvelopeInterrupt() {
   uint8_t indexB = phaseAccumulatorB >> 24;
   uint8_t indexEnv = envAccumulator >> 24;
 
-  contrastMultInt = sineWaveTable[indexEnv];  // Optimized redundant math
+  uint16_t contrastMultInt = sineWaveTable[indexEnv];  // Localized and optimized math
 
   uint16_t currentContrastIntA = ((uint32_t)contrastMultInt * contrastMultIntA) >> 8;
   uint16_t currentContrastIntB = ((uint32_t)contrastMultInt * contrastMultIntB) >> 8;
@@ -625,38 +620,20 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
   fadeOutStartInterrupt = 4294967295UL;
 
   unsigned long totalDurationUs = 0;
-  unsigned long timeForOneWaySweepUs = 0;
   bool isSweeping = false;
 
-  const float dt_sec_step = (float)TARGET_RECONFIG_INTERVAL_US / 1000000.0f; 
-
+  // Optimized continuous math logic
   if (sweepFactorPerSec > 0.000001f && fmax > fmin && (fmax / fmin) > 1.000001f) {
     float timeForOneWaySweepSec_calc = log(fmax / fmin) / sweepFactorPerSec;
 
     if (timeForOneWaySweepSec_calc > 0.0000001f) {
       isSweeping = true;
-      timeForOneWaySweepUs = (unsigned long)(timeForOneWaySweepSec_calc * 1000000.0f);
-      totalDurationUs = 2 * timeForOneWaySweepUs;
-
-      if (totalDurationUs == 0 && timeForOneWaySweepSec_calc > 0.0000001f) {
-        totalDurationUs = 2;  
-        if (timeForOneWaySweepUs == 0) timeForOneWaySweepUs = 1;
-      } else if (totalDurationUs == 0) {
-        isSweeping = false;
-      }
-    } else {
-      isSweeping = false;  
-    }
+      totalDurationUs = 2UL * (unsigned long)(timeForOneWaySweepSec_calc * 1000000.0f);
+    } 
   }
 
-  if (!isSweeping) {
+  if (!isSweeping || totalDurationUs == 0) {
     totalDurationUs = TARGET_RECONFIG_INTERVAL_US;
-    timeForOneWaySweepUs = totalDurationUs / 2;  
-  }
-
-  if (totalDurationUs == 0) {
-    totalDurationUs = TARGET_RECONFIG_INTERVAL_US;
-    timeForOneWaySweepUs = totalDurationUs / 2;
     isSweeping = false;
   }
 
@@ -769,9 +746,8 @@ void setDutyCycleTime(float dutyCyclePercentage_A, float dutyCyclePercentage_B, 
 }
 
 void cycleDutyCycles(float stepSize, float waitTime, int nReps, long TopLumi) {
-  float dutyCycle = 0;
-
   for (int irep = 0; irep < nReps; irep++) {
+    float dutyCycle = 0;
     while (dutyCycle <= 1) {
       Serial.print(dutyCycle);
       Serial.print(F("\n"));
