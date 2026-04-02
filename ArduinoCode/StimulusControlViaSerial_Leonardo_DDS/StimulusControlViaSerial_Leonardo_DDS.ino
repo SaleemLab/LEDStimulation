@@ -519,7 +519,7 @@ void outputSinewave(float sinewaveFrequency, long duration, float phaseA, float 
   // --- TEMPORAL WINDOW (RAISED COSINE) SETUP ---
   unsigned long totalInterrupts = (unsigned long)((duration / 1000.0) * actualPWMFreq); 
   
-  float fadeTimeMs = 200.0; // Set to 100.0 for fades, 0.0 to instantly disable!
+  float fadeTimeMs = 100.0; // Set to 100.0 for fades, 0.0 to instantly disable!
   
   if (fadeTimeMs > 0.0) {
     fadeInterrupts = (unsigned long)(actualPWMFreq * (fadeTimeMs / 1000.0));
