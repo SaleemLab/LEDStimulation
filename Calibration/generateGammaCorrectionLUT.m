@@ -1,6 +1,6 @@
 %% Gamma calibration
 
-outputFileName = 'test_panel.txt';
+outputFileName = 'panel09.txt';
 
 %% parse power values from gamma data
 
@@ -16,7 +16,7 @@ takeValsDuration = 3000;
 dutyCyclesOrig = 0:2:100;
 
 %%
-startTime = 24561; % estimate from figure
+startTime = 39161; % estimate from figure
 
 
 for icycle = 1:numel(dutyCyclesOrig)
