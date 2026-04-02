@@ -272,12 +272,10 @@ volatile unsigned long fadeInterrupts = 0;
 volatile unsigned long fadeOutStartInterrupt = 0;
 volatile uint32_t envStep = 0; // DDS phase step
 
-// Function to calculate exact DDS phase increment (Uses 64-bit integer math to prevent floating point truncation!)
+// Function to calculate exact DDS phase increment 
 uint32_t calcPhaseInc(float freq) {
-  // Scale float to an integer saving 6 decimal places (e.g. 200.000000 Hz)
-  uint64_t scaledFreq = (uint64_t)(freq * 1000000.0);
-  // (scaledFreq * 2^32) / (PWM_FREQ * 1,000,000)
-  return (uint32_t)((scaledFreq * 4294967296ULL) / ((uint64_t)(actualPWMFreq * 1000000.0)));
+  uint64_t scaledFreq = (uint64_t)(freq * 10000.0); // Safe 200Hz scale
+  return (uint32_t)((scaledFreq * 4294967296ULL) / ((uint64_t)(actualPWMFreq * 10000.0)));
 }
 
 void setup() {
@@ -499,7 +497,6 @@ void ActionSerial() {
   memset(receivedChars, '\0', sizeof(receivedChars));
 }
 
-
 ///////////////////////////////////// SINEWAVE FLICKER (DDS) //////////////////////////////////////
 void generateSineWaveTable(long TOP) {
   for (int i = 0; i < TABLE_SIZE; i++) {
@@ -510,22 +507,19 @@ void generateSineWaveTable(long TOP) {
 
 void outputSinewave(float sinewaveFrequency, long duration, float phaseA, float phaseB, float contrastA, float contrastB) {
 
-  // Map 0.0-1.0 phase request to 32-bit integer space (0 to 4,294,967,296)
   phaseAccumulatorA = (uint32_t)(phaseA * 4294967296.0);
   phaseAccumulatorB = (uint32_t)(phaseB * 4294967296.0);
 
   contrastMultIntA = (uint16_t)(contrastA * 256.0);
   contrastMultIntB = (uint16_t)(contrastB * 256.0);
 
-  // DDS math directly linked to actual PWM frequency
   phaseIncrementA = calcPhaseInc(sinewaveFrequency);
   phaseIncrementB = phaseIncrementA;
 
   // --- TEMPORAL WINDOW (RAISED COSINE) SETUP ---
-  long targetCycles = (long)((duration / 1000.0) * sinewaveFrequency);
   unsigned long totalInterrupts = (unsigned long)((duration / 1000.0) * actualPWMFreq); 
   
-  float fadeTimeMs = 100.0; // Set to 100.0 for fades, 0.0 to instantly disable!
+  float fadeTimeMs = 200.0; // Set to 100.0 for fades, 0.0 to instantly disable!
   
   if (fadeTimeMs > 0.0) {
     fadeInterrupts = (unsigned long)(actualPWMFreq * (fadeTimeMs / 1000.0));
@@ -538,30 +532,34 @@ void outputSinewave(float sinewaveFrequency, long duration, float phaseA, float 
     // Calculates phase step based on our new macro
     envStep = ((uint32_t)FADE_LUT_MAX << 16) / fadeInterrupts;
   } else {
-    // SAFELY DISABLE ENVELOPE (Prevents divide-by-zero crash)
+    // SAFELY DISABLE ENVELOPE 
     fadeInterrupts = 0;
-    fadeOutStartInterrupt = 4294967295UL; // Max 32-bit integer, will never trigger
+    fadeOutStartInterrupt = 4294967295UL; 
     envStep = 0;
   }
   currentTick = 0;
   // -------------------------------------------------
 
-  // Prime outputs at MidLumi (0% contrast)
   if (useChA) { setChA(MidLumi); }
   if (useChB) { setChB(MidLumi); }
 
-  PORTC |= (1 << PORTC6);                     // set Pin 5 HIGH
-  PORTD |= (1 << PIND4);                      // set Pin 4 HIGH
+  PORTC |= (1 << PORTC6);                     
+  PORTD |= (1 << PIND4);                      
 
-  completedCycles = 0; 
-  
   TIMSK0 &= ~_BV(TOIE0); // Disable Timer0 to prevent jitter
   
   setTimer1Callback(sinewaveInterrupt);
   startTimer1Interrupt(); // Engage Timer 1 Overflow 
 
-  // Wait for the requested number of cycles (tracked safely via overflow math)
-  while (completedCycles < targetCycles) {
+  // ATOMIC READ: Safely wait for the tick-counter to finish
+  unsigned long safeTick = 0;
+  while (true) {
+    noInterrupts();
+    safeTick = currentTick;
+    interrupts();
+    
+    if (safeTick >= totalInterrupts) break;
+    
     delayMicroseconds(1);  
   }
 
@@ -580,51 +578,44 @@ void sinewaveInterrupt() {
   
   uint16_t currentEnvelope = 256; 
 
-  // --- TEMPORAL WINDOW MATH ---
   if (currentTick < fadeInterrupts) {
-    // Fade In
     uint32_t phase = currentTick * envStep; 
     uint16_t envIndex = phase >> 16;
     if (envIndex > FADE_LUT_MAX) envIndex = FADE_LUT_MAX;
     currentEnvelope = raisedCosineLUT[envIndex];
     
   } else if (currentTick >= fadeOutStartInterrupt) {
-    // Fade Out
     uint32_t ticksIntoFadeOut = currentTick - fadeOutStartInterrupt;
     uint32_t phase = ticksIntoFadeOut * envStep;
     uint16_t shiftPhase = phase >> 16;
-    
-    // Reverse the index using the macro
     uint16_t envIndex = (shiftPhase >= FADE_LUT_MAX) ? 0 : (FADE_LUT_MAX - shiftPhase);
     currentEnvelope = raisedCosineLUT[envIndex];
   }
   currentTick++;
-  // ----------------------------
 
   uint16_t effectiveContrastA = ((uint32_t)contrastMultIntA * currentEnvelope) >> 8;
   uint16_t effectiveContrastB = ((uint32_t)contrastMultIntB * currentEnvelope) >> 8;
 
-  // Track if a 32-bit rollover just happened to count cycles
   uint32_t oldPhaseA = phaseAccumulatorA;
   
-  // Advance the DDS Phase
   phaseAccumulatorA += phaseIncrementA;
   phaseAccumulatorB += phaseIncrementB;
 
   if (phaseAccumulatorA < oldPhaseA) {
     completedCycles++;          
-    PORTD ^= (1 << PIND4); // Toggle pin 4 per cycle
+    PORTD ^= (1 << PIND4); 
   }
 
-  // Grab the top 8 bits for our 256-item LUT index
   uint8_t indexA = phaseAccumulatorA >> 24;
   uint8_t indexB = phaseAccumulatorB >> 24;
 
   long tempA = (long)sineWaveTable[indexA] - MidLumi;
-  uint16_t ocrValA = MidLumi + ((tempA * effectiveContrastA) >> 8);
-
+  long ocrValA_calc = MidLumi + ((tempA * effectiveContrastA) >> 8);
+  uint16_t ocrValA = (ocrValA_calc > 1040) ? 1040 : (uint16_t)ocrValA_calc; // PROGMEM CLAMP
+  
   long tempB = (long)sineWaveTable[indexB] - MidLumi;
-  uint16_t ocrValB = MidLumi + ((tempB * effectiveContrastB) >> 8);
+  long ocrValB_calc = MidLumi + ((tempB * effectiveContrastB) >> 8);
+  uint16_t ocrValB = (ocrValB_calc > 1040) ? 1040 : (uint16_t)ocrValB_calc; // PROGMEM CLAMP
 
   if (useChA) { setChA(ocrValA); }  
   if (useChB) { setChB(ocrValB); }  
@@ -642,9 +633,13 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
   phaseIncrementA = calcPhaseInc(sinewaveFrequency);
   phaseIncrementB = phaseIncrementA;
 
-  // Start envelope at LUT index 191 (approx 0 contrast). 191/256 mapped to 32-bit space:
+  // Start envelope at LUT index 191 (approx 0 contrast). 
   envAccumulator = (191UL << 24); 
   envIncrement = calcPhaseInc(envelopeFreq);
+
+  // Explicitly disable the raised cosine fade for this mode
+  fadeInterrupts = 0; 
+  fadeOutStartInterrupt = 4294967295UL; 
 
   long targetCycles = (long)((duration / 1000.0) * sinewaveFrequency);
   completedCycles = 0; 
@@ -653,13 +648,19 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
   if (useChB) { setChB(MidLumi); }  
 
   PORTC |= (1 << PORTC6);     
-  
-  TIMSK0 &= ~_BV(TOIE0); // Disable Timer0 
+  TIMSK0 &= ~_BV(TOIE0); 
   
   setTimer1Callback(sinewaveEnvelopeInterrupt);
   startTimer1Interrupt();
 
-  while (completedCycles < targetCycles) {
+  // ATOMIC READ
+  unsigned int safeCycles = 0;
+  while (true) {
+    noInterrupts();
+    safeCycles = completedCycles;
+    interrupts();
+    
+    if (safeCycles >= targetCycles) break;
     delayMicroseconds(1);  
   }
   
@@ -674,7 +675,6 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
   if (useChA) { setChA(TopLumi / 2); }  
   if (useChB) { setChB(TopLumi / 2); }  
 }
-
 
 void sinewaveEnvelopeInterrupt() {
   
@@ -703,10 +703,12 @@ void sinewaveEnvelopeInterrupt() {
   uint16_t currentContrastIntB = ((uint32_t)contrastMultInt * contrastMultIntB) >> 8;
 
   long tempA = (long)sineWaveTable[indexA] - MidLumi;
-  uint16_t ocrValA = MidLumi + ((tempA * currentContrastIntA) >> 8);
+  long ocrValA_calc = MidLumi + ((tempA * currentContrastIntA) >> 8);
+  uint16_t ocrValA = (ocrValA_calc > 1040) ? 1040 : (uint16_t)ocrValA_calc; // CLAMP
 
   long tempB = (long)sineWaveTable[indexB] - MidLumi;
-  uint16_t ocrValB = MidLumi + ((tempB * currentContrastIntB) >> 8);
+  long ocrValB_calc = MidLumi + ((tempB * currentContrastIntB) >> 8);
+  uint16_t ocrValB = (ocrValB_calc > 1040) ? 1040 : (uint16_t)ocrValB_calc; // CLAMP
 
   if (useChA) { setChA(ocrValA); }  
   if (useChB) { setChB(ocrValB); }  
@@ -721,6 +723,10 @@ void SteppedFrequencySweep(float startFreq, float endFreq, float stepFreq, int c
   contrastMultIntA = (uint16_t)(contrastA * 256.0);
   contrastMultIntB = (uint16_t)(contrastB * 256.0);
 
+  // Disable the fade for sweeps
+  fadeInterrupts = 0; 
+  fadeOutStartInterrupt = 4294967295UL; 
+
   PORTC |= (1 << PORTC6);  
   PORTD |= (1 << PIND4);   
 
@@ -728,11 +734,9 @@ void SteppedFrequencySweep(float startFreq, float endFreq, float stepFreq, int c
   bool sweepingUp = startFreq <= endFreq;
   stepFreq = abs(stepFreq); 
 
-  // Initial increments
   phaseIncrementA = calcPhaseInc(currentFreq);
   phaseIncrementB = phaseIncrementA;
 
-  // We reuse the standard DDS interrupt because it just traces whatever increment we give it!
   setTimer1Callback(sinewaveInterrupt);
   
   TIMSK0 &= ~_BV(TOIE0); 
@@ -740,17 +744,22 @@ void SteppedFrequencySweep(float startFreq, float endFreq, float stepFreq, int c
 
   while ((sweepingUp && currentFreq <= endFreq) || (!sweepingUp && currentFreq >= endFreq)) {
     
-    // Smoothly overwrite the phase increment dynamically
     uint32_t newInc = calcPhaseInc(currentFreq);
-    
-    noInterrupts(); // Pause briefly to ensure 32-bit write isn't corrupted mid-byte
+    noInterrupts(); 
     phaseIncrementA = newInc;
     phaseIncrementB = newInc;
     interrupts();
     
     completedCycles = 0; 
     
-    while (completedCycles < cyclesPerFreq) {
+    // ATOMIC READ
+    unsigned int safeCycles = 0;
+    while (true) {
+      noInterrupts();
+      safeCycles = completedCycles;
+      interrupts();
+      
+      if (safeCycles >= cyclesPerFreq) break;
       delayMicroseconds(1); 
     }
 
@@ -788,6 +797,10 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
   phaseAccumulatorB = (uint32_t)(phaseB * 4294967296.0);
   contrastMultIntA = (uint16_t)(contrastA * 256.0);
   contrastMultIntB = (uint16_t)(contrastB * 256.0);
+
+  // Disable fade for sweeps
+  fadeInterrupts = 0; 
+  fadeOutStartInterrupt = 4294967295UL;
 
   unsigned long totalDurationUs = 0;
   unsigned long timeForOneWaySweepUs = 0;
@@ -846,23 +859,26 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
   setTimer1Callback(sinewaveInterrupt);
   startTimer1Interrupt();
 
-  // Since Timer0 is off, we must use a cycle-locked target, NOT micros()!!
-  // We approximate the required cycles based on duration and median frequency.
-  // Warning: Sweep duration will inherently be tied to phase completion in this state.
   long targetCycles = (long)((totalDurationUs / 1000000.0) * ((fmax+fmin)/2.0));
   completedCycles = 0;
 
-  // We adapt the "while" loop to trace the target cycles instead of time.
-  while (completedCycles < targetCycles) {
+  // ATOMIC READ
+  unsigned int safeCycles = 0;
+  
+  while (true) {
+      noInterrupts();
+      safeCycles = completedCycles;
+      interrupts();
+      
+      if (safeCycles >= targetCycles) break;
     
-    // Calculate new frequency dynamically based on phase progression instead of time
-    float sweepProgress = (float)completedCycles / (float)targetCycles;
+    float sweepProgress = (float)safeCycles / (float)targetCycles;
     
     if (isSweeping) {
-      if (sweepProgress < 0.5) {  // Sweeping up phase
+      if (sweepProgress < 0.5) {  
         actual_calc_freq = fmin * exp(sweepFactorPerSec * (sweepProgress * totalDurationUs / 1000000.0));
         if (actual_calc_freq > fmax) actual_calc_freq = fmax;
-      } else {                    // Sweeping down phase
+      } else {                    
         actual_calc_freq = fmax * exp(-sweepFactorPerSec * ((sweepProgress - 0.5) * totalDurationUs / 1000000.0));
         if (actual_calc_freq < fmin) actual_calc_freq = fmin;
       }
@@ -1054,7 +1070,6 @@ long constrainFrequency(long frequency) {
   return frequency - (frequency % TABLE_SIZE);
 }
 
-
 ////////////////////////////// Timer 1 Overflow Interrupt control /////////////////////////////////
 
 void (*timer1Callback)() = nullptr;  
@@ -1073,7 +1088,6 @@ void stopTimer1Interrupt() {
 }
 
 // ISR for Timer 1 Overflow - This triggers at the exact "BOTTOM" of the PWM cycle.
-// Synchronizing the math here guarantees perfectly uniform pulse widths!
 ISR(TIMER1_OVF_vect) {
   if (timer1Callback) {
     timer1Callback();  
