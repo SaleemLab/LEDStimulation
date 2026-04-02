@@ -1,6 +1,6 @@
 %% Gamma calibration
 
-outputFileName = 'test.txt';
+outputFileName = 'test_panel.txt';
 
 %% parse power values from gamma data
 
@@ -10,13 +10,13 @@ figure,
 subplot(121)
 plot(power_table.Time,power_table.Power)
 
-waitTime = 10000; % duration of each power level used in gamma correction procedure
-delayTime = 2000; % how long to wait before taking values
-takeValsDuration = 6000;
-dutyCyclesOrig = 0:1:100;
+waitTime = 5000; % duration of each power level used in gamma correction procedure
+delayTime = 1000; % how long to wait before taking values
+takeValsDuration = 3000;
+dutyCyclesOrig = 0:2:100;
 
 %%
-startTime = 13883; % estimate from figure
+startTime = 24561; % estimate from figure
 
 
 for icycle = 1:numel(dutyCyclesOrig)
