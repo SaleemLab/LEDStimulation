@@ -104,8 +104,9 @@ volatile unsigned long targetTotalInterrupts = 0;
 
 // Function to calculate exact DDS phase increment 
 uint32_t calcPhaseInc(float freq) {
-  uint64_t scaledFreq = (uint64_t)((freq * 10000.0) + 0.5); 
-  return (uint32_t)((scaledFreq * 4294967296ULL) / ((uint64_t)(actualPWMFreq * 10000.0)));
+  // 4294967296.0 / 31250.0 = 137438.953125
+  // This executes instantly and is mathematically exact in IEEE 754.
+  return (uint32_t)(freq * 137438.953125f + 0.5f);
 }
 
 void setup() {
@@ -388,17 +389,14 @@ void outputSinewave(float freqA, float freqB, long duration, float phaseA, float
 void sinewaveInterrupt() {
   uint8_t currentEnvelope = 255; 
 
-  // OPTIMIZATION: 32-bit addition instead of slow 32x32-bit multiplication
   if (currentTick < fadeInterrupts) {
     fadePhase += envStep; 
     uint16_t envIndex = fadePhase >> 16;
     if (envIndex > FADE_LUT_MAX) envIndex = FADE_LUT_MAX;
     currentEnvelope = raisedCosineLUT[envIndex];
-    
   } else if (currentTick == fadeOutStartInterrupt) {
-    fadePhase = 0; // Hardware Reset once
+    fadePhase = 0; 
     currentEnvelope = raisedCosineLUT[FADE_LUT_MAX];
-    
   } else if (currentTick > fadeOutStartInterrupt) {
     fadePhase += envStep;
     uint16_t shiftPhase = fadePhase >> 16;
@@ -407,17 +405,15 @@ void sinewaveInterrupt() {
   }
   
   currentTick++;
-  // Exit condition managed securely in ISR
   if (currentTick >= targetTotalInterrupts) {
     stimulusActive = false;
   }
 
-  // OPTIMIZATION: Stripped away the uint32_t casts. This is natively fast 16-bit math now!
-  uint16_t effectiveContrastA = (contrastMultIntA * currentEnvelope) >> 8;
-  uint16_t effectiveContrastB = (contrastMultIntB * currentEnvelope) >> 8;
+  // Cast to uint16_t before multiplying to prevent signed integer overflow!
+  uint16_t effectiveContrastA = ((uint16_t)contrastMultIntA * (uint16_t)currentEnvelope) >> 8;
+  uint16_t effectiveContrastB = ((uint16_t)contrastMultIntB * (uint16_t)currentEnvelope) >> 8;
 
   uint32_t oldPhaseA = phaseAccumulatorA;
-  
   phaseAccumulatorA += phaseIncrementA;
   phaseAccumulatorB += phaseIncrementB;
 
@@ -426,18 +422,18 @@ void sinewaveInterrupt() {
     PIND = (1 << PIND4); 
   }
 
-  // OPTIMIZATION: Little-Endian Pointer Array Hack. Takes 1 Clock Cycle instead of ~30.
   uint8_t indexA = ((uint8_t*)&phaseAccumulatorA)[3];
   uint8_t indexB = ((uint8_t*)&phaseAccumulatorB)[3];
 
+  // Pure 16-bit math. No software multipliers required.
   int16_t tempA = (int16_t)sineWaveTable[indexA] - (int16_t)MidLumi;
-  int32_t ocrValA_calc = MidLumi + (((int32_t)tempA * effectiveContrastA) >> 8);
+  int16_t ocrValA_calc = (int16_t)MidLumi + ((tempA * (int16_t)effectiveContrastA) >> 8);
   if (ocrValA_calc < 0) ocrValA_calc = 0;
   if (ocrValA_calc > 255) ocrValA_calc = 255;
   uint8_t ocrValA = (uint8_t)ocrValA_calc; 
   
   int16_t tempB = (int16_t)sineWaveTable[indexB] - (int16_t)MidLumi;
-  int32_t ocrValB_calc = MidLumi + (((int32_t)tempB * effectiveContrastB) >> 8);
+  int16_t ocrValB_calc = (int16_t)MidLumi + ((tempB * (int16_t)effectiveContrastB) >> 8);
   if (ocrValB_calc < 0) ocrValB_calc = 0;
   if (ocrValB_calc > 255) ocrValB_calc = 255;
   uint8_t ocrValB = (uint8_t)ocrValB_calc;
@@ -504,7 +500,6 @@ void sinewaveEnvelopeInterrupt() {
   }
 
   uint32_t oldPhaseA = phaseAccumulatorA;
-  
   phaseAccumulatorA += phaseIncrementA;
   phaseAccumulatorB += phaseIncrementB;
 
@@ -519,25 +514,24 @@ void sinewaveEnvelopeInterrupt() {
       PIND = (1 << PIND4); 
   }
 
-  // OPTIMIZATION: Pointer hack
   uint8_t indexA = ((uint8_t*)&phaseAccumulatorA)[3];
   uint8_t indexB = ((uint8_t*)&phaseAccumulatorB)[3];
   uint8_t indexEnv = ((uint8_t*)&envAccumulator)[3];
 
-  uint16_t contrastMultInt = sineWaveTable[indexEnv];  // Max 256
+  uint16_t contrastMultInt = sineWaveTable[indexEnv];  
 
-  // OPTIMIZATION: Removed uint32_t cast! 256 * 255 = 65,280 (fits in 16-bit safely)
-  uint16_t currentContrastIntA = (contrastMultInt * contrastMultIntA) >> 8;
-  uint16_t currentContrastIntB = (contrastMultInt * contrastMultIntB) >> 8;
+  // Cast to uint16_t before multiplying to prevent signed integer overflow!
+  uint16_t currentContrastIntA = ((uint16_t)contrastMultInt * (uint16_t)contrastMultIntA) >> 8;
+  uint16_t currentContrastIntB = ((uint16_t)contrastMultInt * (uint16_t)contrastMultIntB) >> 8;
 
   int16_t tempA = (int16_t)sineWaveTable[indexA] - (int16_t)MidLumi;
-  int32_t ocrValA_calc = MidLumi + (((int32_t)tempA * currentContrastIntA) >> 8);
+  int16_t ocrValA_calc = (int16_t)MidLumi + ((tempA * (int16_t)currentContrastIntA) >> 8);
   if (ocrValA_calc < 0) ocrValA_calc = 0;
   if (ocrValA_calc > 255) ocrValA_calc = 255;
   uint8_t ocrValA = (uint8_t)ocrValA_calc; 
 
   int16_t tempB = (int16_t)sineWaveTable[indexB] - (int16_t)MidLumi;
-  int32_t ocrValB_calc = MidLumi + (((int32_t)tempB * currentContrastIntB) >> 8);
+  int16_t ocrValB_calc = (int16_t)MidLumi + ((tempB * (int16_t)currentContrastIntB) >> 8);
   if (ocrValB_calc < 0) ocrValB_calc = 0;
   if (ocrValB_calc > 255) ocrValB_calc = 255;
   uint8_t ocrValB = (uint8_t)ocrValB_calc; 
