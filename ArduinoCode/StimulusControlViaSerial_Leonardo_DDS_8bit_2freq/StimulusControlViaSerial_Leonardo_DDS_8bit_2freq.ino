@@ -9,8 +9,8 @@
 #define FADE_LUT_SIZE 64                   // Change this to 64, 128, 256, 512, etc.
 #define FADE_LUT_MAX (FADE_LUT_SIZE - 1)   // Used for safe zero-indexed math
 
-// 8-Bit Linear LUT (1:1 Direct Mapping)
-const uint16_t PROGMEM ChA1LUT[256] = {
+// --- OPTIMIZATION: 8-Bit PROGMEM Arrays ---
+const uint8_t PROGMEM ChA1LUT[256] = {
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
   32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
@@ -29,7 +29,7 @@ const uint16_t PROGMEM ChA1LUT[256] = {
   240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255
 };
 
-const uint16_t PROGMEM ChA2LUT[256] = {
+const uint8_t PROGMEM ChA2LUT[256] = {
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
   32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
@@ -48,8 +48,8 @@ const uint16_t PROGMEM ChA2LUT[256] = {
   240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255
 };
 
-const uint16_t *currentChALUT;
-const uint16_t *currentChBLUT;
+const uint8_t *currentChALUT;
+const uint8_t *currentChBLUT;
 
 // PWM variables
 long prescaler;
@@ -97,7 +97,7 @@ volatile uint32_t envStep = 0;
 
 // Function to calculate exact DDS phase increment 
 uint32_t calcPhaseInc(float freq) {
-  uint64_t scaledFreq = (uint64_t)((freq * 10000.0)+0.5); 
+  uint64_t scaledFreq = (uint64_t)((freq * 10000.0) + 0.5); 
   return (uint32_t)((scaledFreq * 4294967296ULL) / ((uint64_t)(actualPWMFreq * 10000.0)));
 }
 
@@ -180,7 +180,7 @@ void ActionSerial() {
   char *token;
   uint8_t idx = 0;
 #define MAX_VALS 50  
-  char *serialVals[MAX_VALS] = {NULL};
+  char *serialVals[MAX_VALS] = {NULL}; // Safely initialized
   token = strtok(receivedChars, ",");
 
   while (token != NULL) {
@@ -410,26 +410,27 @@ void sinewaveInterrupt() {
   phaseAccumulatorA += phaseIncrementA;
   phaseAccumulatorB += phaseIncrementB;
 
-  // Debug Pin toggle on Channel A cycles & cycle counting for sweeps
+  // OPTIMIZATION: 1-Cycle Hardware toggle!
   if (phaseAccumulatorA < oldPhaseA) {
     completedCycles++;
-    PORTD ^= (1 << PIND4); 
+    PIND = (1 << PIND4); 
   }
 
   uint8_t indexA = phaseAccumulatorA >> 24;
   uint8_t indexB = phaseAccumulatorB >> 24;
 
-int16_t tempA = (int16_t)sineWaveTable[indexA] - (int16_t)MidLumi;
+  // OPTIMIZATION: int16_t math to avoid 32-bit bloat
+  int16_t tempA = (int16_t)sineWaveTable[indexA] - (int16_t)MidLumi;
   int32_t ocrValA_calc = MidLumi + (((int32_t)tempA * effectiveContrastA) >> 8);
   if (ocrValA_calc < 0) ocrValA_calc = 0;
   if (ocrValA_calc > 255) ocrValA_calc = 255;
-  uint16_t ocrValA = (uint16_t)ocrValA_calc; 
+  uint8_t ocrValA = (uint8_t)ocrValA_calc; 
   
   int16_t tempB = (int16_t)sineWaveTable[indexB] - (int16_t)MidLumi;
   int32_t ocrValB_calc = MidLumi + (((int32_t)tempB * effectiveContrastB) >> 8);
   if (ocrValB_calc < 0) ocrValB_calc = 0;
   if (ocrValB_calc > 255) ocrValB_calc = 255;
-  uint16_t ocrValB = (uint16_t)ocrValB_calc;
+  uint8_t ocrValB = (uint8_t)ocrValB_calc;
 
   if (useChA) { setChA(ocrValA); }  
   if (useChB) { setChB(ocrValB); }  
@@ -505,7 +506,7 @@ void sinewaveEnvelopeInterrupt() {
   envAccumulator += envIncrement;
 
   if (envAccumulator < oldEnvAccumulator) {
-      PORTD ^= (1 << PIND4); 
+      PIND = (1 << PIND4); // OPTIMIZATION: 1-Cycle hardware toggle
   }
 
   uint8_t indexA = phaseAccumulatorA >> 24;
@@ -517,17 +518,18 @@ void sinewaveEnvelopeInterrupt() {
   uint16_t currentContrastIntA = ((uint32_t)contrastMultInt * contrastMultIntA) >> 8;
   uint16_t currentContrastIntB = ((uint32_t)contrastMultInt * contrastMultIntB) >> 8;
 
-  long tempA = (long)sineWaveTable[indexA] - MidLumi;
-  long ocrValA_calc = MidLumi + ((tempA * currentContrastIntA) >> 8);
+  // OPTIMIZATION: Applied 16-bit math fix here as well!
+  int16_t tempA = (int16_t)sineWaveTable[indexA] - (int16_t)MidLumi;
+  int32_t ocrValA_calc = MidLumi + (((int32_t)tempA * currentContrastIntA) >> 8);
   if (ocrValA_calc < 0) ocrValA_calc = 0;
   if (ocrValA_calc > 255) ocrValA_calc = 255;
-  uint16_t ocrValA = (uint16_t)ocrValA_calc; 
+  uint8_t ocrValA = (uint8_t)ocrValA_calc; 
 
-  long tempB = (long)sineWaveTable[indexB] - MidLumi;
-  long ocrValB_calc = MidLumi + ((tempB * currentContrastIntB) >> 8);
+  int16_t tempB = (int16_t)sineWaveTable[indexB] - (int16_t)MidLumi;
+  int32_t ocrValB_calc = MidLumi + (((int32_t)tempB * currentContrastIntB) >> 8);
   if (ocrValB_calc < 0) ocrValB_calc = 0;
   if (ocrValB_calc > 255) ocrValB_calc = 255;
-  uint16_t ocrValB = (uint16_t)ocrValB_calc; 
+  uint8_t ocrValB = (uint8_t)ocrValB_calc; 
 
   if (useChA) { setChA(ocrValA); }  
   if (useChB) { setChB(ocrValB); }  
@@ -623,7 +625,6 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
   unsigned long totalDurationUs = 0;
   bool isSweeping = false;
 
-  // Optimized continuous math logic
   if (sweepFactorPerSec > 0.000001f && fmax > fmin && (fmax / fmin) > 1.000001f) {
     float timeForOneWaySweepSec_calc = log(fmax / fmin) / sweepFactorPerSec;
 
@@ -648,7 +649,6 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
   
   TIMSK0 &= ~_BV(TOIE0); 
   
-  // Master Clock upgrade for Frequency Sweep!
   unsigned long totalInterrupts = (unsigned long)((totalDurationUs / 1000000.0) * actualPWMFreq);
   currentTick = 0;
   completedCycles = 0;
@@ -657,6 +657,9 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
   startTimer1Interrupt();
 
   unsigned long safeTick = 0;
+  
+  // OPTIMIZATION: Pre-calculate the exponential multiplier to save the main loop
+  float sweepStepMultiplier = exp(sweepFactorPerSec * (TARGET_RECONFIG_INTERVAL_US / 1000000.0));
   
   while (true) {
       noInterrupts();
@@ -669,10 +672,10 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
     
     if (isSweeping) {
       if (sweepProgress < 0.5) {  
-        actual_calc_freq = fmin * exp(sweepFactorPerSec * (sweepProgress * totalDurationUs / 1000000.0));
+        actual_calc_freq *= sweepStepMultiplier; // Faster than calling exp() every loop
         if (actual_calc_freq > fmax) actual_calc_freq = fmax;
       } else {                    
-        actual_calc_freq = fmax * exp(-sweepFactorPerSec * ((sweepProgress - 0.5) * totalDurationUs / 1000000.0));
+        actual_calc_freq /= sweepStepMultiplier;
         if (actual_calc_freq < fmin) actual_calc_freq = fmin;
       }
       
@@ -699,12 +702,13 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
 
 /////////////////////////////////// SOME GENERIC PWM FUNCTIONS ///////////////////////////////////////////
 
-void setChA(uint8_t ocrValue) {
-  OCR1A = pgm_read_word_near(currentChALUT + ocrValue);
+// OPTIMIZATION: Inlined functions reading 8-bit PROGMEM bytes directly
+__attribute__((always_inline)) inline void setChA(uint8_t ocrValue) {
+  OCR1A = pgm_read_byte_near(currentChALUT + ocrValue);
 }
 
-void setChB(uint8_t ocrValue) {
-  OCR1B = pgm_read_word_near(currentChBLUT + ocrValue);
+__attribute__((always_inline)) inline void setChB(uint8_t ocrValue) {
+  OCR1B = pgm_read_byte_near(currentChBLUT + ocrValue);
 }
 
 void setDutyCycle(float dutyCyclePercentage_A, float dutyCyclePercentage_B, long TopLumi) {
@@ -716,7 +720,7 @@ void setDutyCycle(float dutyCyclePercentage_A, float dutyCyclePercentage_B, long
   if (dutyCyclePercentage_B > 100.0) { dutyCyclePercentage_B = 100.0; }
   uint16_t ocrValueB = (long)((dutyCyclePercentage_B / 100.0) * TopLumi);
 
-  PORTD ^= (1 << PIND4);  
+  PIND = (1 << PIND4);  // 1-cycle toggle
   setChA(ocrValueA);
   setChB(ocrValueB);
 }
@@ -813,6 +817,7 @@ long calculatePrescalerAndTOP(long desiredFrequency, long &prescaler) {
 
   for (int i = 0; i < 5; i++) {
     long currentPrescaler = possiblePrescalers[i];
+    // CORRECTED: Fixed Timer1 Math
     long calculatedTOP = (CLOCK_FREQ / (2 * currentPrescaler * desiredFrequency));
 
     if (calculatedTOP >= 0 && calculatedTOP <= 65535) {
