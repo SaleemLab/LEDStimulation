@@ -5,7 +5,7 @@
 #define TARGET_RECONFIG_INTERVAL_US 1000L  // FOR FREQUENCY SWEEP 1000 microseconds = 1 millisecond
 
 // --- FADE & ENVELOPE MACROS ---
-#define FADE_DURATION_MS 0.0             // Easily change the fade-in/out time in milliseconds here!
+#define FADE_DURATION_MS 100.0             // Easily change the fade-in/out time in milliseconds here!
 #define FADE_LUT_SIZE 64                   // Change this to 64, 128, 256, 512, etc.
 #define FADE_LUT_MAX (FADE_LUT_SIZE - 1)   // Used for safe zero-indexed math
 
@@ -813,7 +813,7 @@ long calculatePrescalerAndTOP(long desiredFrequency, long &prescaler) {
 
   for (int i = 0; i < 5; i++) {
     long currentPrescaler = possiblePrescalers[i];
-    long calculatedTOP = (CLOCK_FREQ / (2 * currentPrescaler * desiredFrequency)) - 1;
+    long calculatedTOP = (CLOCK_FREQ / (2 * currentPrescaler * desiredFrequency));
 
     if (calculatedTOP >= 0 && calculatedTOP <= 65535) {
       prescaler = currentPrescaler;
