@@ -97,7 +97,7 @@ volatile uint32_t envStep = 0;
 
 // Function to calculate exact DDS phase increment 
 uint32_t calcPhaseInc(float freq) {
-  uint64_t scaledFreq = (uint64_t)(freq * 10000.0); 
+  uint64_t scaledFreq = (uint64_t)((freq * 10000.0)+0.5); 
   return (uint32_t)((scaledFreq * 4294967296ULL) / ((uint64_t)(actualPWMFreq * 10000.0)));
 }
 
@@ -180,7 +180,7 @@ void ActionSerial() {
   char *token;
   uint8_t idx = 0;
 #define MAX_VALS 50  
-  char *serialVals[MAX_VALS];
+  char *serialVals[MAX_VALS] = {NULL};
   token = strtok(receivedChars, ",");
 
   while (token != NULL) {
@@ -419,17 +419,17 @@ void sinewaveInterrupt() {
   uint8_t indexA = phaseAccumulatorA >> 24;
   uint8_t indexB = phaseAccumulatorB >> 24;
 
-  long tempA = (long)sineWaveTable[indexA] - MidLumi;
-  long ocrValA_calc = MidLumi + ((tempA * effectiveContrastA) >> 8);
+int16_t tempA = (int16_t)sineWaveTable[indexA] - (int16_t)MidLumi;
+  int32_t ocrValA_calc = MidLumi + (((int32_t)tempA * effectiveContrastA) >> 8);
   if (ocrValA_calc < 0) ocrValA_calc = 0;
   if (ocrValA_calc > 255) ocrValA_calc = 255;
   uint16_t ocrValA = (uint16_t)ocrValA_calc; 
   
-  long tempB = (long)sineWaveTable[indexB] - MidLumi;
-  long ocrValB_calc = MidLumi + ((tempB * effectiveContrastB) >> 8);
+  int16_t tempB = (int16_t)sineWaveTable[indexB] - (int16_t)MidLumi;
+  int32_t ocrValB_calc = MidLumi + (((int32_t)tempB * effectiveContrastB) >> 8);
   if (ocrValB_calc < 0) ocrValB_calc = 0;
   if (ocrValB_calc > 255) ocrValB_calc = 255;
-  uint16_t ocrValB = (uint16_t)ocrValB_calc; 
+  uint16_t ocrValB = (uint16_t)ocrValB_calc;
 
   if (useChA) { setChA(ocrValA); }  
   if (useChB) { setChB(ocrValB); }  
@@ -699,11 +699,11 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
 
 /////////////////////////////////// SOME GENERIC PWM FUNCTIONS ///////////////////////////////////////////
 
-void setChA(uint16_t ocrValue) {
+void setChA(uint8_t ocrValue) {
   OCR1A = pgm_read_word_near(currentChALUT + ocrValue);
 }
 
-void setChB(uint16_t ocrValue) {
+void setChB(uint8_t ocrValue) {
   OCR1B = pgm_read_word_near(currentChBLUT + ocrValue);
 }
 
