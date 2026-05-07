@@ -380,6 +380,8 @@ void outputSinewave(float freqA, float freqB, long duration, float phaseA, float
 
   PORTD &= ~(1 << PIND4);   
   PORTC &= ~(1 << PORTC6);  
+  if (useChA) { setChA(TopLumi / 2); }  
+  if (useChB) { setChB(TopLumi / 2); }  
   delayMicroseconds(2000);
   Serial.print(F("-1\n"));
 
