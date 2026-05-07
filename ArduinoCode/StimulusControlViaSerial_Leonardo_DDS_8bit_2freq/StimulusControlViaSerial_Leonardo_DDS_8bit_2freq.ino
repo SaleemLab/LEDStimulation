@@ -380,6 +380,7 @@ void outputSinewave(float freqA, float freqB, long duration, float phaseA, float
 
   PORTD &= ~(1 << PIND4);   
   PORTC &= ~(1 << PORTC6);  
+  delayMicroseconds(2000);
   Serial.print(F("-1\n"));
 
   if (useChA) { setChA(TopLumi / 2); }  
@@ -486,6 +487,7 @@ void SineContrastConv(float duration, float freqA, float freqB, float envelopeFr
 
   PORTD &= ~(1 << PIND4);   
   PORTC &= ~(1 << PORTC6);  
+  delayMicroseconds(2000);
   Serial.print(F("-1\n"));
   Serial.flush();
   
@@ -607,6 +609,7 @@ void SteppedFrequencySweep(float startFreq, float endFreq, float stepFreq, int c
   
   PORTD &= ~(1 << PIND4);   
   PORTC &= ~(1 << PORTC6);  
+  delayMicroseconds(2000);
   Serial.print(F("-1\n"));
 
   if (useChA) { setChA(TopLumi / 2); } 
@@ -708,6 +711,7 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
      
   PORTD &= ~(1 << PIND4);   
   PORTC &= ~(1 << PORTC6);  
+  delayMicroseconds(2000);
   Serial.print(F("-1\n"));
 
   if (useChA) { setChA(TopLumi / 2); }  
@@ -757,6 +761,7 @@ void setDutyCycleTime(float dutyCyclePercentage_A, float dutyCyclePercentage_B, 
   }
   PORTD &= ~(1 << PIND4);   
   PORTC &= ~(1 << PORTC6);  
+  delayMicroseconds(2000);
   Serial.print(F("-1\n"));
   Serial.flush();
   if (useChA) { setChA(TopLumi / 2); }  
@@ -776,6 +781,7 @@ void cycleDutyCycles(float stepSize, float waitTime, int nReps, long TopLumi) {
       delay(waitTime);
     }
   }
+  delayMicroseconds(2000);
   Serial.print(F("-1\n"));
   if (useChA) { setChA(TopLumi / 2); }  
   if (useChB) { setChB(TopLumi / 2); }  

@@ -3,26 +3,18 @@
   <WindowState>Maximized</WindowState>
   <EditorTheme>Light</EditorTheme>
   <DesktopBounds>
-    <X>1064</X>
-    <Y>28</Y>
-    <Width>1917</Width>
+    <X>1339</X>
+    <Y>-19</Y>
+    <Width>1094</Width>
     <Height>595</Height>
   </DesktopBounds>
   <RecentlyUsedFiles>
     <RecentlyUsedFile>
-      <Timestamp>2026-05-06T14:06:00.4502827+01:00</Timestamp>
-      <Name>D:\Code\LEDStimulation\BonsaiCode\ManualMethodOfAdjustment.bonsai</Name>
-    </RecentlyUsedFile>
-    <RecentlyUsedFile>
-      <Timestamp>2026-05-06T10:40:42.5305014+01:00</Timestamp>
-      <Name>D:\Code\LEDStimulation\BonsaiCode\WIP_simpleUpdate.bonsai</Name>
-    </RecentlyUsedFile>
-    <RecentlyUsedFile>
-      <Timestamp>2026-05-06T10:18:57.5672663+01:00</Timestamp>
+      <Timestamp>2026-05-07T11:18:21.8119102+01:00</Timestamp>
       <Name>D:\Code\LEDStimulation\BonsaiCode\staircase_dev.bonsai</Name>
     </RecentlyUsedFile>
     <RecentlyUsedFile>
-      <Timestamp>2026-05-06T10:10:19.7009670+01:00</Timestamp>
+      <Timestamp>2026-04-20T15:29:27.0035144+01:00</Timestamp>
       <Name>D:\Code\LEDStimulation\BonsaiCode\LEDstimulation_task_wip.bonsai</Name>
     </RecentlyUsedFile>
     <RecentlyUsedFile>
@@ -108,6 +100,14 @@
     <RecentlyUsedFile>
       <Timestamp>2025-03-25T14:38:00.3560628+00:00</Timestamp>
       <Name>C:\Users\saleemlab\Documents\GitHub\MatrixRigs\VisualStimuli\BacklightModulationStimuli\StimulusGeneration\FlickerStimulationWorkflow.bonsai</Name>
+    </RecentlyUsedFile>
+    <RecentlyUsedFile>
+      <Timestamp>2025-01-24T14:34:19.3661422+00:00</Timestamp>
+      <Name>D:\Code\MatrixRigs-main\VisualStimuli\DotMotion_StateDependentSpeed_backup.bonsai</Name>
+    </RecentlyUsedFile>
+    <RecentlyUsedFile>
+      <Timestamp>2025-01-24T13:32:46.9279135+00:00</Timestamp>
+      <Name>D:\MatrixRigs-main\VisualStimuli\DotMotion_StateDependentSpeed.bonsai</Name>
     </RecentlyUsedFile>
   </RecentlyUsedFiles>
 </EditorSettings>
