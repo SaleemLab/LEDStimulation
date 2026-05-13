@@ -16,7 +16,6 @@
       <Expression xsi:type="ExternalizedMapping">
         <Property Name="PWMport" DisplayName="PWM_ArduinoCom" />
         <Property Name="TrialDuration" DisplayName="TrialDuration (ms)" Category="StimulusParameters" />
-        <Property Name="StepSize" Category="Staircase" />
       </Expression>
       <Expression xsi:type="GroupWorkflow">
         <Name>InitialiseVars</Name>
@@ -65,6 +64,14 @@
             <Expression xsi:type="rx:BehaviorSubject">
               <Name>CurrentRightFreq</Name>
             </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="IntProperty">
+                <Value>0</Value>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>nReversals</Name>
+            </Expression>
             <Expression xsi:type="WorkflowInput">
               <Name>Source1</Name>
             </Expression>
@@ -112,17 +119,6 @@
                 <port:ReceivedBytesThreshold>1</port:ReceivedBytesThreshold>
               </Combinator>
             </Expression>
-            <Expression xsi:type="ExternalizedMapping">
-              <Property Name="Value" DisplayName="StepSize" />
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="IntProperty">
-                <Value>1</Value>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>StepSize</Name>
-            </Expression>
           </Nodes>
           <Edges>
             <Edge From="0" To="1" Label="Source1" />
@@ -134,13 +130,12 @@
             <Edge From="8" To="9" Label="Source1" />
             <Edge From="9" To="10" Label="Source1" />
             <Edge From="11" To="12" Label="Source1" />
-            <Edge From="12" To="13" Label="Source1" />
             <Edge From="13" To="14" Label="Source1" />
             <Edge From="14" To="15" Label="Source1" />
             <Edge From="15" To="16" Label="Source1" />
+            <Edge From="16" To="17" Label="Source1" />
             <Edge From="17" To="18" Label="Source1" />
             <Edge From="19" To="20" Label="Source1" />
-            <Edge From="20" To="21" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -150,6 +145,7 @@
         <Property Name="MaxIntensity" />
         <Property Name="CorrectRule" />
         <Property Name="IncorrectRule" />
+        <Property Name="StepSizeArray" />
       </Expression>
       <Expression xsi:type="GroupWorkflow">
         <Name>Staircase</Name>
@@ -170,7 +166,7 @@
             </Expression>
             <Expression xsi:type="PropertyMapping">
               <PropertyMappings>
-                <Property Name="StepSize" Selector="it" />
+                <Property Name="StepSize" />
               </PropertyMappings>
             </Expression>
             <Expression xsi:type="Combinator">
@@ -308,8 +304,27 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:DistinctUntilChanged" />
             </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
+            <Expression xsi:type="MulticastSubject">
               <Name>nReversals</Name>
+            </Expression>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="Expression" DisplayName="StepSizeArray" Category="Staircase" />
+            </Expression>
+            <Expression xsi:type="scr:ExpressionSource">
+              <scr:Name>StepSizeArray</scr:Name>
+              <scr:Expression>(new double[] { 5.0, 4.0, 3.0, 2.0, 1.0 })</scr:Expression>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>nReversals</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:CombineLatest" />
+            </Expression>
+            <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Expression>Item1[Math.Min(Item2, Item1.Length - 1)]</scr:Expression>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>StepSize</Name>
             </Expression>
           </Nodes>
           <Edges>
@@ -343,6 +358,11 @@
             <Edge From="25" To="26" Label="Source1" />
             <Edge From="27" To="28" Label="Source1" />
             <Edge From="28" To="29" Label="Source1" />
+            <Edge From="30" To="31" Label="Source1" />
+            <Edge From="31" To="33" Label="Source1" />
+            <Edge From="32" To="33" Label="Source2" />
+            <Edge From="33" To="34" Label="Source1" />
+            <Edge From="34" To="35" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -857,7 +877,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:BufferCount">
-                <rx:Count>2</rx:Count>
+                <rx:Count>6</rx:Count>
                 <rx:Skip>1</rx:Skip>
               </Combinator>
             </Expression>
@@ -905,6 +925,9 @@ def process(value):
       </Expression>
       <Expression xsi:type="SubscribeSubject">
         <Name>MeanReversalFrequency</Name>
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>StepSize</Name>
       </Expression>
       <Expression xsi:type="ExternalizedMapping">
         <Property Name="StimulusID" />
@@ -1134,7 +1157,7 @@ def generate():
       <Edge From="2" To="3" Label="Source1" />
       <Edge From="4" To="5" Label="Source1" />
       <Edge From="9" To="10" Label="Source1" />
-      <Edge From="15" To="16" Label="Source1" />
+      <Edge From="16" To="17" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>
