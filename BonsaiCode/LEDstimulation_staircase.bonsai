@@ -8,8 +8,8 @@
                  xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
                  xmlns:wie="clr-namespace:Bonsai.Windows.Input;assembly=Bonsai.Windows.Input"
                  xmlns:io="clr-namespace:Bonsai.IO;assembly=Bonsai.System"
-                 xmlns:ipy="clr-namespace:Bonsai.Scripting.IronPython;assembly=Bonsai.Scripting.IronPython"
                  xmlns:al="clr-namespace:Bonsai.Audio;assembly=Bonsai.Audio"
+                 xmlns:ipy="clr-namespace:Bonsai.Scripting.IronPython;assembly=Bonsai.Scripting.IronPython"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
     <Nodes>
@@ -100,24 +100,26 @@
             <Expression xsi:type="ExternalizedMapping">
               <Property Name="PortName" DisplayName="PWMport" />
             </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="port:CreateSerialPort">
-                <port:Name>ArdPWM</port:Name>
-                <port:PortName>COM3</port:PortName>
-                <port:BaudRate>9600</port:BaudRate>
-                <port:NewLine>\r\n</port:NewLine>
-                <port:Parity>None</port:Parity>
-                <port:ParityReplace>63</port:ParityReplace>
-                <port:DataBits>8</port:DataBits>
-                <port:StopBits>One</port:StopBits>
-                <port:Handshake>None</port:Handshake>
-                <port:DiscardNull>false</port:DiscardNull>
-                <port:DtrEnable>false</port:DtrEnable>
-                <port:RtsEnable>false</port:RtsEnable>
-                <port:ReadBufferSize>4096</port:ReadBufferSize>
-                <port:WriteBufferSize>2048</port:WriteBufferSize>
-                <port:ReceivedBytesThreshold>1</port:ReceivedBytesThreshold>
-              </Combinator>
+            <Expression xsi:type="Disable">
+              <Builder xsi:type="Combinator">
+                <Combinator xsi:type="port:CreateSerialPort">
+                  <port:Name>ArdPWM</port:Name>
+                  <port:PortName>COM3</port:PortName>
+                  <port:BaudRate>9600</port:BaudRate>
+                  <port:NewLine>\r\n</port:NewLine>
+                  <port:Parity>None</port:Parity>
+                  <port:ParityReplace>63</port:ParityReplace>
+                  <port:DataBits>8</port:DataBits>
+                  <port:StopBits>One</port:StopBits>
+                  <port:Handshake>None</port:Handshake>
+                  <port:DiscardNull>false</port:DiscardNull>
+                  <port:DtrEnable>false</port:DtrEnable>
+                  <port:RtsEnable>false</port:RtsEnable>
+                  <port:ReadBufferSize>4096</port:ReadBufferSize>
+                  <port:WriteBufferSize>2048</port:WriteBufferSize>
+                  <port:ReceivedBytesThreshold>1</port:ReceivedBytesThreshold>
+                </Combinator>
+              </Builder>
             </Expression>
           </Nodes>
           <Edges>
@@ -172,7 +174,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p2:StaircaseProcedure">
                 <p2:InitialIntensity>20</p2:InitialIntensity>
-                <p2:StepSize>1</p2:StepSize>
+                <p2:StepSize>5</p2:StepSize>
                 <p2:MinIntensity>0</p2:MinIntensity>
                 <p2:MaxIntensity>100</p2:MaxIntensity>
                 <p2:CorrectRule>2</p2:CorrectRule>
@@ -512,11 +514,13 @@
                 <rx:DueTime>PT1S</rx:DueTime>
               </Combinator>
             </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="port:SerialWriteLine">
-                <port:PortName>ArdPWM</port:PortName>
-                <port:NewLine>\r</port:NewLine>
-              </Combinator>
+            <Expression xsi:type="Disable">
+              <Builder xsi:type="Combinator">
+                <Combinator xsi:type="port:SerialWriteLine">
+                  <port:PortName>ArdPWM</port:PortName>
+                  <port:NewLine>\r</port:NewLine>
+                </Combinator>
+              </Builder>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
               <Name>CurrentStimulus</Name>
@@ -681,22 +685,16 @@
               <Name>GetResponse</Name>
               <Workflow>
                 <Nodes>
-                  <Expression xsi:type="Combinator">
-                    <Combinator xsi:type="wie:KeyDown">
-                      <wie:Filter>L</wie:Filter>
-                      <wie:SuppressRepetitions>true</wie:SuppressRepetitions>
-                    </Combinator>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>RightResponse</Name>
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="IntProperty">
                       <Value>1</Value>
                     </Combinator>
                   </Expression>
-                  <Expression xsi:type="Combinator">
-                    <Combinator xsi:type="wie:KeyDown">
-                      <wie:Filter>A</wie:Filter>
-                      <wie:SuppressRepetitions>true</wie:SuppressRepetitions>
-                    </Combinator>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>LeftResponse</Name>
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="IntProperty">
@@ -723,6 +721,47 @@
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
               <Name>Response</Name>
+            </Expression>
+            <Expression xsi:type="rx:SelectMany">
+              <Name>GetYesNo</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>LeftResponse</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="IntProperty">
+                      <Value>1</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>RightResponse</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="IntProperty">
+                      <Value>0</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Amb" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:First" />
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="4" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source2" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>YesNoResponse</Name>
             </Expression>
             <Expression xsi:type="rx:Condition">
               <Name>Pause</Name>
@@ -760,12 +799,14 @@
           </Nodes>
           <Edges>
             <Edge From="0" To="1" Label="Source1" />
-            <Edge From="0" To="4" Label="Source1" />
+            <Edge From="0" To="6" Label="Source1" />
             <Edge From="1" To="2" Label="Source1" />
             <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
             <Edge From="4" To="5" Label="Source1" />
-            <Edge From="5" To="6" Label="Source1" />
             <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="8" To="9" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -775,6 +816,15 @@
           <Nodes>
             <Expression xsi:type="SubscribeSubject">
               <Name>Response</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>YesNoResponse</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Zip" />
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item1</Selector>
             </Expression>
             <Expression xsi:type="SubscribeSubject">
               <Name>TargetSide</Name>
@@ -797,9 +847,12 @@
             <Edge From="0" To="2" Label="Source1" />
             <Edge From="1" To="2" Label="Source2" />
             <Edge From="2" To="3" Label="Source1" />
-            <Edge From="3" To="4" Label="Source1" />
-            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="3" To="5" Label="Source1" />
+            <Edge From="4" To="5" Label="Source2" />
             <Edge From="5" To="6" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="8" To="9" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -847,87 +900,140 @@
           </Edges>
         </Workflow>
       </Expression>
-      <Expression xsi:type="ExternalizedMapping">
-        <Property Name="nReversalsToAverage" />
+      <Expression xsi:type="GroupWorkflow">
+        <Name>ResponseHardware</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="wie:KeyUp">
+                <wie:Filter>L</wie:Filter>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Unit" />
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>RightResponse</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="wie:KeyUp">
+                <wie:Filter>A</wie:Filter>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Unit" />
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>LeftResponse</Name>
+            </Expression>
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+          </Edges>
+        </Workflow>
       </Expression>
       <Expression xsi:type="GroupWorkflow">
-        <Name>GetAverageReversalFrequencies</Name>
+        <Name>ClickAudio</Name>
         <Workflow>
           <Nodes>
             <Expression xsi:type="SubscribeSubject">
-              <Name>nReversals</Name>
+              <Name>StimEnded</Name>
+            </Expression>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="FileName" DisplayName="StimEndSound" />
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:DistinctUntilChanged" />
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>CurrentFrequency</Name>
+              <Combinator xsi:type="al:AudioReader">
+                <al:FileName>D:\Code\LEDStimulation\BonsaiForHumanExperiments\mixkit-modern-technology-select-3124.wav</al:FileName>
+                <al:BufferLength>500</al:BufferLength>
+                <al:SampleRate>44100</al:SampleRate>
+              </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:WithLatestFrom" />
-            </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>ReversalFrequencies</Name>
+              <Combinator xsi:type="rx:CombineLatest" />
             </Expression>
             <Expression xsi:type="MemberSelector">
               <Selector>Item2</Selector>
             </Expression>
-            <Expression xsi:type="ExternalizedMapping">
-              <Property Name="Count" DisplayName="nReversalsToAverage" Category="Staircase" />
-            </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:BufferCount">
-                <rx:Count>6</rx:Count>
-                <rx:Skip>1</rx:Skip>
+              <Combinator xsi:type="al:AudioPlayback">
+                <al:DeviceName>Generic Software on Speakers/Headphones (Realtek(R) Audio)</al:DeviceName>
+                <al:SampleRate>44100</al:SampleRate>
+                <al:State>Playing</al:State>
               </Combinator>
             </Expression>
-            <Expression xsi:type="ipy:PythonTransform">
-              <ipy:Script>@returns(float)
-def process(value):
-    return sum(value) / len(value)</ipy:Script>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>CurrentStimulus</Name>
+            </Expression>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="FileName" DisplayName="StimStartTone" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="al:AudioReader">
+                <al:FileName>D:\Code\LEDStimulation\BonsaiForHumanExperiments\mixkit-on-or-off-light-switch-tap-2585.wav</al:FileName>
+                <al:BufferLength>1000</al:BufferLength>
+                <al:SampleRate>44100</al:SampleRate>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:CombineLatest" />
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="al:AudioPlayback">
+                <al:DeviceName>Generic Software on Speakers/Headphones (Realtek(R) Audio)</al:DeviceName>
+                <al:SampleRate>44100</al:SampleRate>
+                <al:State>Playing</al:State>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Response</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Delay">
+                <rx:DueTime>PT0.05S</rx:DueTime>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="al:AudioReader">
+                <al:FileName>D:\Code\LEDStimulation\BonsaiForHumanExperiments\mixkit-modern-technology-select-3124.wav</al:FileName>
+                <al:BufferLength>500</al:BufferLength>
+                <al:SampleRate>44100</al:SampleRate>
+              </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:WithLatestFrom" />
             </Expression>
-            <Expression xsi:type="scr:ExpressionTransform">
-              <scr:Expression>new(Item2 as nReversals, Item1 as MeanFrequency)</scr:Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2</Selector>
             </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>MeanReversalFrequency</Name>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="al:AudioPlayback">
+                <al:DeviceName>Generic Software on Speakers/Headphones (Realtek(R) Audio)</al:DeviceName>
+                <al:SampleRate>44100</al:SampleRate>
+                <al:State>Playing</al:State>
+              </Combinator>
             </Expression>
-            <Expression xsi:type="WorkflowOutput" />
           </Nodes>
           <Edges>
-            <Edge From="0" To="1" Label="Source1" />
-            <Edge From="0" To="9" Label="Source2" />
-            <Edge From="1" To="3" Label="Source1" />
+            <Edge From="0" To="3" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
             <Edge From="2" To="3" Label="Source2" />
             <Edge From="3" To="4" Label="Source1" />
             <Edge From="4" To="5" Label="Source1" />
-            <Edge From="5" To="7" Label="Source1" />
-            <Edge From="6" To="7" Label="Source2" />
+            <Edge From="6" To="9" Label="Source1" />
             <Edge From="7" To="8" Label="Source1" />
-            <Edge From="8" To="9" Label="Source1" />
+            <Edge From="8" To="9" Label="Source2" />
             <Edge From="9" To="10" Label="Source1" />
             <Edge From="10" To="11" Label="Source1" />
-            <Edge From="11" To="12" Label="Source1" />
+            <Edge From="12" To="13" Label="Source1" />
+            <Edge From="13" To="15" Label="Source1" />
+            <Edge From="14" To="15" Label="Source2" />
+            <Edge From="15" To="16" Label="Source1" />
+            <Edge From="16" To="17" Label="Source1" />
           </Edges>
         </Workflow>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>CurrentFrequency</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>nReversals</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>CurrentStimulus</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>MeanReversalFrequency</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>StepSize</Name>
       </Expression>
       <Expression xsi:type="ExternalizedMapping">
         <Property Name="StimulusID" />
@@ -964,12 +1070,16 @@ def process(value):
             <Expression xsi:type="MemberSelector">
               <Selector>Timestamp.TimeOfDay.TotalMilliseconds</Selector>
             </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>YesNoResponse</Name>
+            </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Zip" />
             </Expression>
             <Expression xsi:type="scr:ExpressionTransform">
               <scr:Expression>new(Item1 as Stimulus,
 Item2 as Response,
+Item4 as YesNoResponse,
 Item3 as BonsaiTime)</scr:Expression>
             </Expression>
             <Expression xsi:type="io:CsvWriter">
@@ -1066,98 +1176,110 @@ def generate():
           </Nodes>
           <Edges>
             <Edge From="0" To="1" Label="Source1" />
-            <Edge From="1" To="10" Label="Source1" />
-            <Edge From="2" To="10" Label="Source2" />
-            <Edge From="3" To="10" Label="Source3" />
-            <Edge From="4" To="8" Label="Source1" />
+            <Edge From="1" To="11" Label="Source1" />
+            <Edge From="2" To="11" Label="Source2" />
+            <Edge From="3" To="11" Label="Source3" />
+            <Edge From="4" To="9" Label="Source1" />
             <Edge From="5" To="6" Label="Source1" />
-            <Edge From="5" To="8" Label="Source2" />
+            <Edge From="5" To="9" Label="Source2" />
             <Edge From="6" To="7" Label="Source1" />
-            <Edge From="7" To="8" Label="Source3" />
+            <Edge From="7" To="9" Label="Source3" />
+            <Edge From="8" To="9" Label="Source4" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="10" To="11" Label="Source4" />
+            <Edge From="12" To="13" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="ExternalizedMapping">
+        <Property Name="nReversalsToAverage" />
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>GetAverageReversalFrequencies</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>nReversals</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:DistinctUntilChanged" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>CurrentFrequency</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:WithLatestFrom" />
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>ReversalFrequencies</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2</Selector>
+            </Expression>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="Count" DisplayName="nReversalsToAverage" Category="Staircase" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:BufferCount">
+                <rx:Count>6</rx:Count>
+                <rx:Skip>1</rx:Skip>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="ipy:PythonTransform">
+              <ipy:Script>@returns(float)
+def process(value):
+    return sum(value) / len(value)</ipy:Script>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:WithLatestFrom" />
+            </Expression>
+            <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Expression>new(Item2 as nReversals, Item1 as MeanFrequency)</scr:Expression>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>MeanReversalFrequency</Name>
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="0" To="9" Label="Source2" />
+            <Edge From="1" To="3" Label="Source1" />
+            <Edge From="2" To="3" Label="Source2" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="7" Label="Source1" />
+            <Edge From="6" To="7" Label="Source2" />
+            <Edge From="7" To="8" Label="Source1" />
             <Edge From="8" To="9" Label="Source1" />
-            <Edge From="9" To="10" Label="Source4" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
             <Edge From="11" To="12" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
-      <Expression xsi:type="GroupWorkflow">
-        <Name>ClickAudio</Name>
-        <Workflow>
-          <Nodes>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>StimEnded</Name>
-            </Expression>
-            <Expression xsi:type="ExternalizedMapping">
-              <Property Name="FileName" DisplayName="StimEndSound" />
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="al:AudioReader">
-                <al:FileName>mixkit-modern-technology-select-3124.wav</al:FileName>
-                <al:BufferLength>500</al:BufferLength>
-                <al:SampleRate>44100</al:SampleRate>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:CombineLatest" />
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Item2</Selector>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="al:AudioPlayback">
-                <al:DeviceName>Generic Software on Speakers/Headphones (Realtek(R) Audio)</al:DeviceName>
-                <al:SampleRate>44100</al:SampleRate>
-                <al:State>Playing</al:State>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>CurrentStimulus</Name>
-            </Expression>
-            <Expression xsi:type="ExternalizedMapping">
-              <Property Name="FileName" DisplayName="StimStartTone" />
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="al:AudioReader">
-                <al:FileName>mixkit-on-or-off-light-switch-tap-2585.wav</al:FileName>
-                <al:BufferLength>1000</al:BufferLength>
-                <al:SampleRate>44100</al:SampleRate>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:CombineLatest" />
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Item2</Selector>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="al:AudioPlayback">
-                <al:DeviceName>Generic Software on Speakers/Headphones (Realtek(R) Audio)</al:DeviceName>
-                <al:SampleRate>44100</al:SampleRate>
-                <al:State>Playing</al:State>
-              </Combinator>
-            </Expression>
-          </Nodes>
-          <Edges>
-            <Edge From="0" To="3" Label="Source1" />
-            <Edge From="1" To="2" Label="Source1" />
-            <Edge From="2" To="3" Label="Source2" />
-            <Edge From="3" To="4" Label="Source1" />
-            <Edge From="4" To="5" Label="Source1" />
-            <Edge From="6" To="9" Label="Source1" />
-            <Edge From="7" To="8" Label="Source1" />
-            <Edge From="8" To="9" Label="Source2" />
-            <Edge From="9" To="10" Label="Source1" />
-            <Edge From="10" To="11" Label="Source1" />
-          </Edges>
-        </Workflow>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>CurrentFrequency</Name>
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>nReversals</Name>
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>CurrentStimulus</Name>
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>MeanReversalFrequency</Name>
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>StepSize</Name>
       </Expression>
     </Nodes>
     <Edges>
       <Edge From="0" To="1" Label="Source1" />
       <Edge From="2" To="3" Label="Source1" />
       <Edge From="4" To="5" Label="Source1" />
-      <Edge From="9" To="10" Label="Source1" />
-      <Edge From="16" To="17" Label="Source1" />
+      <Edge From="11" To="12" Label="Source1" />
+      <Edge From="13" To="14" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>
