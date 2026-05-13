@@ -51,9 +51,9 @@
         <VisualizerSettings>
           <MatVisualizer>
             <XMin>0</XMin>
-            <XMax>44100</XMax>
+            <XMax>48762</XMax>
             <YMin>-30000</YMin>
-            <YMax>29999.999999999996</YMax>
+            <YMax>40000</YMax>
             <AutoScaleX>true</AutoScaleX>
             <AutoScaleY>true</AutoScaleY>
             <SelectedPage>0</SelectedPage>
@@ -92,7 +92,7 @@
         <VisualizerSettings>
           <MatVisualizer>
             <XMin>0</XMin>
-            <XMax>44100</XMax>
+            <XMax>48762</XMax>
             <YMin>-30000</YMin>
             <YMax>40000</YMax>
             <AutoScaleX>true</AutoScaleX>
@@ -109,18 +109,18 @@
       <WindowSettings Index="12">
         <Location>
           <X>1297</X>
-          <Y>675</Y>
+          <Y>674</Y>
         </Location>
         <Size>
           <Width>336</Width>
-          <Height>128</Height>
+          <Height>129</Height>
         </Size>
         <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
         <VisualizerSettings>
           <ObjectTextVisualizer />
         </VisualizerSettings>
       </WindowSettings>
-      <WindowSettings Index="15">
+      <WindowSettings Index="17">
         <Location>
           <X>2481</X>
           <Y>347</Y>
@@ -134,7 +134,7 @@
           <ObjectTextVisualizer />
         </VisualizerSettings>
       </WindowSettings>
-      <WindowSettings Index="17">
+      <WindowSettings Index="19">
         <Location>
           <X>1736</X>
           <Y>402</Y>

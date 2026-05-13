@@ -944,7 +944,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="al:AudioReader">
                 <al:FileName>D:\Code\LEDStimulation\BonsaiForHumanExperiments\mixkit-modern-technology-select-3124.wav</al:FileName>
-                <al:BufferLength>500</al:BufferLength>
+                <al:BufferLength>0</al:BufferLength>
                 <al:SampleRate>44100</al:SampleRate>
               </Combinator>
             </Expression>
@@ -970,7 +970,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="al:AudioReader">
                 <al:FileName>D:\Code\LEDStimulation\BonsaiForHumanExperiments\mixkit-on-or-off-light-switch-tap-2585.wav</al:FileName>
-                <al:BufferLength>1000</al:BufferLength>
+                <al:BufferLength>0</al:BufferLength>
                 <al:SampleRate>44100</al:SampleRate>
               </Combinator>
             </Expression>
@@ -990,15 +990,21 @@
             <Expression xsi:type="SubscribeSubject">
               <Name>Response</Name>
             </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>YesNoResponse</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Merge" />
+            </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Delay">
-                <rx:DueTime>PT0.05S</rx:DueTime>
+                <rx:DueTime>PT0.1S</rx:DueTime>
               </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="al:AudioReader">
-                <al:FileName>D:\Code\LEDStimulation\BonsaiForHumanExperiments\mixkit-modern-technology-select-3124.wav</al:FileName>
-                <al:BufferLength>500</al:BufferLength>
+                <al:FileName>D:\Code\LEDStimulation\BonsaiForHumanExperiments\mixkit-cool-interface-click-tone-2568.wav</al:FileName>
+                <al:BufferLength>0</al:BufferLength>
                 <al:SampleRate>44100</al:SampleRate>
               </Combinator>
             </Expression>
@@ -1027,11 +1033,13 @@
             <Edge From="8" To="9" Label="Source2" />
             <Edge From="9" To="10" Label="Source1" />
             <Edge From="10" To="11" Label="Source1" />
-            <Edge From="12" To="13" Label="Source1" />
-            <Edge From="13" To="15" Label="Source1" />
-            <Edge From="14" To="15" Label="Source2" />
-            <Edge From="15" To="16" Label="Source1" />
-            <Edge From="16" To="17" Label="Source1" />
+            <Edge From="12" To="14" Label="Source1" />
+            <Edge From="13" To="14" Label="Source2" />
+            <Edge From="14" To="15" Label="Source1" />
+            <Edge From="15" To="17" Label="Source1" />
+            <Edge From="16" To="17" Label="Source2" />
+            <Edge From="17" To="18" Label="Source1" />
+            <Edge From="18" To="19" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
