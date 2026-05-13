@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Bonsai.Scripting.IronPython</id>
+    <version>2.9.0</version>
+    <title>Bonsai - IronPython Scripting Library</title>
+    <authors>Bonsai Foundation</authors>
+    <license type="file">LICENSE</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <icon>icon.png</icon>
+    <readme>README.md</readme>
+    <projectUrl>https://bonsai-rx.org/ironpython-scripting</projectUrl>
+    <description>Bonsai Scripting Library containing IronPython scripting infrastructure.</description>
+    <copyright>Copyright © Bonsai Foundation CIC and Contributors</copyright>
+    <tags>Bonsai Rx Scripting Iron Python</tags>
+    <packageTypes>
+      <packageType name="Dependency" />
+      <packageType name="BonsaiLibrary" />
+    </packageTypes>
+    <repository type="git" url="https://github.com/bonsai-rx/ironpython-scripting" commit="27dd32871bf0891e9efac8cc2a764001d4e8a978" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.2">
+        <dependency id="Bonsai.Core" version="2.8.0" exclude="Build,Analyzers" />
+        <dependency id="IronPython" version="2.7.5" exclude="Build,Analyzers" />
+        <dependency id="IronPython.StdLib" version="2.7.5" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
