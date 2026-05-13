@@ -36,7 +36,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>edd</Value>
+                <Value>leo</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="SubscribeSubject">
@@ -249,7 +249,7 @@ Item2 as Response,
 Item3 as BonsaiTime)</scr:Expression>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>C:\\Data\edd\20260402\sine_edd_Trial.csv</io:FileName>
+                    <io:FileName>C:\\Data\leo\20260512\sine_leo_Trial.csv</io:FileName>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
                     <io:Suffix>Timestamp</io:Suffix>
@@ -331,7 +331,7 @@ Item3 as BonsaiTime)</scr:Expression>
 Item2 as BonsaiTime)</scr:Expression>
                   </Expression>
                   <Expression xsi:type="io:CsvWriter">
-                    <io:FileName>C:\\Data\edd\20260402\sine_edd_ArduinoStim.csv</io:FileName>
+                    <io:FileName>C:\\Data\leo\20260512\sine_leo_ArduinoStim.csv</io:FileName>
                     <io:Delimiter>,</io:Delimiter>
                     <io:Append>false</io:Append>
                     <io:Overwrite>false</io:Overwrite>
@@ -715,30 +715,52 @@ Item2 as BonsaiTime)</scr:Expression>
               <Combinator xsi:type="p1:RandSampleFromIndexedDistribution">
                 <p1:ProbabilityDistributions>
                   <p1:ArrayOfFloat>
-                    <p1:float>25</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
                     <p1:float>0</p1:float>
-                    <p1:float>0</p1:float>
-                    <p1:float>0</p1:float>
-                    <p1:float>0</p1:float>
-                    <p1:float>25</p1:float>
-                    <p1:float>25</p1:float>
-                    <p1:float>0</p1:float>
-                    <p1:float>0</p1:float>
-                    <p1:float>25</p1:float>
-                    <p1:float>0</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
+                    <p1:float>4.761905</p1:float>
                   </p1:ArrayOfFloat>
                   <p1:ArrayOfFloat>
-                    <p1:float>9.090909</p1:float>
-                    <p1:float>9.090909</p1:float>
-                    <p1:float>9.090909</p1:float>
-                    <p1:float>9.090909</p1:float>
-                    <p1:float>9.090909</p1:float>
-                    <p1:float>9.090909</p1:float>
-                    <p1:float>9.090909</p1:float>
-                    <p1:float>9.090909</p1:float>
-                    <p1:float>9.090909</p1:float>
-                    <p1:float>9.090909</p1:float>
-                    <p1:float>9.090909</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
+                    <p1:float>4.5454545</p1:float>
                   </p1:ArrayOfFloat>
                 </p1:ProbabilityDistributions>
                 <p1:DistributionIndex>0</p1:DistributionIndex>
@@ -2707,19 +2729,41 @@ Item5 as RightVel)</scr:Expression>
                     <Combinator xsi:type="p1:IncrementStateDependentTrialCounter">
                       <p1:TrialCounterArray>
                         <p1:ArrayOfInt>
-                          <p1:int>11</p1:int>
-                          <p1:int>12</p1:int>
-                          <p1:int>12</p1:int>
-                          <p1:int>12</p1:int>
-                          <p1:int>12</p1:int>
-                          <p1:int>11</p1:int>
-                          <p1:int>11</p1:int>
-                          <p1:int>12</p1:int>
-                          <p1:int>12</p1:int>
-                          <p1:int>11</p1:int>
-                          <p1:int>12</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>9</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
+                          <p1:int>8</p1:int>
                         </p1:ArrayOfInt>
                         <p1:ArrayOfInt>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
+                          <p1:int>0</p1:int>
                           <p1:int>0</p1:int>
                           <p1:int>0</p1:int>
                           <p1:int>0</p1:int>
@@ -2801,6 +2845,7 @@ Item5 as RightVel)</scr:Expression>
         <Property Name="scalingFactor" Category="StimControl" />
         <Property Name="DistsFileName" />
         <Property Name="StimFileName" />
+        <Property Name="TrialCount" Category="StimControl" />
       </Expression>
       <Expression xsi:type="GroupWorkflow">
         <Name>AdaptiveStimControl</Name>
@@ -2818,7 +2863,7 @@ Item5 as RightVel)</scr:Expression>
                     <Property Name="FileName" DisplayName="DistsFileName" />
                   </Expression>
                   <Expression xsi:type="io:CsvReader">
-                    <io:FileName>StimulusCSVfiles\TaskFiles\dist_flickerTask.csv</io:FileName>
+                    <io:FileName>StimulusCSVfiles\TaskFiles\dist_flickerTask22stimuli.csv</io:FileName>
                     <io:ScanPattern>%f,%f</io:ScanPattern>
                     <io:SkipRows>1</io:SkipRows>
                   </Expression>
@@ -2887,7 +2932,7 @@ Item5 as RightVel)</scr:Expression>
                     <Property Name="FileName" DisplayName="StimFileName" />
                   </Expression>
                   <Expression xsi:type="io:CsvReader">
-                    <io:FileName>StimulusCSVfiles\TaskFiles\stimuli_flickerTask.csv</io:FileName>
+                    <io:FileName>StimulusCSVfiles\TaskFiles\stimuli_flickerTask300ms.csv</io:FileName>
                     <io:ScanPattern />
                     <io:SkipRows>1</io:SkipRows>
                   </Expression>
@@ -2962,7 +3007,7 @@ def process(value):
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:RepeatCount">
-                      <rx:Count>11</rx:Count>
+                      <rx:Count>22</rx:Count>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="Combinator">
@@ -3082,7 +3127,7 @@ def process(value):
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="p1:UpdateProbDistArray">
-                      <p1:scalingFactor>9999</p1:scalingFactor>
+                      <p1:scalingFactor>1E+08</p1:scalingFactor>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="rx:Condition">
@@ -3101,7 +3146,25 @@ def process(value):
                   <Expression xsi:type="MulticastSubject">
                     <Name>ProbDistArray</Name>
                   </Expression>
-                  <Expression xsi:type="WorkflowOutput" />
+                  <Expression xsi:type="Disable">
+                    <Builder xsi:type="WorkflowOutput" />
+                  </Expression>
+                  <Expression xsi:type="Disable">
+                    <Builder xsi:type="scr:ExpressionTransform">
+                      <scr:Expression>it != null &amp;&amp; it.Count &gt; 0 &amp;&amp; it[0].Length &gt; 0 ? it[0].Min() : 0</scr:Expression>
+                    </Builder>
+                  </Expression>
+                  <Expression xsi:type="Index">
+                    <Operand xsi:type="IntProperty">
+                      <Value>0</Value>
+                    </Operand>
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>Min(it)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="rx:BehaviorSubject">
+                    <Name>currentMinTrial</Name>
+                  </Expression>
                   <Expression xsi:type="ExternalizedMapping">
                     <Property Name="Value" DisplayName="UpdateProbabilityDistsBool" />
                   </Expression>
@@ -3116,6 +3179,7 @@ def process(value):
                 </Nodes>
                 <Edges>
                   <Edge From="0" To="2" Label="Source1" />
+                  <Edge From="0" To="9" Label="Source1" />
                   <Edge From="1" To="2" Label="Source2" />
                   <Edge From="2" To="3" Label="Source1" />
                   <Edge From="3" To="5" Label="Source1" />
@@ -3125,6 +3189,9 @@ def process(value):
                   <Edge From="7" To="8" Label="Source1" />
                   <Edge From="9" To="10" Label="Source1" />
                   <Edge From="10" To="11" Label="Source1" />
+                  <Edge From="11" To="12" Label="Source1" />
+                  <Edge From="13" To="14" Label="Source1" />
+                  <Edge From="14" To="15" Label="Source1" />
                 </Edges>
               </Workflow>
             </Expression>
@@ -3272,7 +3339,7 @@ def process(value):
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="rx:Take">
-                            <rx:Count>11</rx:Count>
+                            <rx:Count>22</rx:Count>
                           </Combinator>
                         </Expression>
                         <Expression xsi:type="Combinator">
@@ -3307,7 +3374,7 @@ def process(value):
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="rx:Take">
-                            <rx:Count>10</rx:Count>
+                            <rx:Count>21</rx:Count>
                           </Combinator>
                         </Expression>
                         <Expression xsi:type="Combinator">
@@ -3428,10 +3495,53 @@ def process(value):
                 </Edges>
               </Workflow>
             </Expression>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="Value" DisplayName="TrialCount" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="IntProperty">
+                <Value>8</Value>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>currentMinTrial</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:CombineLatest" />
+            </Expression>
+            <Expression xsi:type="rx:Condition">
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="Equal" />
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="BooleanProperty">
+                <Value>true</Value>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="MulticastSubject">
+              <Name>PauseFlag</Name>
+            </Expression>
           </Nodes>
           <Edges>
             <Edge From="0" To="1" Label="Source1" />
             <Edge From="3" To="4" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="8" To="10" Label="Source1" />
+            <Edge From="9" To="10" Label="Source2" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="11" To="12" Label="Source1" />
+            <Edge From="12" To="13" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -3636,6 +3746,26 @@ def process(value):
             <Expression xsi:type="MemberSelector">
               <Selector>Item2</Selector>
             </Expression>
+            <Expression xsi:type="rx:Condition">
+              <Name>NotPause</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>PauseFlag</Name>
+                  </Expression>
+                  <Expression xsi:type="Equal">
+                    <Operand xsi:type="BooleanProperty">
+                      <Value>false</Value>
+                    </Operand>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="al:AudioPlayback">
                 <al:DeviceName>Generic Software on Speakers/Headphones (Realtek(R) Audio)</al:DeviceName>
@@ -3656,6 +3786,7 @@ def process(value):
             <Edge From="9" To="10" Label="Source2" />
             <Edge From="10" To="11" Label="Source1" />
             <Edge From="11" To="12" Label="Source1" />
+            <Edge From="12" To="13" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>

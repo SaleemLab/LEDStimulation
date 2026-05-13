@@ -26,7 +26,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="FloatProperty">
-                <Value>1000</Value>
+                <Value>300</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
@@ -116,7 +116,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="IntProperty">
-                <Value>1</Value>
+                <Value>2</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
@@ -180,8 +180,8 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p2:StaircaseProcedure">
-                <p2:InitialIntensity>20</p2:InitialIntensity>
-                <p2:StepSize>1</p2:StepSize>
+                <p2:InitialIntensity>50</p2:InitialIntensity>
+                <p2:StepSize>2</p2:StepSize>
                 <p2:MinIntensity>0</p2:MinIntensity>
                 <p2:MaxIntensity>100</p2:MaxIntensity>
                 <p2:CorrectRule>2</p2:CorrectRule>
@@ -370,7 +370,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>se</Value>
+                <Value>s</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
@@ -424,7 +424,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>4</Value>
+                <Value>0</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
@@ -559,7 +559,7 @@
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:Timeout">
-                      <rx:DueTime>PT1.1S</rx:DueTime>
+                      <rx:DueTime>PT0.4S</rx:DueTime>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="Combinator">
@@ -828,6 +828,12 @@
       <Expression xsi:type="SubscribeSubject">
         <Name>nReversals</Name>
       </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:DistinctUntilChanged" />
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:WithLatestFrom" />
+      </Expression>
       <Expression xsi:type="SubscribeSubject">
         <Name>CurrentStimulus</Name>
       </Expression>
@@ -875,7 +881,7 @@ Item3 as BonsaiTime)</scr:Expression>
               </PropertyMappings>
             </Expression>
             <Expression xsi:type="io:CsvWriter">
-              <io:FileName>C:\\Data\edd\20260507\sine_edd_Trial.csv</io:FileName>
+              <io:FileName>C:\\Data\edd\20260512\sine_edd_Trial.csv</io:FileName>
               <io:Delimiter>\t</io:Delimiter>
               <io:Append>false</io:Append>
               <io:Overwrite>false</io:Overwrite>
@@ -1058,7 +1064,10 @@ def generate():
       <Edge From="0" To="1" Label="Source1" />
       <Edge From="2" To="3" Label="Source1" />
       <Edge From="4" To="5" Label="Source1" />
-      <Edge From="12" To="13" Label="Source1" />
+      <Edge From="9" To="12" Label="Source2" />
+      <Edge From="10" To="11" Label="Source1" />
+      <Edge From="11" To="12" Label="Source1" />
+      <Edge From="14" To="15" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>
