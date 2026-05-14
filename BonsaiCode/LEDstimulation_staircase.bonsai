@@ -10,6 +10,7 @@
                  xmlns:io="clr-namespace:Bonsai.IO;assembly=Bonsai.System"
                  xmlns:al="clr-namespace:Bonsai.Audio;assembly=Bonsai.Audio"
                  xmlns:ipy="clr-namespace:Bonsai.Scripting.IronPython;assembly=Bonsai.Scripting.IronPython"
+                 xmlns:gui="clr-namespace:Bonsai.Gui;assembly=Bonsai.Gui"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
     <Nodes>
@@ -174,7 +175,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p2:StaircaseProcedure">
                 <p2:InitialIntensity>20</p2:InitialIntensity>
-                <p2:StepSize>5</p2:StepSize>
+                <p2:StepSize>4</p2:StepSize>
                 <p2:MinIntensity>0</p2:MinIntensity>
                 <p2:MaxIntensity>100</p2:MaxIntensity>
                 <p2:CorrectRule>2</p2:CorrectRule>
@@ -705,37 +706,62 @@
                     <Combinator xsi:type="rx:Amb" />
                   </Expression>
                   <Expression xsi:type="Combinator">
-                    <Combinator xsi:type="rx:First" />
+                    <Combinator xsi:type="rx:Throttle">
+                      <rx:DueTime>PT0.25S</rx:DueTime>
+                    </Combinator>
                   </Expression>
-                  <Expression xsi:type="WorkflowOutput" />
-                </Nodes>
-                <Edges>
-                  <Edge From="0" To="1" Label="Source1" />
-                  <Edge From="1" To="4" Label="Source1" />
-                  <Edge From="2" To="3" Label="Source1" />
-                  <Edge From="3" To="4" Label="Source2" />
-                  <Edge From="4" To="5" Label="Source1" />
-                  <Edge From="5" To="6" Label="Source1" />
-                </Edges>
-              </Workflow>
-            </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>Response</Name>
-            </Expression>
-            <Expression xsi:type="rx:SelectMany">
-              <Name>GetYesNo</Name>
-              <Workflow>
-                <Nodes>
-                  <Expression xsi:type="SubscribeSubject">
-                    <Name>LeftResponse</Name>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:BufferTrigger">
+                      <rx:Count xsi:nil="true" />
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Count</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:Condition">
+                    <Name>OneClick</Name>
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>1</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="2" Label="Source1" />
+                      </Edges>
+                    </Workflow>
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="IntProperty">
                       <Value>1</Value>
                     </Combinator>
                   </Expression>
-                  <Expression xsi:type="SubscribeSubject">
-                    <Name>RightResponse</Name>
+                  <Expression xsi:type="rx:Condition">
+                    <Name>MoreThanOneClick</Name>
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="GreaterThan">
+                          <Operand xsi:type="IntProperty">
+                            <Value>1</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="2" Label="Source1" />
+                      </Edges>
+                    </Workflow>
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="IntProperty">
@@ -743,7 +769,10 @@
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="Combinator">
-                    <Combinator xsi:type="rx:Amb" />
+                    <Combinator xsi:type="rx:Merge" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:First" />
@@ -756,9 +785,30 @@
                   <Edge From="2" To="3" Label="Source1" />
                   <Edge From="3" To="4" Label="Source2" />
                   <Edge From="4" To="5" Label="Source1" />
-                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="4" To="6" Label="Source1" />
+                  <Edge From="4" To="13" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source2" />
+                  <Edge From="6" To="7" Label="Source1" />
+                  <Edge From="7" To="8" Label="Source1" />
+                  <Edge From="7" To="10" Label="Source1" />
+                  <Edge From="8" To="9" Label="Source1" />
+                  <Edge From="9" To="12" Label="Source1" />
+                  <Edge From="10" To="11" Label="Source1" />
+                  <Edge From="11" To="12" Label="Source2" />
+                  <Edge From="12" To="13" Label="Source2" />
+                  <Edge From="13" To="14" Label="Source1" />
+                  <Edge From="14" To="15" Label="Source1" />
                 </Edges>
               </Workflow>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item1</Selector>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>Response</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2</Selector>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
               <Name>YesNoResponse</Name>
@@ -799,14 +849,15 @@
           </Nodes>
           <Edges>
             <Edge From="0" To="1" Label="Source1" />
-            <Edge From="0" To="6" Label="Source1" />
+            <Edge From="0" To="7" Label="Source1" />
             <Edge From="1" To="2" Label="Source1" />
             <Edge From="2" To="3" Label="Source1" />
+            <Edge From="2" To="5" Label="Source1" />
             <Edge From="3" To="4" Label="Source1" />
-            <Edge From="4" To="5" Label="Source1" />
-            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
             <Edge From="7" To="8" Label="Source1" />
             <Edge From="8" To="9" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -816,15 +867,6 @@
           <Nodes>
             <Expression xsi:type="SubscribeSubject">
               <Name>Response</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>YesNoResponse</Name>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Zip" />
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Item1</Selector>
             </Expression>
             <Expression xsi:type="SubscribeSubject">
               <Name>TargetSide</Name>
@@ -847,12 +889,9 @@
             <Edge From="0" To="2" Label="Source1" />
             <Edge From="1" To="2" Label="Source2" />
             <Edge From="2" To="3" Label="Source1" />
-            <Edge From="3" To="5" Label="Source1" />
-            <Edge From="4" To="5" Label="Source2" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
             <Edge From="5" To="6" Label="Source1" />
-            <Edge From="6" To="7" Label="Source1" />
-            <Edge From="7" To="8" Label="Source1" />
-            <Edge From="8" To="9" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -944,7 +983,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="al:AudioReader">
                 <al:FileName>D:\Code\LEDStimulation\BonsaiForHumanExperiments\mixkit-modern-technology-select-3124.wav</al:FileName>
-                <al:BufferLength>0</al:BufferLength>
+                <al:BufferLength>500</al:BufferLength>
                 <al:SampleRate>44100</al:SampleRate>
               </Combinator>
             </Expression>
@@ -970,7 +1009,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="al:AudioReader">
                 <al:FileName>D:\Code\LEDStimulation\BonsaiForHumanExperiments\mixkit-on-or-off-light-switch-tap-2585.wav</al:FileName>
-                <al:BufferLength>0</al:BufferLength>
+                <al:BufferLength>1000</al:BufferLength>
                 <al:SampleRate>44100</al:SampleRate>
               </Combinator>
             </Expression>
@@ -987,39 +1026,45 @@
                 <al:State>Playing</al:State>
               </Combinator>
             </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>Response</Name>
+            <Expression xsi:type="Disable">
+              <Builder xsi:type="SubscribeSubject">
+                <Name>Response</Name>
+              </Builder>
             </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>YesNoResponse</Name>
+            <Expression xsi:type="Disable">
+              <Builder xsi:type="Combinator">
+                <Combinator xsi:type="rx:Delay">
+                  <rx:DueTime>PT0.1S</rx:DueTime>
+                </Combinator>
+              </Builder>
             </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Merge" />
+            <Expression xsi:type="Disable">
+              <Builder xsi:type="Combinator">
+                <Combinator xsi:type="al:AudioReader">
+                  <al:FileName>D:\Code\LEDStimulation\BonsaiForHumanExperiments\mixkit-cool-interface-click-tone-2568.wav</al:FileName>
+                  <al:BufferLength>0</al:BufferLength>
+                  <al:SampleRate>44100</al:SampleRate>
+                </Combinator>
+              </Builder>
             </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Delay">
-                <rx:DueTime>PT0.1S</rx:DueTime>
-              </Combinator>
+            <Expression xsi:type="Disable">
+              <Builder xsi:type="Combinator">
+                <Combinator xsi:type="rx:WithLatestFrom" />
+              </Builder>
             </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="al:AudioReader">
-                <al:FileName>D:\Code\LEDStimulation\BonsaiForHumanExperiments\mixkit-cool-interface-click-tone-2568.wav</al:FileName>
-                <al:BufferLength>0</al:BufferLength>
-                <al:SampleRate>44100</al:SampleRate>
-              </Combinator>
+            <Expression xsi:type="Disable">
+              <Builder xsi:type="MemberSelector">
+                <Selector>Item2</Selector>
+              </Builder>
             </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:WithLatestFrom" />
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Item2</Selector>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="al:AudioPlayback">
-                <al:DeviceName>Generic Software on Speakers/Headphones (Realtek(R) Audio)</al:DeviceName>
-                <al:SampleRate>44100</al:SampleRate>
-                <al:State>Playing</al:State>
-              </Combinator>
+            <Expression xsi:type="Disable">
+              <Builder xsi:type="Combinator">
+                <Combinator xsi:type="al:AudioPlayback">
+                  <al:DeviceName>Generic Software on Speakers/Headphones (Realtek(R) Audio)</al:DeviceName>
+                  <al:SampleRate>44100</al:SampleRate>
+                  <al:State>Playing</al:State>
+                </Combinator>
+              </Builder>
             </Expression>
           </Nodes>
           <Edges>
@@ -1033,13 +1078,11 @@
             <Edge From="8" To="9" Label="Source2" />
             <Edge From="9" To="10" Label="Source1" />
             <Edge From="10" To="11" Label="Source1" />
-            <Edge From="12" To="14" Label="Source1" />
-            <Edge From="13" To="14" Label="Source2" />
-            <Edge From="14" To="15" Label="Source1" />
-            <Edge From="15" To="17" Label="Source1" />
-            <Edge From="16" To="17" Label="Source2" />
-            <Edge From="17" To="18" Label="Source1" />
-            <Edge From="18" To="19" Label="Source1" />
+            <Edge From="12" To="13" Label="Source1" />
+            <Edge From="13" To="15" Label="Source1" />
+            <Edge From="14" To="15" Label="Source2" />
+            <Edge From="15" To="16" Label="Source1" />
+            <Edge From="16" To="17" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -1091,7 +1134,7 @@ Item4 as YesNoResponse,
 Item3 as BonsaiTime)</scr:Expression>
             </Expression>
             <Expression xsi:type="io:CsvWriter">
-              <io:FileName>C:\\Data\edd\20260513\sine_edd_Trial.csv</io:FileName>
+              <io:FileName>C:\\Data\edd\20260514\sine_edd_Trial.csv</io:FileName>
               <io:Delimiter>\t</io:Delimiter>
               <io:Append>false</io:Append>
               <io:Overwrite>false</io:Overwrite>
@@ -1266,20 +1309,88 @@ def process(value):
           </Edges>
         </Workflow>
       </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>CurrentFrequency</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>nReversals</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>CurrentStimulus</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>MeanReversalFrequency</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>StepSize</Name>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>Visualizer</Name>
+        <Description>Double click me :)</Description>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>CurrentFrequency</Name>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="SubscribeSubject">
+              <Name>CurrentStimulus</Name>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Response</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>YesNoResponse</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Zip" />
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="SubscribeSubject">
+              <Name>StepSize</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>nReversals</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Zip" />
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="SubscribeSubject">
+              <Name>MeanReversalFrequency</Name>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping" />
+            <Expression xsi:type="gui:TableLayoutPanelBuilder">
+              <gui:Name>Experiment Dashboard</gui:Name>
+              <gui:Enabled>true</gui:Enabled>
+              <gui:Visible>true</gui:Visible>
+              <gui:ColumnCount>2</gui:ColumnCount>
+              <gui:RowCount>3</gui:RowCount>
+              <gui:ColumnStyles />
+              <gui:RowStyles>
+                <gui:RowStyle>
+                  <gui:SizeType>Percent</gui:SizeType>
+                  <gui:Height>50</gui:Height>
+                </gui:RowStyle>
+                <gui:RowStyle>
+                  <gui:SizeType>Percent</gui:SizeType>
+                  <gui:Height>25</gui:Height>
+                </gui:RowStyle>
+                <gui:RowStyle>
+                  <gui:SizeType>Percent</gui:SizeType>
+                  <gui:Height>25</gui:Height>
+                </gui:RowStyle>
+              </gui:RowStyles>
+              <gui:CellSpans>
+                <gui:CellSpan ColumnSpan="2" RowSpan="1" />
+              </gui:CellSpans>
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="14" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="14" Label="Source2" />
+            <Edge From="4" To="6" Label="Source1" />
+            <Edge From="5" To="6" Label="Source2" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="14" Label="Source3" />
+            <Edge From="8" To="10" Label="Source1" />
+            <Edge From="9" To="10" Label="Source2" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="11" To="14" Label="Source4" />
+            <Edge From="12" To="13" Label="Source1" />
+            <Edge From="13" To="14" Label="Source5" />
+            <Edge From="14" To="15" Label="Source1" />
+          </Edges>
+        </Workflow>
       </Expression>
     </Nodes>
     <Edges>
