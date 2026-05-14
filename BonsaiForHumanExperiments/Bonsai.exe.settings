@@ -1,16 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <EditorSettings>
-  <WindowState>Normal</WindowState>
+  <WindowState>Maximized</WindowState>
   <EditorTheme>Light</EditorTheme>
   <AnnotationPanelSize>189</AnnotationPanelSize>
-  <ExplorerSplitterDistance>224</ExplorerSplitterDistance>
+  <ExplorerSplitterDistance>617</ExplorerSplitterDistance>
   <DesktopBounds>
-    <X>1581</X>
-    <Y>336</Y>
+    <X>1485</X>
+    <Y>223</Y>
     <Width>1181</Width>
     <Height>450</Height>
   </DesktopBounds>
   <RecentlyUsedFiles>
+    <RecentlyUsedFile>
+      <Timestamp>2026-05-14T16:36:00.1157038+01:00</Timestamp>
+      <Name>D:\Code\LEDStimulation\HumanExperimentBonsaiWorkflows\GeneralTaskWorkflow.bonsai</Name>
+    </RecentlyUsedFile>
+    <RecentlyUsedFile>
+      <Timestamp>2026-05-14T16:11:05.6491275+01:00</Timestamp>
+      <Name>D:\Code\LEDStimulation\HumanExperimentBonsaiWorkflows\LEDstimulation_staircase.bonsai</Name>
+    </RecentlyUsedFile>
+    <RecentlyUsedFile>
+      <Timestamp>2026-05-14T15:42:08.2616414+01:00</Timestamp>
+      <Name>D:\Code\LEDStimulation\BonsaiForHumanExperiments\GeneralTaskWorkflow.bonsai</Name>
+    </RecentlyUsedFile>
     <RecentlyUsedFile>
       <Timestamp>2026-05-14T15:34:54.2797991+01:00</Timestamp>
       <Name>D:\Code\LEDStimulation\BonsaiCode\LEDstimulation_staircase.bonsai</Name>
