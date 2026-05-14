@@ -1,19 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <EditorSettings>
-  <WindowState>Maximized</WindowState>
+  <WindowState>Normal</WindowState>
   <EditorTheme>Light</EditorTheme>
-  <AnnotationPanelSize>393</AnnotationPanelSize>
-  <ExplorerSplitterDistance>623</ExplorerSplitterDistance>
+  <AnnotationPanelSize>189</AnnotationPanelSize>
+  <ExplorerSplitterDistance>224</ExplorerSplitterDistance>
   <DesktopBounds>
-    <X>1697</X>
-    <Y>231</Y>
-    <Width>700</Width>
+    <X>1581</X>
+    <Y>336</Y>
+    <Width>1181</Width>
     <Height>450</Height>
   </DesktopBounds>
   <RecentlyUsedFiles>
     <RecentlyUsedFile>
-      <Timestamp>2026-05-14T11:11:08.4118696+01:00</Timestamp>
+      <Timestamp>2026-05-14T15:34:54.2797991+01:00</Timestamp>
       <Name>D:\Code\LEDStimulation\BonsaiCode\LEDstimulation_staircase.bonsai</Name>
+    </RecentlyUsedFile>
+    <RecentlyUsedFile>
+      <Timestamp>2026-05-14T15:28:42.2348999+01:00</Timestamp>
+      <Name>D:\Code\LEDStimulation\HumanBonsaiCode\LEDstimulation_staircase.bonsai</Name>
+    </RecentlyUsedFile>
+    <RecentlyUsedFile>
+      <Timestamp>2026-05-14T15:19:34.5493757+01:00</Timestamp>
+      <Name>D:\Code\LEDStimulation\BonsaiForHumanExperiments\LEDstimulation_staircase.bonsai</Name>
     </RecentlyUsedFile>
   </RecentlyUsedFiles>
 </EditorSettings>
