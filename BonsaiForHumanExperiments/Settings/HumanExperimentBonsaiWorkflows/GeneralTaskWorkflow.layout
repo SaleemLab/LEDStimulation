@@ -28,4 +28,23 @@
       <ObjectTextVisualizer />
     </VisualizerSettings>
   </WindowSettings>
+  <WindowSettings Index="43">
+    <NestedLayout>
+      <WindowSettings Index="1">
+        <Visible>false</Visible>
+        <Location>
+          <X>1525</X>
+          <Y>429</Y>
+        </Location>
+        <Size>
+          <Width>726</Width>
+          <Height>296</Height>
+        </Size>
+        <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
+        <VisualizerSettings>
+          <ObjectTextVisualizer />
+        </VisualizerSettings>
+      </WindowSettings>
+    </NestedLayout>
+  </WindowSettings>
 </VisualizerLayout>
