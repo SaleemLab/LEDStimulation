@@ -3,7 +3,7 @@ using System.Reactive.Linq;
 using System.ComponentModel;
 using Bonsai;
 
-// 1. The Master Data Container
+// Master Data Container
 public class TrialPayload
 {
     // Constructor safely sets defaults
@@ -46,7 +46,7 @@ public class TrialPayload
     public double ContrastB { get; set; }      
 }
 
-// 2. The Result Container
+// Result Container
 public class TrialResult
 {
     public TrialPayload OriginalPayload { get; set; }
@@ -55,7 +55,7 @@ public class TrialResult
     public bool IsCorrect { get; set; }
 }
 
-// 3. The Assembler Node
+// Assembler Node
 [Description("Calculates FreqA and FreqB based on Target Side (-1=Left, 1=Right) and the provided Stimulus Intensity (e.g., from Staircase or MOCS).")]
 public class CreateTrialPayload : Transform<Tuple<double, int>, TrialPayload> 
 {
@@ -117,7 +117,7 @@ public class CreateTrialPayload : Transform<Tuple<double, int>, TrialPayload>
     }
 }
 
-// 4. The Result Packager Node (MUST BE ITS OWN CLASS)
+// Result Packager Node
 [Description("Combines the TrialPayload, Discrimination Response, and Detection Response into a single TrialResult object.")]
 public class CreateTrialResult : Transform<Tuple<TrialPayload, int, int>, TrialResult>
 {
