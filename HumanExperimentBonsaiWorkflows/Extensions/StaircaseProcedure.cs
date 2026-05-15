@@ -10,13 +10,13 @@ public class StaircaseState
     public int Reversals { get; set; }
 }
 
-[Description("Adaptive Staircase tracking intensity and reversals.")]
+[Description("Adaptive Staircase tracking intensity and reversals with dynamic step sizes.")]
 public class StaircaseProcedure : Transform<bool, StaircaseState>
 {
     public StaircaseProcedure()
     {
         InitialIntensity = 10.0;
-        StepSize = 1.0;
+        StepSizes = new double[] { 2.0, 1.0, 0.5 }; 
         MinIntensity = 0.0;
         MaxIntensity = 100.0;
         CorrectRule = 2;   // Formerly DownRule
@@ -26,8 +26,8 @@ public class StaircaseProcedure : Transform<bool, StaircaseState>
     [Description("The initial stimulus intensity before any responses are made.")]
     public double InitialIntensity { get; set; }
 
-    [Description("The amount to change the intensity.")]
-    public double StepSize { get; set; }
+    [Description("Array of step sizes mapped to reversals (e.g., 0 reversals uses the 1st number, 1 reversal uses the 2nd).")]
+    public double[] StepSizes { get; set; } // CHANGED: Replaced 'StepSize' with 'StepSizes' array
 
     [Description("Minimum allowed intensity.")]
     public double MinIntensity { get; set; }
@@ -60,12 +60,22 @@ public class StaircaseProcedure : Transform<bool, StaircaseState>
                 bool changed = false;
                 Direction currentDirection = Direction.None;
 
+                // Determine current step size from the array based on reversals ---
+                // We use Math.Min to lock onto the final number if reversals exceed the array length.
+                int safeIndex = (StepSizes != null && StepSizes.Length > 0) 
+                                ? Math.Min(reversals, StepSizes.Length - 1) 
+                                : 0;
+                
+                double currentStepSize = (StepSizes != null && StepSizes.Length > 0) 
+                                         ? StepSizes[safeIndex] 
+                                         : 1.0; // Fallback just in case array is deleted
+
                 if (isCorrect) {
                     consecutiveIncorrect = 0;
                     consecutiveCorrect++;
 
                     if (consecutiveCorrect >= CorrectRule) {
-                        currentIntensity += StepSize; // Make value higher
+                        currentIntensity += currentStepSize; // Use dynamic step size
                         consecutiveCorrect = 0;       // Reset counter
                         changed = true;
                         currentDirection = Direction.Up;
@@ -75,7 +85,7 @@ public class StaircaseProcedure : Transform<bool, StaircaseState>
                     consecutiveIncorrect++;
 
                     if (consecutiveIncorrect >= IncorrectRule) {
-                        currentIntensity -= StepSize; // Make value lower
+                        currentIntensity -= currentStepSize; // Use dynamic step size
                         consecutiveIncorrect = 0;     // Reset counter
                         changed = true;
                         currentDirection = Direction.Down;
