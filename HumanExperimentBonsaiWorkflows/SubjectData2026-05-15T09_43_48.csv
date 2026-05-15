@@ -1,0 +1,2 @@
+OriginalPayload,OriginalPayload,OriginalPayload,OriginalPayload.TargetSide,OriginalPayload.Intensity,OriginalPayload.FreqA,OriginalPayload.FreqB,OriginalPayload.Duration,OriginalPayload.EnvFrequency,OriginalPayload.PhaseA,OriginalPayload.PhaseB,OriginalPayload.ContrastA,OriginalPayload.ContrastB,DiscriminationResponse,DetectionResponse,IsCorrect
+Standing,Staircase,se,1,10,200,10,1000,4,0,0,1,1,-1,1,False
