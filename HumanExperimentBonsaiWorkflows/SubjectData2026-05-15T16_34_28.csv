@@ -1,0 +1,15 @@
+OriginalPayload,OriginalPayload,OriginalPayload,OriginalPayload.TargetSide,OriginalPayload.Intensity,OriginalPayload.FreqA,OriginalPayload.FreqB,OriginalPayload.Duration,OriginalPayload.EnvFrequency,OriginalPayload.PhaseA,OriginalPayload.PhaseB,OriginalPayload.ContrastA,OriginalPayload.ContrastB,DiscriminationResponse,DetectionResponse,IsCorrect
+Standing,Staircase,se,-1,10,10,200,1000,4,0,0,1,1,-1,1,True
+Walking,MOCS,se,-1,60,60,200,1000,4,0,0,1,1,1,1,False
+Standing,MOCS,se,-1,60,60,200,1000,4,0,0,1,1,-1,1,True
+Standing,MOCS,se,1,40,200,40,1000,4,0,0,1,1,-1,1,False
+Walking,MOCS,se,1,40,200,40,1000,4,0,0,1,1,-1,1,False
+Standing,Staircase,se,-1,10,10,200,1000,4,0,0,1,1,-1,1,True
+Standing,MOCS,se,1,40,200,40,1000,4,0,0,1,1,-1,1,False
+Walking,MOCS,se,1,40,200,40,1000,4,0,0,1,1,-1,1,False
+Walking,MOCS,se,1,50,200,50,1000,4,0,0,1,1,-1,0,False
+Standing,Staircase,se,-1,15,15,200,1000,4,0,0,1,1,1,1,False
+Walking,MOCS,se,1,40,200,40,1000,4,0,0,1,1,-1,1,False
+Standing,Staircase,se,1,10,200,10,1000,4,0,0,1,1,1,1,True
+Walking,Staircase,se,1,10,200,10,1000,4,0,0,1,1,-1,1,False
+Walking,Staircase,se,1,5,200,5,1000,4,0,0,1,1,1,1,True

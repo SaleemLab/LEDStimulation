@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WorkflowBuilder Version="2.9.0"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:vid="clr-namespace:Bonsai.Video;assembly=Bonsai.Video"
+                 xmlns:drw="clr-namespace:Bonsai.Vision.Drawing;assembly=Bonsai.Vision"
+                 xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
+                 xmlns:cv="clr-namespace:Bonsai.Vision;assembly=Bonsai.Vision"
+                 xmlns:ui="clr-namespace:Bonsai.Design;assembly=Bonsai.Design"
+                 xmlns="https://bonsai-rx.org/2018/workflow">
+  <Workflow>
+    <Nodes>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="vid:VideoCaptureDevice">
+          <vid:Index>0</vid:Index>
+          <vid:CaptureProperties />
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="drw:CreateCanvas">
+          <drw:Size>
+            <drw:Width>640</drw:Width>
+            <drw:Height>480</drw:Height>
+          </drw:Size>
+          <drw:Depth>U8</drw:Depth>
+          <drw:Channels>3</drw:Channels>
+          <drw:Color>
+            <drw:Val0>0</drw:Val0>
+            <drw:Val1>0</drw:Val1>
+            <drw:Val2>0</drw:Val2>
+            <drw:Val3>0</drw:Val3>
+          </drw:Color>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:WithLatestFrom" />
+      </Expression>
+      <Expression xsi:type="MemberSelector">
+        <Selector>Item2</Selector>
+      </Expression>
+      <Expression xsi:type="MemberSelector">
+        <Selector>Item1</Selector>
+      </Expression>
+      <Expression xsi:type="PropertyMapping">
+        <PropertyMappings>
+          <Property Name="Image" />
+        </PropertyMappings>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="drw:AddImage">
+          <drw:Destination>
+            <drw:X>0</drw:X>
+            <drw:Y>0</drw:Y>
+            <drw:Width>0</drw:Width>
+            <drw:Height>0</drw:Height>
+          </drw:Destination>
+          <drw:Interpolation>Linear</drw:Interpolation>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="cv:Grayscale" />
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="cv:Threshold">
+          <cv:ThresholdValue>242</cv:ThresholdValue>
+          <cv:MaxValue>255</cv:MaxValue>
+          <cv:ThresholdType>Binary</cv:ThresholdType>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="cv:FindContours">
+          <cv:Mode>External</cv:Mode>
+          <cv:Method>ChainApproxNone</cv:Method>
+          <cv:Offset>
+            <cv:X>0</cv:X>
+            <cv:Y>0</cv:Y>
+          </cv:Offset>
+          <cv:MinArea xsi:nil="true" />
+          <cv:MaxArea xsi:nil="true" />
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="cv:BinaryRegionAnalysis" />
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="cv:LargestBinaryRegion" />
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="cv:Centroid" />
+      </Expression>
+      <Expression xsi:type="PropertyMapping">
+        <PropertyMappings>
+          <Property Name="X" Selector="X" />
+        </PropertyMappings>
+      </Expression>
+      <Expression xsi:type="PropertyMapping">
+        <PropertyMappings>
+          <Property Name="Y" Selector="Y" />
+        </PropertyMappings>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="cv:CreatePoint">
+          <cv:X>477</cv:X>
+          <cv:Y>236</cv:Y>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:WindowCount">
+          <rx:Count>5</rx:Count>
+          <rx:Skip>1</rx:Skip>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="rx:SelectMany">
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="WorkflowInput">
+              <Name>Source1</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:ToArray" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:ToArray" />
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="PropertyMapping">
+        <PropertyMappings>
+          <Property Name="Points" />
+        </PropertyMappings>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="drw:PolyLine">
+          <drw:Closed>false</drw:Closed>
+          <drw:Color>
+            <drw:Val0>255</drw:Val0>
+            <drw:Val1>255</drw:Val1>
+            <drw:Val2>255</drw:Val2>
+            <drw:Val3>255</drw:Val3>
+          </drw:Color>
+          <drw:Thickness>2</drw:Thickness>
+          <drw:LineType>Connected8</drw:LineType>
+          <drw:Shift>0</drw:Shift>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="drw:DrawCanvas" />
+      </Expression>
+      <Expression xsi:type="ui:VisualizerWindow">
+        <ui:Visible>true</ui:Visible>
+        <ui:Location>
+          <ui:X>300</ui:X>
+          <ui:Y>300</ui:Y>
+        </ui:Location>
+        <ui:Size>
+          <ui:Width>640</ui:Width>
+          <ui:Height>480</ui:Height>
+        </ui:Size>
+        <ui:WindowState xsi:nil="true" />
+      </Expression>
+    </Nodes>
+    <Edges>
+      <Edge From="0" To="2" Label="Source1" />
+      <Edge From="0" To="7" Label="Source1" />
+      <Edge From="0" To="15" Label="Source3" />
+      <Edge From="1" To="2" Label="Source2" />
+      <Edge From="2" To="3" Label="Source1" />
+      <Edge From="2" To="4" Label="Source1" />
+      <Edge From="3" To="6" Label="Source1" />
+      <Edge From="4" To="5" Label="Source1" />
+      <Edge From="5" To="6" Label="Source2" />
+      <Edge From="6" To="19" Label="Source1" />
+      <Edge From="7" To="8" Label="Source1" />
+      <Edge From="8" To="9" Label="Source1" />
+      <Edge From="9" To="10" Label="Source1" />
+      <Edge From="10" To="11" Label="Source1" />
+      <Edge From="11" To="12" Label="Source1" />
+      <Edge From="12" To="13" Label="Source1" />
+      <Edge From="12" To="14" Label="Source1" />
+      <Edge From="13" To="15" Label="Source1" />
+      <Edge From="14" To="15" Label="Source2" />
+      <Edge From="15" To="16" Label="Source1" />
+      <Edge From="16" To="17" Label="Source1" />
+      <Edge From="17" To="18" Label="Source1" />
+      <Edge From="18" To="19" Label="Source2" />
+      <Edge From="19" To="20" Label="Source1" />
+      <Edge From="20" To="21" Label="Source1" />
+    </Edges>
+  </Workflow>
+</WorkflowBuilder>
