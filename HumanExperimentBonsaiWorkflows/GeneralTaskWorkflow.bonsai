@@ -183,6 +183,17 @@
           </Edges>
         </Workflow>
       </Expression>
+      <Expression xsi:type="ExternalizedMapping">
+        <Property Name="Intensities" DisplayName="MOCS frequencies" Category="MOCS" />
+        <Property Name="Repetitions" DisplayName="TrialRepsShuffling" Category="MOCS" />
+        <Property Name="InitialIntensity" Category="Staircase" />
+        <Property Name="StepSizes" Category="Staircase" />
+        <Property Name="MovingAverageWindow" Category="Staircase" />
+        <Property Name="MinIntensity" Category="Staircase" />
+        <Property Name="MaxIntensity" Category="Staircase" />
+        <Property Name="CorrectRule" Category="Staircase" />
+        <Property Name="IncorrectRule" Category="Staircase" />
+      </Expression>
       <Expression xsi:type="GroupWorkflow">
         <Name>TrialManager</Name>
         <Workflow>
@@ -197,6 +208,15 @@
             <Expression xsi:type="MemberSelector">
               <Selector>IsCorrect</Selector>
             </Expression>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="InitialIntensity" />
+              <Property Name="StepSizes" />
+              <Property Name="MovingAverageWindow" />
+              <Property Name="MinIntensity" />
+              <Property Name="MaxIntensity" />
+              <Property Name="CorrectRule" />
+              <Property Name="IncorrectRule" />
+            </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:StaircaseProcedure">
                 <p1:InitialIntensity>10</p1:InitialIntensity>
@@ -207,9 +227,9 @@
                   <p1:double>2</p1:double>
                   <p1:double>1</p1:double>
                 </p1:StepSizes>
-                <p1:MovingAverageWindow>4</p1:MovingAverageWindow>
-                <p1:MinIntensity>0</p1:MinIntensity>
-                <p1:MaxIntensity>100</p1:MaxIntensity>
+                <p1:MovingAverageWindow>6</p1:MovingAverageWindow>
+                <p1:MinIntensity>10</p1:MinIntensity>
+                <p1:MaxIntensity>200</p1:MaxIntensity>
                 <p1:CorrectRule>2</p1:CorrectRule>
                 <p1:IncorrectRule>1</p1:IncorrectRule>
               </Combinator>
@@ -237,9 +257,9 @@
                   <p1:double>2</p1:double>
                   <p1:double>1</p1:double>
                 </p1:StepSizes>
-                <p1:MovingAverageWindow>4</p1:MovingAverageWindow>
-                <p1:MinIntensity>0</p1:MinIntensity>
-                <p1:MaxIntensity>100</p1:MaxIntensity>
+                <p1:MovingAverageWindow>6</p1:MovingAverageWindow>
+                <p1:MinIntensity>10</p1:MinIntensity>
+                <p1:MaxIntensity>200</p1:MaxIntensity>
                 <p1:CorrectRule>2</p1:CorrectRule>
                 <p1:IncorrectRule>1</p1:IncorrectRule>
               </Combinator>
@@ -254,6 +274,12 @@
               <scr:Name>Standing, MOCS</scr:Name>
               <scr:Expression>it.OriginalPayload.Method == "MOCS" &amp;&amp; it.OriginalPayload.Context == "Standing"</scr:Expression>
             </Expression>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="Intensities" />
+            </Expression>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="Repetitions" />
+            </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:MocsProcedure">
                 <p1:Intensities>
@@ -262,8 +288,9 @@
                   <p1:double>50</p1:double>
                   <p1:double>60</p1:double>
                   <p1:double>70</p1:double>
+                  <p1:double>200</p1:double>
                 </p1:Intensities>
-                <p1:Repetitions>10</p1:Repetitions>
+                <p1:Repetitions>1</p1:Repetitions>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
@@ -284,8 +311,9 @@
                   <p1:double>50</p1:double>
                   <p1:double>60</p1:double>
                   <p1:double>70</p1:double>
+                  <p1:double>200</p1:double>
                 </p1:Intensities>
-                <p1:Repetitions>10</p1:Repetitions>
+                <p1:Repetitions>1</p1:Repetitions>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
@@ -295,18 +323,24 @@
           <Edges>
             <Edge From="0" To="1" Label="Source1" />
             <Edge From="1" To="2" Label="Source1" />
-            <Edge From="2" To="3" Label="Source1" />
-            <Edge From="3" To="4" Label="Source1" />
-            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="2" To="4" Label="Source1" />
+            <Edge From="3" To="4" Label="Source2" />
+            <Edge From="3" To="9" Label="Source2" />
+            <Edge From="4" To="5" Label="Source1" />
             <Edge From="6" To="7" Label="Source1" />
             <Edge From="7" To="8" Label="Source1" />
             <Edge From="8" To="9" Label="Source1" />
-            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
             <Edge From="11" To="12" Label="Source1" />
-            <Edge From="12" To="13" Label="Source1" />
-            <Edge From="14" To="15" Label="Source1" />
+            <Edge From="12" To="15" Label="Source1" />
+            <Edge From="13" To="15" Label="Source2" />
+            <Edge From="13" To="19" Label="Source2" />
+            <Edge From="14" To="15" Label="Source3" />
+            <Edge From="14" To="19" Label="Source3" />
             <Edge From="15" To="16" Label="Source1" />
-            <Edge From="16" To="17" Label="Source1" />
+            <Edge From="17" To="18" Label="Source1" />
+            <Edge From="18" To="19" Label="Source1" />
+            <Edge From="19" To="20" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -750,6 +784,9 @@
           </Edges>
         </Workflow>
       </Expression>
+      <Expression xsi:type="ExternalizedMapping">
+        <Property Name="PauseEveryNTrials" />
+      </Expression>
       <Expression xsi:type="GroupWorkflow">
         <Name>PauseWorkflow</Name>
         <Workflow>
@@ -776,6 +813,23 @@
                 <Value>false</Value>
               </Combinator>
             </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>TrialCompleted</Name>
+            </Expression>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="Count" DisplayName="PauseEveryNTrials" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:BufferCount">
+                <rx:Count>50</rx:Count>
+                <rx:Skip xsi:nil="true" />
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="BooleanProperty">
+                <Value>true</Value>
+              </Combinator>
+            </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Merge" />
             </Expression>
@@ -785,10 +839,14 @@
           </Nodes>
           <Edges>
             <Edge From="0" To="1" Label="Source1" />
-            <Edge From="1" To="4" Label="Source1" />
+            <Edge From="1" To="8" Label="Source1" />
             <Edge From="2" To="3" Label="Source1" />
-            <Edge From="3" To="4" Label="Source2" />
-            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="3" To="8" Label="Source2" />
+            <Edge From="4" To="6" Label="Source1" />
+            <Edge From="5" To="6" Label="Source2" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source3" />
+            <Edge From="8" To="9" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -1283,7 +1341,7 @@ def generate():
         </PropertyMappings>
       </Expression>
       <Expression xsi:type="io:CsvWriter">
-        <io:FileName>C:\\Data\edd\20260515\sine_edd_Trial.csv</io:FileName>
+        <io:FileName>C:\\Data\edd\20260518\sine_edd_Trial.csv</io:FileName>
         <io:Append>false</io:Append>
         <io:Overwrite>false</io:Overwrite>
         <io:Suffix>Timestamp</io:Suffix>
@@ -1391,259 +1449,384 @@ def generate():
         <Name>Visualisers</Name>
         <Workflow>
           <Nodes>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>Staircase_Standing</Name>
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Reversals</Selector>
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>ReversalAverage</Selector>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Zip" />
-            </Expression>
-            <Expression xsi:type="VisualizerMapping" />
-            <Expression xsi:type="SubscribeSubject">
-              <Name>Staircase_Walking</Name>
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Reversals</Selector>
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>ReversalAverage</Selector>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Zip" />
-            </Expression>
-            <Expression xsi:type="VisualizerMapping" />
-            <Expression xsi:type="SubscribeSubject">
-              <Name>Staircase_Standing</Name>
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Intensity</Selector>
-            </Expression>
-            <Expression xsi:type="rx:Visualizer">
-              <Name>StandingStaircase</Name>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>Performance and Trial Counts</Name>
               <Workflow>
                 <Nodes>
-                  <Expression xsi:type="WorkflowInput">
-                    <Name>Source1</Name>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Staircase_Standing</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Reversals</Selector>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>ReversalAverage</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Staircase_Walking</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Reversals</Selector>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>ReversalAverage</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Staircase_Standing</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Intensity</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:Visualizer">
+                    <Name>StandingStaircase</Name>
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Staircase_Walking</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Intensity</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:Visualizer">
+                    <Name>WalkingStaircase</Name>
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>TrialCompleted</Name>
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionCondition">
+                    <scr:Expression>it.OriginalPayload.Context == "Standing" &amp;&amp; it.OriginalPayload.Method == "MOCS"</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="p1:PsychometricTracker" />
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item1</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item2</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>new(Item1 as X, Item2 as Y)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Length</Selector>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="Capacity" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>1</zg:LineWidth>
+                    <zg:CurveSettings />
+                    <zg:Capacity>6</zg:Capacity>
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin>-0.1</zg:YMin>
+                    <zg:YMax>1.1</zg:YMax>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>TrialCompleted</Name>
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionCondition">
+                    <scr:Expression>it.OriginalPayload.Context == "Walking" &amp;&amp; it.OriginalPayload.Method == "MOCS"</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="p1:PsychometricTracker" />
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item1</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item2</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>new(Item1 as X, Item2 as Y)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Length</Selector>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="Capacity" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="zg:LineGraphBuilder">
+                    <zg:SymbolType>Circle</zg:SymbolType>
+                    <zg:LineWidth>1</zg:LineWidth>
+                    <zg:CurveSettings />
+                    <zg:Capacity>5</zg:Capacity>
+                    <zg:XMin xsi:nil="true" />
+                    <zg:XMax xsi:nil="true" />
+                    <zg:YMin>-0.1</zg:YMin>
+                    <zg:YMax>1.1</zg:YMax>
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item3</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item1</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>new(Item1 as X, Item2 as Y)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Length</Selector>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="Capacity" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="zg:BarGraphBuilder">
+                    <zg:IndexSelector>Y</zg:IndexSelector>
+                    <zg:ValueSelector>X</zg:ValueSelector>
+                    <zg:BaseAxis>X</zg:BaseAxis>
+                    <zg:BarType>Cluster</zg:BarType>
+                    <zg:CurveSettings />
+                    <zg:Capacity>6</zg:Capacity>
+                    <zg:Min xsi:nil="true" />
+                    <zg:Max xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item3</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item1</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Concat" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Expression>new(Item1 as X, Item2 as Y)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Length</Selector>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="Capacity" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="zg:BarGraphBuilder">
+                    <zg:IndexSelector>Y</zg:IndexSelector>
+                    <zg:ValueSelector>X</zg:ValueSelector>
+                    <zg:BaseAxis>X</zg:BaseAxis>
+                    <zg:BarType>Cluster</zg:BarType>
+                    <zg:CurveSettings />
+                    <zg:Capacity xsi:nil="true" />
+                    <zg:Min xsi:nil="true" />
+                    <zg:Max xsi:nil="true" />
+                  </Expression>
+                  <Expression xsi:type="VisualizerMapping" />
+                  <Expression xsi:type="gui:TableLayoutPanelBuilder">
+                    <gui:Name>Performance</gui:Name>
+                    <gui:Enabled>true</gui:Enabled>
+                    <gui:Visible>true</gui:Visible>
+                    <gui:ColumnCount>2</gui:ColumnCount>
+                    <gui:RowCount>4</gui:RowCount>
+                    <gui:ColumnStyles />
+                    <gui:RowStyles>
+                      <gui:RowStyle>
+                        <gui:SizeType>Percent</gui:SizeType>
+                        <gui:Height>7</gui:Height>
+                      </gui:RowStyle>
+                      <gui:RowStyle>
+                        <gui:SizeType>Percent</gui:SizeType>
+                        <gui:Height>31</gui:Height>
+                      </gui:RowStyle>
+                      <gui:RowStyle>
+                        <gui:SizeType>Percent</gui:SizeType>
+                        <gui:Height>31</gui:Height>
+                      </gui:RowStyle>
+                      <gui:RowStyle>
+                        <gui:SizeType>Percent</gui:SizeType>
+                        <gui:Height>31</gui:Height>
+                      </gui:RowStyle>
+                    </gui:RowStyles>
+                    <gui:CellSpans />
                   </Expression>
                   <Expression xsi:type="WorkflowOutput" />
                 </Nodes>
                 <Edges>
                   <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="0" To="2" Label="Source1" />
+                  <Edge From="1" To="3" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source2" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="64" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="5" To="7" Label="Source1" />
+                  <Edge From="6" To="8" Label="Source1" />
+                  <Edge From="7" To="8" Label="Source2" />
+                  <Edge From="8" To="9" Label="Source1" />
+                  <Edge From="9" To="64" Label="Source2" />
+                  <Edge From="10" To="11" Label="Source1" />
+                  <Edge From="11" To="12" Label="Source1" />
+                  <Edge From="12" To="13" Label="Source1" />
+                  <Edge From="13" To="64" Label="Source3" />
+                  <Edge From="14" To="15" Label="Source1" />
+                  <Edge From="15" To="16" Label="Source1" />
+                  <Edge From="16" To="17" Label="Source1" />
+                  <Edge From="17" To="64" Label="Source4" />
+                  <Edge From="18" To="19" Label="Source1" />
+                  <Edge From="19" To="20" Label="Source1" />
+                  <Edge From="20" To="21" Label="Source1" />
+                  <Edge From="20" To="23" Label="Source1" />
+                  <Edge From="20" To="44" Label="Source1" />
+                  <Edge From="20" To="46" Label="Source1" />
+                  <Edge From="21" To="22" Label="Source1" />
+                  <Edge From="21" To="27" Label="Source1" />
+                  <Edge From="22" To="25" Label="Source1" />
+                  <Edge From="23" To="24" Label="Source1" />
+                  <Edge From="24" To="25" Label="Source2" />
+                  <Edge From="25" To="26" Label="Source1" />
+                  <Edge From="26" To="29" Label="Source1" />
+                  <Edge From="27" To="28" Label="Source1" />
+                  <Edge From="28" To="29" Label="Source2" />
+                  <Edge From="29" To="30" Label="Source1" />
+                  <Edge From="30" To="64" Label="Source5" />
+                  <Edge From="31" To="32" Label="Source1" />
+                  <Edge From="32" To="33" Label="Source1" />
+                  <Edge From="33" To="34" Label="Source1" />
+                  <Edge From="33" To="36" Label="Source1" />
+                  <Edge From="33" To="54" Label="Source1" />
+                  <Edge From="33" To="56" Label="Source1" />
+                  <Edge From="34" To="35" Label="Source1" />
+                  <Edge From="34" To="40" Label="Source1" />
+                  <Edge From="35" To="38" Label="Source1" />
+                  <Edge From="36" To="37" Label="Source1" />
+                  <Edge From="37" To="38" Label="Source2" />
+                  <Edge From="38" To="39" Label="Source1" />
+                  <Edge From="39" To="42" Label="Source1" />
+                  <Edge From="40" To="41" Label="Source1" />
+                  <Edge From="41" To="42" Label="Source2" />
+                  <Edge From="42" To="43" Label="Source1" />
+                  <Edge From="43" To="64" Label="Source6" />
+                  <Edge From="44" To="45" Label="Source1" />
+                  <Edge From="45" To="48" Label="Source1" />
+                  <Edge From="46" To="47" Label="Source1" />
+                  <Edge From="46" To="50" Label="Source1" />
+                  <Edge From="47" To="48" Label="Source2" />
+                  <Edge From="48" To="49" Label="Source1" />
+                  <Edge From="49" To="52" Label="Source1" />
+                  <Edge From="50" To="51" Label="Source1" />
+                  <Edge From="51" To="52" Label="Source2" />
+                  <Edge From="52" To="53" Label="Source1" />
+                  <Edge From="53" To="64" Label="Source7" />
+                  <Edge From="54" To="55" Label="Source1" />
+                  <Edge From="55" To="58" Label="Source1" />
+                  <Edge From="56" To="57" Label="Source1" />
+                  <Edge From="56" To="60" Label="Source1" />
+                  <Edge From="57" To="58" Label="Source2" />
+                  <Edge From="58" To="59" Label="Source1" />
+                  <Edge From="59" To="62" Label="Source1" />
+                  <Edge From="60" To="61" Label="Source1" />
+                  <Edge From="61" To="62" Label="Source2" />
+                  <Edge From="62" To="63" Label="Source1" />
+                  <Edge From="63" To="64" Label="Source8" />
+                  <Edge From="64" To="65" Label="Source1" />
                 </Edges>
               </Workflow>
             </Expression>
-            <Expression xsi:type="VisualizerMapping" />
-            <Expression xsi:type="SubscribeSubject">
-              <Name>Staircase_Walking</Name>
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Intensity</Selector>
-            </Expression>
-            <Expression xsi:type="rx:Visualizer">
-              <Name>WalkingStaircase</Name>
-              <Workflow>
-                <Nodes>
-                  <Expression xsi:type="WorkflowInput">
-                    <Name>Source1</Name>
-                  </Expression>
-                  <Expression xsi:type="WorkflowOutput" />
-                </Nodes>
-                <Edges>
-                  <Edge From="0" To="1" Label="Source1" />
-                </Edges>
-              </Workflow>
-            </Expression>
-            <Expression xsi:type="VisualizerMapping" />
             <Expression xsi:type="SubscribeSubject">
               <Name>TrialCompleted</Name>
             </Expression>
-            <Expression xsi:type="scr:ExpressionCondition">
-              <scr:Expression>it.OriginalPayload.Context == "Standing" &amp;&amp; it.OriginalPayload.Method == "MOCS"</scr:Expression>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p1:PsychometricTracker" />
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Item1</Selector>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Concat" />
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Item2</Selector>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Concat" />
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Zip" />
-            </Expression>
             <Expression xsi:type="scr:ExpressionTransform">
-              <scr:Expression>new(Item1 as X, Item2 as Y)</scr:Expression>
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Length</Selector>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="Capacity" />
-              </PropertyMappings>
-            </Expression>
-            <Expression xsi:type="zg:LineGraphBuilder">
-              <zg:SymbolType>Circle</zg:SymbolType>
-              <zg:LineWidth>1</zg:LineWidth>
-              <zg:CurveSettings />
-              <zg:Capacity>5</zg:Capacity>
-              <zg:XMin xsi:nil="true" />
-              <zg:XMax xsi:nil="true" />
-              <zg:YMin>-0.1</zg:YMin>
-              <zg:YMax>1.1</zg:YMax>
-            </Expression>
-            <Expression xsi:type="VisualizerMapping" />
-            <Expression xsi:type="SubscribeSubject">
-              <Name>TrialCompleted</Name>
-            </Expression>
-            <Expression xsi:type="scr:ExpressionCondition">
-              <scr:Expression>it.OriginalPayload.Context == "Walking" &amp;&amp; it.OriginalPayload.Method == "MOCS"</scr:Expression>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p1:PsychometricTracker" />
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Item1</Selector>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Concat" />
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Item2</Selector>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Concat" />
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Zip" />
-            </Expression>
-            <Expression xsi:type="scr:ExpressionTransform">
-              <scr:Expression>new(Item1 as X, Item2 as Y)</scr:Expression>
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Length</Selector>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="Capacity" />
-              </PropertyMappings>
-            </Expression>
-            <Expression xsi:type="zg:LineGraphBuilder">
-              <zg:SymbolType>Circle</zg:SymbolType>
-              <zg:LineWidth>1</zg:LineWidth>
-              <zg:CurveSettings />
-              <zg:Capacity>5</zg:Capacity>
-              <zg:XMin xsi:nil="true" />
-              <zg:XMax xsi:nil="true" />
-              <zg:YMin>-0.1</zg:YMin>
-              <zg:YMax>1.1</zg:YMax>
-            </Expression>
-            <Expression xsi:type="VisualizerMapping" />
-            <Expression xsi:type="gui:TableLayoutPanelBuilder">
-              <gui:Name>Performance</gui:Name>
-              <gui:Enabled>true</gui:Enabled>
-              <gui:Visible>true</gui:Visible>
-              <gui:ColumnCount>2</gui:ColumnCount>
-              <gui:RowCount>3</gui:RowCount>
-              <gui:ColumnStyles />
-              <gui:RowStyles>
-                <gui:RowStyle>
-                  <gui:SizeType>Percent</gui:SizeType>
-                  <gui:Height>6</gui:Height>
-                </gui:RowStyle>
-                <gui:RowStyle>
-                  <gui:SizeType>Percent</gui:SizeType>
-                  <gui:Height>47</gui:Height>
-                </gui:RowStyle>
-                <gui:RowStyle>
-                  <gui:SizeType>Percent</gui:SizeType>
-                  <gui:Height>47</gui:Height>
-                </gui:RowStyle>
-              </gui:RowStyles>
-              <gui:CellSpans />
+              <scr:Name>CurrentTrialValues</scr:Name>
+              <scr:Expression>String.Format("Context: {0}, Method: {1}, StimType: {2}, TargetSide: {3}, Intensity: {4}Hz, FreqA: {5}Hz, FreqB: {6}Hz, Duration: {7}ms, EnvFreq: {8}Hz, PhaseA: {9}, PhaseB: {10}, ContrastA: {11}, ContrastB: {12}, DiscrimResponse: {13}, DetectResponse: {14}, IsCorrect: {15}", it.OriginalPayload.Context, it.OriginalPayload.Method, it.OriginalPayload.StimulusType, it.OriginalPayload.TargetSide, it.OriginalPayload.Intensity, it.OriginalPayload.FreqA, it.OriginalPayload.FreqB, it.OriginalPayload.Duration, it.OriginalPayload.EnvFrequency, it.OriginalPayload.PhaseA, it.OriginalPayload.PhaseB, it.OriginalPayload.ContrastA, it.OriginalPayload.ContrastB, it.DiscriminationResponse, it.DetectionResponse, it.IsCorrect)</scr:Expression>
             </Expression>
           </Nodes>
           <Edges>
-            <Edge From="0" To="1" Label="Source1" />
-            <Edge From="0" To="2" Label="Source1" />
-            <Edge From="1" To="3" Label="Source1" />
-            <Edge From="2" To="3" Label="Source2" />
-            <Edge From="3" To="4" Label="Source1" />
-            <Edge From="4" To="44" Label="Source1" />
-            <Edge From="5" To="6" Label="Source1" />
-            <Edge From="5" To="7" Label="Source1" />
-            <Edge From="6" To="8" Label="Source1" />
-            <Edge From="7" To="8" Label="Source2" />
-            <Edge From="8" To="9" Label="Source1" />
-            <Edge From="9" To="44" Label="Source2" />
-            <Edge From="10" To="11" Label="Source1" />
-            <Edge From="11" To="12" Label="Source1" />
-            <Edge From="12" To="13" Label="Source1" />
-            <Edge From="13" To="44" Label="Source3" />
-            <Edge From="14" To="15" Label="Source1" />
-            <Edge From="15" To="16" Label="Source1" />
-            <Edge From="16" To="17" Label="Source1" />
-            <Edge From="17" To="44" Label="Source4" />
-            <Edge From="18" To="19" Label="Source1" />
-            <Edge From="19" To="20" Label="Source1" />
-            <Edge From="20" To="21" Label="Source1" />
-            <Edge From="20" To="23" Label="Source1" />
-            <Edge From="21" To="22" Label="Source1" />
-            <Edge From="21" To="27" Label="Source1" />
-            <Edge From="22" To="25" Label="Source1" />
-            <Edge From="23" To="24" Label="Source1" />
-            <Edge From="24" To="25" Label="Source2" />
-            <Edge From="25" To="26" Label="Source1" />
-            <Edge From="26" To="29" Label="Source1" />
-            <Edge From="27" To="28" Label="Source1" />
-            <Edge From="28" To="29" Label="Source2" />
-            <Edge From="29" To="30" Label="Source1" />
-            <Edge From="30" To="44" Label="Source5" />
-            <Edge From="31" To="32" Label="Source1" />
-            <Edge From="32" To="33" Label="Source1" />
-            <Edge From="33" To="34" Label="Source1" />
-            <Edge From="33" To="36" Label="Source1" />
-            <Edge From="34" To="35" Label="Source1" />
-            <Edge From="34" To="40" Label="Source1" />
-            <Edge From="35" To="38" Label="Source1" />
-            <Edge From="36" To="37" Label="Source1" />
-            <Edge From="37" To="38" Label="Source2" />
-            <Edge From="38" To="39" Label="Source1" />
-            <Edge From="39" To="42" Label="Source1" />
-            <Edge From="40" To="41" Label="Source1" />
-            <Edge From="41" To="42" Label="Source2" />
-            <Edge From="42" To="43" Label="Source1" />
-            <Edge From="43" To="44" Label="Source6" />
+            <Edge From="1" To="2" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
     </Nodes>
     <Edges>
       <Edge From="0" To="1" Label="Source1" />
-      <Edge From="6" To="7" Label="Source1" />
-      <Edge From="8" To="10" Label="Source1" />
-      <Edge From="9" To="10" Label="Source2" />
-      <Edge From="10" To="11" Label="Source1" />
-      <Edge From="11" To="14" Label="Source1" />
+      <Edge From="2" To="3" Label="Source1" />
+      <Edge From="5" To="6" Label="Source1" />
+      <Edge From="8" To="9" Label="Source1" />
+      <Edge From="10" To="12" Label="Source1" />
+      <Edge From="11" To="12" Label="Source2" />
       <Edge From="12" To="13" Label="Source1" />
-      <Edge From="13" To="14" Label="Source2" />
+      <Edge From="13" To="16" Label="Source1" />
       <Edge From="14" To="15" Label="Source1" />
-      <Edge From="14" To="16" Label="Source2" />
-      <Edge From="15" To="16" Label="Source1" />
+      <Edge From="15" To="16" Label="Source2" />
       <Edge From="16" To="17" Label="Source1" />
+      <Edge From="16" To="18" Label="Source2" />
       <Edge From="17" To="18" Label="Source1" />
+      <Edge From="18" To="19" Label="Source1" />
+      <Edge From="19" To="20" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>

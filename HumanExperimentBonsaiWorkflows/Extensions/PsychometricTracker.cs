@@ -5,10 +5,10 @@ using System.Reactive.Linq;
 using System.ComponentModel;
 using Bonsai;
 
-[Description("Aggregates TrialResults and emits a Tuple containing two arrays: (Frequencies[], pCorrect[]).")]
-public class PsychometricTracker : Transform<TrialResult, Tuple<double[], double[]>>
+[Description("Aggregates TrialResults and emits a Tuple containing three arrays: (Frequencies[], pCorrect[], TrialCounts[]).")]
+public class PsychometricTracker : Transform<TrialResult, Tuple<double[], double[], int[]>>
 {
-    public override IObservable<Tuple<double[], double[]>> Process(IObservable<TrialResult> source)
+    public override IObservable<Tuple<double[], double[], int[]>> Process(IObservable<TrialResult> source)
     {
         return Observable.Defer(() => {
             
@@ -33,12 +33,13 @@ public class PsychometricTracker : Transform<TrialResult, Tuple<double[], double
                 // Sort the dictionary so the curve is ordered left-to-right
                 var sortedData = data.OrderBy(kvp => kvp.Key).ToList();
 
-                // Generate the two distinct arrays
+                // Generate the three distinct arrays
                 double[] frequencies = sortedData.Select(kvp => kvp.Key).ToArray();
                 double[] pCorrects = sortedData.Select(kvp => (double)kvp.Value.Item2 / kvp.Value.Item1).ToArray();
+                int[] trialCounts = sortedData.Select(kvp => kvp.Value.Item1).ToArray();
 
-                // Output the Tuple of arrays
-                return Tuple.Create(frequencies, pCorrects);
+                // Output the Tuple of arrays: Item1, Item2, and Item3
+                return Tuple.Create(frequencies, pCorrects, trialCounts);
             });
         });
     }
