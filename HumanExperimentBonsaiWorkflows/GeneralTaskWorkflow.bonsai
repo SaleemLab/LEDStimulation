@@ -18,6 +18,7 @@
       <Expression xsi:type="ExternalizedMapping">
         <Property Name="StateContext" />
         <Property Name="SamplingMethod" />
+        <Property Name="PWMport" />
       </Expression>
       <Expression xsi:type="GroupWorkflow">
         <Name>InitialiseVars</Name>
@@ -39,7 +40,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>MOCS</Value>
+                <Value>Staircase</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
@@ -222,10 +223,7 @@
                 <p1:InitialIntensity>10</p1:InitialIntensity>
                 <p1:StepSizes>
                   <p1:double>5</p1:double>
-                  <p1:double>4</p1:double>
-                  <p1:double>3</p1:double>
                   <p1:double>2</p1:double>
-                  <p1:double>1</p1:double>
                 </p1:StepSizes>
                 <p1:MovingAverageWindow>6</p1:MovingAverageWindow>
                 <p1:MinIntensity>10</p1:MinIntensity>
@@ -252,10 +250,7 @@
                 <p1:InitialIntensity>10</p1:InitialIntensity>
                 <p1:StepSizes>
                   <p1:double>5</p1:double>
-                  <p1:double>4</p1:double>
-                  <p1:double>3</p1:double>
                   <p1:double>2</p1:double>
-                  <p1:double>1</p1:double>
                 </p1:StepSizes>
                 <p1:MovingAverageWindow>6</p1:MovingAverageWindow>
                 <p1:MinIntensity>10</p1:MinIntensity>
@@ -283,12 +278,10 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:MocsProcedure">
                 <p1:Intensities>
-                  <p1:double>30</p1:double>
                   <p1:double>40</p1:double>
                   <p1:double>50</p1:double>
                   <p1:double>60</p1:double>
                   <p1:double>70</p1:double>
-                  <p1:double>200</p1:double>
                 </p1:Intensities>
                 <p1:Repetitions>1</p1:Repetitions>
               </Combinator>
@@ -306,12 +299,10 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:MocsProcedure">
                 <p1:Intensities>
-                  <p1:double>30</p1:double>
                   <p1:double>40</p1:double>
                   <p1:double>50</p1:double>
                   <p1:double>60</p1:double>
                   <p1:double>70</p1:double>
-                  <p1:double>200</p1:double>
                 </p1:Intensities>
                 <p1:Repetitions>1</p1:Repetitions>
               </Combinator>
@@ -343,6 +334,14 @@
             <Edge From="19" To="20" Label="Source1" />
           </Edges>
         </Workflow>
+      </Expression>
+      <Expression xsi:type="ExternalizedMapping">
+        <Property Name="StimulusType" Category="Stimulus" />
+        <Property Name="BaseFrequency" Category="Stimulus" />
+        <Property Name="Duration" Category="Stimulus" />
+        <Property Name="EnvFrequency" Category="Stimulus" />
+        <Property Name="ContrastA" Category="Stimulus" />
+        <Property Name="ContrastB" Category="Stimulus" />
       </Expression>
       <Expression xsi:type="GroupWorkflow">
         <Name>GenerateTrialPayload</Name>
@@ -735,10 +734,18 @@
                 <Property Name="Method" Selector="Item2" />
               </PropertyMappings>
             </Expression>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="StimulusType" />
+              <Property Name="BaseFrequency" />
+              <Property Name="Duration" />
+              <Property Name="EnvFrequency" />
+              <Property Name="ContrastA" />
+              <Property Name="ContrastB" />
+            </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:CreateTrialPayload">
                 <p1:Context>Standing</p1:Context>
-                <p1:Method>MOCS</p1:Method>
+                <p1:Method>Staircase</p1:Method>
                 <p1:StimulusType>se</p1:StimulusType>
                 <p1:BaseFrequency>200</p1:BaseFrequency>
                 <p1:Duration>1000</p1:Duration>
@@ -774,13 +781,14 @@
             <Edge From="16" To="17" Label="Source1" />
             <Edge From="17" To="18" Label="Source1" />
             <Edge From="18" To="19" Label="Source2" />
-            <Edge From="19" To="24" Label="Source1" />
+            <Edge From="19" To="25" Label="Source1" />
             <Edge From="20" To="22" Label="Source1" />
             <Edge From="21" To="22" Label="Source2" />
             <Edge From="22" To="23" Label="Source1" />
-            <Edge From="23" To="24" Label="Source2" />
-            <Edge From="24" To="25" Label="Source1" />
+            <Edge From="23" To="25" Label="Source2" />
+            <Edge From="24" To="25" Label="Source3" />
             <Edge From="25" To="26" Label="Source1" />
+            <Edge From="26" To="27" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -1560,7 +1568,7 @@ def generate():
                     <zg:SymbolType>Circle</zg:SymbolType>
                     <zg:LineWidth>1</zg:LineWidth>
                     <zg:CurveSettings />
-                    <zg:Capacity>6</zg:Capacity>
+                    <zg:Capacity>4</zg:Capacity>
                     <zg:XMin xsi:nil="true" />
                     <zg:XMax xsi:nil="true" />
                     <zg:YMin>-0.1</zg:YMin>
@@ -1645,7 +1653,7 @@ def generate():
                     <zg:BaseAxis>X</zg:BaseAxis>
                     <zg:BarType>Cluster</zg:BarType>
                     <zg:CurveSettings />
-                    <zg:Capacity>6</zg:Capacity>
+                    <zg:Capacity>4</zg:Capacity>
                     <zg:Min xsi:nil="true" />
                     <zg:Max xsi:nil="true" />
                   </Expression>
@@ -1814,19 +1822,20 @@ def generate():
     <Edges>
       <Edge From="0" To="1" Label="Source1" />
       <Edge From="2" To="3" Label="Source1" />
-      <Edge From="5" To="6" Label="Source1" />
-      <Edge From="8" To="9" Label="Source1" />
-      <Edge From="10" To="12" Label="Source1" />
-      <Edge From="11" To="12" Label="Source2" />
-      <Edge From="12" To="13" Label="Source1" />
-      <Edge From="13" To="16" Label="Source1" />
-      <Edge From="14" To="15" Label="Source1" />
-      <Edge From="15" To="16" Label="Source2" />
-      <Edge From="16" To="17" Label="Source1" />
-      <Edge From="16" To="18" Label="Source2" />
+      <Edge From="4" To="5" Label="Source1" />
+      <Edge From="6" To="7" Label="Source1" />
+      <Edge From="9" To="10" Label="Source1" />
+      <Edge From="11" To="13" Label="Source1" />
+      <Edge From="12" To="13" Label="Source2" />
+      <Edge From="13" To="14" Label="Source1" />
+      <Edge From="14" To="17" Label="Source1" />
+      <Edge From="15" To="16" Label="Source1" />
+      <Edge From="16" To="17" Label="Source2" />
       <Edge From="17" To="18" Label="Source1" />
+      <Edge From="17" To="19" Label="Source2" />
       <Edge From="18" To="19" Label="Source1" />
       <Edge From="19" To="20" Label="Source1" />
+      <Edge From="20" To="21" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>

@@ -3,14 +3,18 @@
   <WindowState>Maximized</WindowState>
   <EditorTheme>Light</EditorTheme>
   <AnnotationPanelSize>189</AnnotationPanelSize>
-  <ExplorerSplitterDistance>617</ExplorerSplitterDistance>
+  <ExplorerSplitterDistance>597</ExplorerSplitterDistance>
   <DesktopBounds>
-    <X>1485</X>
-    <Y>223</Y>
-    <Width>1181</Width>
+    <X>333</X>
+    <Y>135</Y>
+    <Width>700</Width>
     <Height>450</Height>
   </DesktopBounds>
   <RecentlyUsedFiles>
+    <RecentlyUsedFile>
+      <Timestamp>2026-05-18T14:39:46.9890443+01:00</Timestamp>
+      <Name>C:\Users\Saleem Lab\Documents\LEDStimulation\HumanExperimentBonsaiWorkflows\GeneralTaskWorkflow.bonsai</Name>
+    </RecentlyUsedFile>
     <RecentlyUsedFile>
       <Timestamp>2026-05-15T09:54:30.9956643+01:00</Timestamp>
       <Name>D:\Code\LEDStimulation\HumanExperimentBonsaiWorkflows\GeneralTaskWorkflow.bonsai</Name>
