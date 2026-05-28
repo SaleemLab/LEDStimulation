@@ -2,26 +2,38 @@
 <EditorSettings>
   <WindowState>Maximized</WindowState>
   <EditorTheme>Light</EditorTheme>
-  <AnnotationPanelSize>185</AnnotationPanelSize>
-  <ExplorerSplitterDistance>314</ExplorerSplitterDistance>
+  <AnnotationPanelSize>189</AnnotationPanelSize>
+  <ExplorerSplitterDistance>597</ExplorerSplitterDistance>
   <DesktopBounds>
-    <X>1655</X>
-    <Y>-33</Y>
+    <X>333</X>
+    <Y>135</Y>
     <Width>700</Width>
     <Height>450</Height>
   </DesktopBounds>
   <RecentlyUsedFiles>
     <RecentlyUsedFile>
-      <Timestamp>2026-05-27T13:58:53.2927147+01:00</Timestamp>
-      <Name>D:\Code\LEDStimulation\HumanExperimentBonsaiWorkflows\imu_dev.bonsai</Name>
+      <Timestamp>2026-05-28T16:30:35.3957443+01:00</Timestamp>
+      <Name>C:\Users\Saleem Lab\Documents\LEDStimulation\BonsaiCode\LEDstimulation_normal.bonsai</Name>
     </RecentlyUsedFile>
     <RecentlyUsedFile>
-      <Timestamp>2026-05-27T13:43:27.9911121+01:00</Timestamp>
-      <Name>D:\Code\LEDStimulation\HumanExperimentBonsaiWorkflows\GeneralTaskWorkflow.bonsai</Name>
+      <Timestamp>2026-05-28T16:30:06.4250136+01:00</Timestamp>
+      <Name>C:\Users\Saleem Lab\Documents\LEDStimulation\BonsaiCode\LEDstimulation_basic.bonsai</Name>
     </RecentlyUsedFile>
     <RecentlyUsedFile>
-      <Timestamp>2026-05-18T14:39:46.9890443+01:00</Timestamp>
+      <Timestamp>2026-05-28T16:29:37.9649504+01:00</Timestamp>
+      <Name>C:\Users\Saleem Lab\Documents\LEDStimulation\HumanExperimentBonsaiWorkflows\LEDstimulation_StateDependent.bonsai</Name>
+    </RecentlyUsedFile>
+    <RecentlyUsedFile>
+      <Timestamp>2026-05-28T16:29:17.9208635+01:00</Timestamp>
+      <Name>C:\Users\Saleem Lab\Documents\LEDStimulation\HumanExperimentBonsaiWorkflows\EEGpilot_fixedFreqFlicker.bonsai</Name>
+    </RecentlyUsedFile>
+    <RecentlyUsedFile>
+      <Timestamp>2026-05-28T15:33:34.1049078+01:00</Timestamp>
       <Name>C:\Users\Saleem Lab\Documents\LEDStimulation\HumanExperimentBonsaiWorkflows\GeneralTaskWorkflow.bonsai</Name>
+    </RecentlyUsedFile>
+    <RecentlyUsedFile>
+      <Timestamp>2026-05-15T09:54:30.9956643+01:00</Timestamp>
+      <Name>D:\Code\LEDStimulation\HumanExperimentBonsaiWorkflows\GeneralTaskWorkflow.bonsai</Name>
     </RecentlyUsedFile>
     <RecentlyUsedFile>
       <Timestamp>2026-05-14T17:19:16.8818593+01:00</Timestamp>

@@ -67,7 +67,7 @@
                 <LineGraphVisualizer>
                   <Capacity>3</Capacity>
                   <XMin>30</XMin>
-                  <XMax>90</XMax>
+                  <XMax>80</XMax>
                   <YMin>-0.1</YMin>
                   <YMax>1.1</YMax>
                   <AutoScaleX>true</AutoScaleX>
@@ -95,7 +95,7 @@
                 <BarGraphVisualizer>
                   <Capacity>3</Capacity>
                   <Min>0</Min>
-                  <Max>6</Max>
+                  <Max>5</Max>
                   <AutoScale>true</AutoScale>
                 </BarGraphVisualizer>
               </VisualizerSettings>

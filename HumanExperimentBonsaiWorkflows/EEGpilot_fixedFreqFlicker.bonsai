@@ -280,7 +280,7 @@
                 <p1:Intensities>
                   <p1:double>30</p1:double>
                   <p1:double>60</p1:double>
-                  <p1:double>90</p1:double>
+                  <p1:double>80</p1:double>
                 </p1:Intensities>
                 <p1:Repetitions>5</p1:Repetitions>
               </Combinator>
@@ -300,7 +300,7 @@
                 <p1:Intensities>
                   <p1:double>30</p1:double>
                   <p1:double>60</p1:double>
-                  <p1:double>90</p1:double>
+                  <p1:double>80</p1:double>
                 </p1:Intensities>
                 <p1:Repetitions>5</p1:Repetitions>
               </Combinator>
