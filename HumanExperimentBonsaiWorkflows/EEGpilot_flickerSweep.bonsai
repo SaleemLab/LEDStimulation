@@ -144,7 +144,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="port:CreateSerialPort">
                 <port:Name>ArdPWM</port:Name>
-                <port:PortName>COM7</port:PortName>
+                <port:PortName>COM6</port:PortName>
                 <port:BaudRate>115200</port:BaudRate>
                 <port:NewLine>\r\n</port:NewLine>
                 <port:Parity>None</port:Parity>
@@ -746,7 +746,7 @@
                 <p1:Method>MOCS</p1:Method>
                 <p1:StimulusType>s</p1:StimulusType>
                 <p1:BaseFrequency>120</p1:BaseFrequency>
-                <p1:Duration>1000</p1:Duration>
+                <p1:Duration>4000</p1:Duration>
                 <p1:EnvFrequency>4</p1:EnvFrequency>
                 <p1:ContrastA>1</p1:ContrastA>
                 <p1:ContrastB>1</p1:ContrastB>
@@ -1096,7 +1096,7 @@ def generate():
               </Workflow>
             </Expression>
             <Expression xsi:type="scr:ExpressionTransform">
-              <scr:Expression>String.Format("sfs 9.0 100.0 1.0 2 0 0 {0:0.0} {1:0.0}\n", it.TargetSide == -1 ? 1.0 : 0.0, it.TargetSide == 1 ? 1.0 : 0.0)</scr:Expression>
+              <scr:Expression>String.Format("sfs,9.0,100.0,1.0,2,0,0,{0:0.0},{1:0.0}\n", it.TargetSide == -1 ? 1.0 : 0.0, it.TargetSide == 1 ? 1.0 : 0.0)</scr:Expression>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="port:SerialWriteLine">
@@ -1336,10 +1336,10 @@ def generate():
             <Edge From="13" To="14" Label="Source1" />
             <Edge From="15" To="16" Label="Source1" />
             <Edge From="16" To="19" Label="Source1" />
+            <Edge From="16" To="21" Label="Source1" />
             <Edge From="17" To="18" Label="Source2" />
             <Edge From="18" To="19" Label="Source2" />
             <Edge From="19" To="20" Label="Source1" />
-            <Edge From="19" To="21" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
