@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VisualizerLayout Version="2.9.0">
+  <WindowSettings Index="18">
+    <Location>
+      <X>2143</X>
+      <Y>320</Y>
+    </Location>
+    <Size>
+      <Width>633</Width>
+      <Height>517</Height>
+    </Size>
+    <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
+    <VisualizerSettings>
+      <ObjectTextVisualizer />
+    </VisualizerSettings>
+  </WindowSettings>
+  <WindowSettings Index="24">
+    <Visible>false</Visible>
+    <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
+    <VisualizerSettings>
+      <ObjectTextVisualizer />
+    </VisualizerSettings>
+    <NestedLayout>
+      <WindowSettings Index="0">
+        <Location>
+          <X>1995</X>
+          <Y>88</Y>
+        </Location>
+        <Size>
+          <Width>614</Width>
+          <Height>777</Height>
+        </Size>
+        <VisualizerTypeName>Bonsai.Gui.TableLayoutPanelVisualizer</VisualizerTypeName>
+        <VisualizerSettings>
+          <TableLayoutPanelVisualizer>
+            <MashupSettings>
+              <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
+              <VisualizerSettings>
+                <ObjectTextVisualizer />
+              </VisualizerSettings>
+            </MashupSettings>
+            <MashupSettings>
+              <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
+              <VisualizerSettings>
+                <ObjectTextVisualizer />
+              </VisualizerSettings>
+            </MashupSettings>
+            <MashupSettings>
+              <VisualizerTypeName>Bonsai.Design.Visualizers.TimeSeriesVisualizer</VisualizerTypeName>
+              <VisualizerSettings>
+                <TimeSeriesVisualizer>
+                  <Capacity>640</Capacity>
+                  <Min>9.5</Min>
+                  <Max>10.5</Max>
+                  <AutoScale>true</AutoScale>
+                </TimeSeriesVisualizer>
+              </VisualizerSettings>
+            </MashupSettings>
+            <MashupSettings>
+              <VisualizerTypeName>Bonsai.Design.Visualizers.TimeSeriesVisualizer</VisualizerTypeName>
+              <VisualizerSettings>
+                <TimeSeriesVisualizer>
+                  <Capacity>640</Capacity>
+                  <Min>9.5</Min>
+                  <Max>10.5</Max>
+                  <AutoScale>true</AutoScale>
+                </TimeSeriesVisualizer>
+              </VisualizerSettings>
+            </MashupSettings>
+            <MashupSettings>
+              <VisualizerTypeName>Bonsai.Gui.ZedGraph.LineGraphVisualizer</VisualizerTypeName>
+              <VisualizerSettings>
+                <LineGraphVisualizer>
+                  <Capacity>3</Capacity>
+                  <XMin>30</XMin>
+                  <XMax>60</XMax>
+                  <YMin>-0.1</YMin>
+                  <YMax>1.1</YMax>
+                  <AutoScaleX>true</AutoScaleX>
+                  <AutoScaleY>false</AutoScaleY>
+                </LineGraphVisualizer>
+              </VisualizerSettings>
+            </MashupSettings>
+            <MashupSettings>
+              <VisualizerTypeName>Bonsai.Gui.ZedGraph.LineGraphVisualizer</VisualizerTypeName>
+              <VisualizerSettings>
+                <LineGraphVisualizer>
+                  <Capacity>5</Capacity>
+                  <XMin>0</XMin>
+                  <XMax>1</XMax>
+                  <YMin>-0.1</YMin>
+                  <YMax>1.1</YMax>
+                  <AutoScaleX>true</AutoScaleX>
+                  <AutoScaleY>false</AutoScaleY>
+                </LineGraphVisualizer>
+              </VisualizerSettings>
+            </MashupSettings>
+            <MashupSettings>
+              <VisualizerTypeName>Bonsai.Gui.ZedGraph.BarGraphVisualizer</VisualizerTypeName>
+              <VisualizerSettings>
+                <BarGraphVisualizer>
+                  <Capacity>3</Capacity>
+                  <Min>0</Min>
+                  <Max>2.5</Max>
+                  <AutoScale>true</AutoScale>
+                </BarGraphVisualizer>
+              </VisualizerSettings>
+            </MashupSettings>
+            <MashupSettings>
+              <VisualizerTypeName>Bonsai.Gui.ZedGraph.BarGraphVisualizer</VisualizerTypeName>
+              <VisualizerSettings>
+                <BarGraphVisualizer>
+                  <Capacity>0</Capacity>
+                  <Min>0</Min>
+                  <Max>1.1</Max>
+                  <AutoScale>true</AutoScale>
+                </BarGraphVisualizer>
+              </VisualizerSettings>
+            </MashupSettings>
+          </TableLayoutPanelVisualizer>
+        </VisualizerSettings>
+      </WindowSettings>
+      <WindowSettings Index="2">
+        <Visible>false</Visible>
+        <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
+        <VisualizerSettings>
+          <ObjectTextVisualizer />
+        </VisualizerSettings>
+      </WindowSettings>
+      <WindowSettings Index="4">
+        <Location>
+          <X>1497</X>
+          <Y>533</Y>
+        </Location>
+        <Size>
+          <Width>336</Width>
+          <Height>65</Height>
+        </Size>
+        <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
+        <VisualizerSettings>
+          <ObjectTextVisualizer />
+        </VisualizerSettings>
+      </WindowSettings>
+    </NestedLayout>
+  </WindowSettings>
+</VisualizerLayout>
