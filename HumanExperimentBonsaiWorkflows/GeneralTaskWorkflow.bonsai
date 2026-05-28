@@ -40,7 +40,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>Staircase</Value>
+                <Value>MOCS</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
@@ -829,7 +829,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:BufferCount">
-                <rx:Count>50</rx:Count>
+                <rx:Count>5</rx:Count>
                 <rx:Skip xsi:nil="true" />
               </Combinator>
             </Expression>
@@ -988,7 +988,9 @@ def generate():
         <Workflow>
           <Nodes>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="port:SerialReadLine" />
+              <Combinator xsi:type="port:SerialReadLine">
+                <port:PortName>ArdPWM</port:PortName>
+              </Combinator>
             </Expression>
             <Expression xsi:type="Parse">
               <Pattern>%i</Pattern>

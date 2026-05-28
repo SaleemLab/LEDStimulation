@@ -17,8 +17,8 @@
     <NestedLayout>
       <WindowSettings Index="0">
         <Location>
-          <X>631</X>
-          <Y>27</Y>
+          <X>1954</X>
+          <Y>375</Y>
         </Location>
         <Size>
           <Width>701</Width>
@@ -44,8 +44,8 @@
               <VisualizerSettings>
                 <TimeSeriesVisualizer>
                   <Capacity>640</Capacity>
-                  <Min>10</Min>
-                  <Max>16</Max>
+                  <Min>9.5</Min>
+                  <Max>10.5</Max>
                   <AutoScale>true</AutoScale>
                 </TimeSeriesVisualizer>
               </VisualizerSettings>
@@ -116,8 +116,8 @@
       </WindowSettings>
       <WindowSettings Index="2">
         <Location>
-          <X>151</X>
-          <Y>474</Y>
+          <X>1391</X>
+          <Y>484</Y>
         </Location>
         <Size>
           <Width>479</Width>

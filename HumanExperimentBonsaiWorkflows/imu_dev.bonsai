@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WorkflowBuilder Version="2.9.0"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:port="clr-namespace:Bonsai.IO.Ports;assembly=Bonsai.System"
+                 xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
+                 xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
+                 xmlns:ipy="clr-namespace:Bonsai.Scripting.IronPython;assembly=Bonsai.Scripting.IronPython"
+                 xmlns="https://bonsai-rx.org/2018/workflow">
+  <Workflow>
+    <Nodes>
+      <Expression xsi:type="ExternalizedMapping">
+        <Property Name="PortName" DisplayName="PWMport" />
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="port:CreateSerialPort">
+          <port:Name>ArdIMU</port:Name>
+          <port:PortName>COM7</port:PortName>
+          <port:BaudRate>500000</port:BaudRate>
+          <port:NewLine>\n</port:NewLine>
+          <port:Parity>None</port:Parity>
+          <port:ParityReplace>63</port:ParityReplace>
+          <port:DataBits>8</port:DataBits>
+          <port:StopBits>One</port:StopBits>
+          <port:Handshake>None</port:Handshake>
+          <port:DiscardNull>false</port:DiscardNull>
+          <port:DtrEnable>true</port:DtrEnable>
+          <port:RtsEnable>false</port:RtsEnable>
+          <port:ReadBufferSize>4096</port:ReadBufferSize>
+          <port:WriteBufferSize>2048</port:WriteBufferSize>
+          <port:ReceivedBytesThreshold>1</port:ReceivedBytesThreshold>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="port:SerialReadLine">
+          <port:PortName>ArdIMU</port:PortName>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:Skip">
+          <rx:Count>1</rx:Count>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="scr:ExpressionCondition">
+        <scr:Expression>it.Split(',').Length == 4</scr:Expression>
+      </Expression>
+      <Expression xsi:type="scr:ExpressionTransform">
+        <scr:Expression>new(
+  Int64.Parse(it.Split(',')[0]) as Timestamp,
+  Double.Parse(it.Split(',')[1]) as AccelX,
+  Double.Parse(it.Split(',')[2]) as AccelY,
+  Double.Parse(it.Split(',')[3]) as AccelZ
+)</scr:Expression>
+      </Expression>
+      <Expression xsi:type="scr:ExpressionTransform">
+        <scr:Expression>Math.Sqrt(it.AccelX*it.AccelX + it.AccelY*it.AccelY + it.AccelZ*it.AccelZ)</scr:Expression>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:BufferCount">
+          <rx:Count>100</rx:Count>
+          <rx:Skip>1</rx:Skip>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="ipy:PythonTransform">
+        <ipy:Script>import math
+
+@returns(float)
+def process(buffer):
+    # If the buffer isn't full yet (e.g., the first split second of the experiment), return 0
+    if len(buffer) &lt; 2:
+        return 0.0
+        
+    # Calculate the average (mean) of the 100 samples
+    mean = sum(buffer) / len(buffer)
+    
+    # Calculate the variance
+    variance = sum((x - mean) ** 2 for x in buffer) / len(buffer)
+    
+    # Return the Standard Deviation
+    return math.sqrt(variance)</ipy:Script>
+      </Expression>
+    </Nodes>
+    <Edges>
+      <Edge From="0" To="1" Label="Source1" />
+      <Edge From="2" To="3" Label="Source1" />
+      <Edge From="3" To="4" Label="Source1" />
+      <Edge From="4" To="5" Label="Source1" />
+      <Edge From="5" To="6" Label="Source1" />
+      <Edge From="6" To="7" Label="Source1" />
+      <Edge From="7" To="8" Label="Source1" />
+    </Edges>
+  </Workflow>
+</WorkflowBuilder>
