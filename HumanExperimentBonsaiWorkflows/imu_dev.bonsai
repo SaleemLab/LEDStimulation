@@ -4,6 +4,7 @@
                  xmlns:port="clr-namespace:Bonsai.IO.Ports;assembly=Bonsai.System"
                  xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
                  xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
+                 xmlns:io="clr-namespace:Bonsai.IO;assembly=Bonsai.System"
                  xmlns:ipy="clr-namespace:Bonsai.Scripting.IronPython;assembly=Bonsai.Scripting.IronPython"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
@@ -14,8 +15,8 @@
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="port:CreateSerialPort">
           <port:Name>ArdIMU</port:Name>
-          <port:PortName>COM7</port:PortName>
-          <port:BaudRate>500000</port:BaudRate>
+          <port:PortName>COM3</port:PortName>
+          <port:BaudRate>115200</port:BaudRate>
           <port:NewLine>\n</port:NewLine>
           <port:Parity>None</port:Parity>
           <port:ParityReplace>63</port:ParityReplace>
@@ -41,27 +42,43 @@
         </Combinator>
       </Expression>
       <Expression xsi:type="scr:ExpressionCondition">
-        <scr:Expression>it.Split(',').Length == 4</scr:Expression>
+        <scr:Expression>it.Split(',').Length == 8</scr:Expression>
       </Expression>
       <Expression xsi:type="scr:ExpressionTransform">
         <scr:Expression>new(
-  Int64.Parse(it.Split(',')[0]) as Timestamp,
-  Double.Parse(it.Split(',')[1]) as AccelX,
-  Double.Parse(it.Split(',')[2]) as AccelY,
-  Double.Parse(it.Split(',')[3]) as AccelZ
+    Int64.Parse(it.Split(',')[0]) as TimeUs,
+    Double.Parse(it.Split(',')[1]) as AccelX,
+    Double.Parse(it.Split(',')[2]) as AccelY,
+    Double.Parse(it.Split(',')[3]) as AccelZ,
+    Double.Parse(it.Split(',')[4]) as QuatI,
+    Double.Parse(it.Split(',')[5]) as QuatJ,
+    Double.Parse(it.Split(',')[6]) as QuatK,
+    Double.Parse(it.Split(',')[7]) as QuatReal
 )</scr:Expression>
       </Expression>
-      <Expression xsi:type="scr:ExpressionTransform">
-        <scr:Expression>Math.Sqrt(it.AccelX*it.AccelX + it.AccelY*it.AccelY + it.AccelZ*it.AccelZ)</scr:Expression>
+      <Expression xsi:type="io:CsvWriter">
+        <io:FileName>imu_test.csv</io:FileName>
+        <io:Append>false</io:Append>
+        <io:Overwrite>false</io:Overwrite>
+        <io:Suffix>Timestamp</io:Suffix>
+        <io:IncludeHeader>true</io:IncludeHeader>
       </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="rx:BufferCount">
-          <rx:Count>100</rx:Count>
-          <rx:Skip>1</rx:Skip>
-        </Combinator>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="scr:ExpressionTransform">
+          <scr:Expression>Math.Sqrt(it.AccelX*it.AccelX + it.AccelY*it.AccelY + it.AccelZ*it.AccelZ)</scr:Expression>
+        </Builder>
       </Expression>
-      <Expression xsi:type="ipy:PythonTransform">
-        <ipy:Script>import math
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="Combinator">
+          <Combinator xsi:type="rx:BufferCount">
+            <rx:Count>100</rx:Count>
+            <rx:Skip>1</rx:Skip>
+          </Combinator>
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="ipy:PythonTransform">
+          <ipy:Script>import math
 
 @returns(float)
 def process(buffer):
@@ -77,6 +94,10 @@ def process(buffer):
     
     # Return the Standard Deviation
     return math.sqrt(variance)</ipy:Script>
+        </Builder>
+      </Expression>
+      <Expression xsi:type="scr:ExpressionTransform">
+        <scr:Expression>Math.Atan2(2.0 * (it.QuatReal * it.QuatK + it.QuatI * it.QuatJ), 1.0 - 2.0 * (it.QuatJ * it.QuatJ + it.QuatK * it.QuatK)) * (180.0 / Math.PI)</scr:Expression>
       </Expression>
     </Nodes>
     <Edges>
@@ -86,7 +107,9 @@ def process(buffer):
       <Edge From="4" To="5" Label="Source1" />
       <Edge From="5" To="6" Label="Source1" />
       <Edge From="6" To="7" Label="Source1" />
+      <Edge From="6" To="10" Label="Source1" />
       <Edge From="7" To="8" Label="Source1" />
+      <Edge From="8" To="9" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>
