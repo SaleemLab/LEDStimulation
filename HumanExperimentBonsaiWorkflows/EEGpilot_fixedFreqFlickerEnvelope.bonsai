@@ -746,7 +746,7 @@
                 <p1:Method>MOCS</p1:Method>
                 <p1:StimulusType>s</p1:StimulusType>
                 <p1:BaseFrequency>120</p1:BaseFrequency>
-                <p1:Duration>4000</p1:Duration>
+                <p1:Duration>2000</p1:Duration>
                 <p1:EnvFrequency>4</p1:EnvFrequency>
                 <p1:ContrastA>1</p1:ContrastA>
                 <p1:ContrastB>1</p1:ContrastB>
@@ -827,7 +827,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:BufferCount">
-                <rx:Count>20</rx:Count>
+                <rx:Count>60</rx:Count>
                 <rx:Skip xsi:nil="true" />
               </Combinator>
             </Expression>
@@ -901,7 +901,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>flickerSweep</Value>
+                <Value>sine</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="ExternalizedMapping">
@@ -909,7 +909,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>laura</Value>
+                <Value>edd</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="ExternalizedMapping">
@@ -1039,7 +1039,7 @@ def generate():
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Timeout">
-                <rx:DueTime>PT4.1S</rx:DueTime>
+                <rx:DueTime>PT2.1S</rx:DueTime>
               </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
@@ -1096,13 +1096,55 @@ def generate():
               </Workflow>
             </Expression>
             <Expression xsi:type="scr:ExpressionTransform">
-              <scr:Expression>String.Format("sfs,9.0,100.0,1.0,2,0,0,{0:0.0},{1:0.0}\n", it.TargetSide == -1 ? 1.0 : 0.0, it.TargetSide == 1 ? 1.0 : 0.0)</scr:Expression>
+              <scr:Expression>it.StimulusType == "s" ? string.Format("s,{0},{1},{2},{3},{4},{5},{6}", it.Duration, it.FreqA, it.FreqB, it.PhaseA, it.PhaseB, it.ContrastA, it.ContrastB) : string.Format("se,{0},{1},{2},{3},{4},{5}", it.Duration, it.FreqA, it.FreqB, it.EnvFrequency, it.ContrastA, it.ContrastB)</scr:Expression>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="port:SerialWriteLine">
                 <port:PortName>ArdPWM</port:PortName>
                 <port:NewLine>\r</port:NewLine>
               </Combinator>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>ClickStartStim</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="FileName" DisplayName="StimStartTone" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="al:AudioReader">
+                      <al:FileName>mixkit-on-or-off-light-switch-tap-2585.wav</al:FileName>
+                      <al:BufferLength>1000</al:BufferLength>
+                      <al:SampleRate>44100</al:SampleRate>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:CombineLatest" />
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item2</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="al:AudioPlayback">
+                      <al:DeviceName>Generic Software on Speakers/Headphones (Realtek(R) Audio)</al:DeviceName>
+                      <al:SampleRate>44100</al:SampleRate>
+                      <al:State>Playing</al:State>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="3" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source2" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                </Edges>
+              </Workflow>
             </Expression>
             <Expression xsi:type="SubscribeSubject">
               <Name>StimEnded</Name>
@@ -1270,52 +1312,7 @@ def generate():
                 </Edges>
               </Workflow>
             </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Zip" />
-            </Expression>
             <Expression xsi:type="WorkflowOutput" />
-            <Expression xsi:type="GroupWorkflow">
-              <Name>ClickStartStim</Name>
-              <Workflow>
-                <Nodes>
-                  <Expression xsi:type="WorkflowInput">
-                    <Name>Source1</Name>
-                  </Expression>
-                  <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="FileName" DisplayName="StimStartTone" />
-                  </Expression>
-                  <Expression xsi:type="Combinator">
-                    <Combinator xsi:type="al:AudioReader">
-                      <al:FileName>mixkit-on-or-off-light-switch-tap-2585.wav</al:FileName>
-                      <al:BufferLength>1000</al:BufferLength>
-                      <al:SampleRate>44100</al:SampleRate>
-                    </Combinator>
-                  </Expression>
-                  <Expression xsi:type="Combinator">
-                    <Combinator xsi:type="rx:CombineLatest" />
-                  </Expression>
-                  <Expression xsi:type="MemberSelector">
-                    <Selector>Item2</Selector>
-                  </Expression>
-                  <Expression xsi:type="Combinator">
-                    <Combinator xsi:type="al:AudioPlayback">
-                      <al:DeviceName>Generic Software on Speakers/Headphones (Realtek(R) Audio)</al:DeviceName>
-                      <al:SampleRate>44100</al:SampleRate>
-                      <al:State>Playing</al:State>
-                    </Combinator>
-                  </Expression>
-                  <Expression xsi:type="WorkflowOutput" />
-                </Nodes>
-                <Edges>
-                  <Edge From="0" To="3" Label="Source1" />
-                  <Edge From="1" To="2" Label="Source1" />
-                  <Edge From="2" To="3" Label="Source2" />
-                  <Edge From="3" To="4" Label="Source1" />
-                  <Edge From="4" To="5" Label="Source1" />
-                  <Edge From="5" To="6" Label="Source1" />
-                </Edges>
-              </Workflow>
-            </Expression>
           </Nodes>
           <Edges>
             <Edge From="0" To="1" Label="Source1" />
@@ -1325,7 +1322,7 @@ def generate():
             <Edge From="4" To="10" Label="Source1" />
             <Edge From="5" To="6" Label="Source1" />
             <Edge From="5" To="15" Label="Source1" />
-            <Edge From="5" To="18" Label="Source1" />
+            <Edge From="5" To="19" Label="Source1" />
             <Edge From="6" To="7" Label="Source1" />
             <Edge From="7" To="8" Label="Source1" />
             <Edge From="8" To="9" Label="Source1" />
@@ -1335,16 +1332,11 @@ def generate():
             <Edge From="12" To="13" Label="Source1" />
             <Edge From="13" To="14" Label="Source1" />
             <Edge From="15" To="16" Label="Source1" />
-            <Edge From="16" To="19" Label="Source1" />
-            <Edge From="16" To="21" Label="Source1" />
-            <Edge From="17" To="18" Label="Source2" />
+            <Edge From="16" To="17" Label="Source1" />
             <Edge From="18" To="19" Label="Source2" />
             <Edge From="19" To="20" Label="Source1" />
           </Edges>
         </Workflow>
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>Item1</Selector>
       </Expression>
       <Expression xsi:type="SubscribeSubject">
         <Name>TrialName</Name>
@@ -1355,7 +1347,7 @@ def generate():
         </PropertyMappings>
       </Expression>
       <Expression xsi:type="io:CsvWriter">
-        <io:FileName>C:\\Data\laura\20260603\flickerSweep_laura_Trial.csv</io:FileName>
+        <io:FileName>C:\\Data\edd\20260603\sine_edd_Trial.csv</io:FileName>
         <io:Append>false</io:Append>
         <io:Overwrite>false</io:Overwrite>
         <io:Suffix>Timestamp</io:Suffix>
@@ -1450,15 +1442,8 @@ def generate():
           </Workflow>
         </Builder>
       </Expression>
-      <Expression xsi:type="Disable">
-        <Builder xsi:type="Combinator">
-          <Combinator xsi:type="rx:WithLatestFrom" />
-        </Builder>
-      </Expression>
-      <Expression xsi:type="Disable">
-        <Builder xsi:type="MemberSelector">
-          <Selector>Item2</Selector>
-        </Builder>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:WithLatestFrom" />
       </Expression>
       <Expression xsi:type="MemberSelector">
         <Selector>Item2</Selector>
@@ -1825,17 +1810,9 @@ def generate():
               <scr:Name>CurrentTrialValues</scr:Name>
               <scr:Expression>String.Format("Context: {0}, Method: {1}, StimType: {2}, TargetSide: {3}, Intensity: {4}Hz, FreqA: {5}Hz, FreqB: {6}Hz, Duration: {7}ms, EnvFreq: {8}Hz, PhaseA: {9}, PhaseB: {10}, ContrastA: {11}, ContrastB: {12}, DiscrimResponse: {13}, DetectResponse: {14}, IsCorrect: {15}", it.OriginalPayload.Context, it.OriginalPayload.Method, it.OriginalPayload.StimulusType, it.OriginalPayload.TargetSide, it.OriginalPayload.Intensity, it.OriginalPayload.FreqA, it.OriginalPayload.FreqB, it.OriginalPayload.Duration, it.OriginalPayload.EnvFrequency, it.OriginalPayload.PhaseA, it.OriginalPayload.PhaseB, it.OriginalPayload.ContrastA, it.OriginalPayload.ContrastB, it.DiscriminationResponse, it.DetectionResponse, it.IsCorrect)</scr:Expression>
             </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="IntProperty">
-                <Value>1</Value>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="rx:Accumulate" />
           </Nodes>
           <Edges>
             <Edge From="1" To="2" Label="Source1" />
-            <Edge From="1" To="3" Label="Source1" />
-            <Edge From="3" To="4" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -1849,16 +1826,14 @@ def generate():
       <Edge From="11" To="13" Label="Source1" />
       <Edge From="12" To="13" Label="Source2" />
       <Edge From="13" To="14" Label="Source1" />
-      <Edge From="14" To="15" Label="Source1" />
-      <Edge From="14" To="22" Label="Source1" />
-      <Edge From="15" To="18" Label="Source1" />
-      <Edge From="16" To="17" Label="Source1" />
-      <Edge From="17" To="18" Label="Source2" />
+      <Edge From="14" To="17" Label="Source1" />
+      <Edge From="15" To="16" Label="Source1" />
+      <Edge From="16" To="17" Label="Source2" />
+      <Edge From="17" To="18" Label="Source1" />
+      <Edge From="17" To="19" Label="Source2" />
       <Edge From="18" To="19" Label="Source1" />
-      <Edge From="18" To="20" Label="Source2" />
       <Edge From="19" To="20" Label="Source1" />
       <Edge From="20" To="21" Label="Source1" />
-      <Edge From="22" To="23" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>

@@ -746,7 +746,7 @@
                 <p1:Method>MOCS</p1:Method>
                 <p1:StimulusType>s</p1:StimulusType>
                 <p1:BaseFrequency>120</p1:BaseFrequency>
-                <p1:Duration>1000</p1:Duration>
+                <p1:Duration>2000</p1:Duration>
                 <p1:EnvFrequency>4</p1:EnvFrequency>
                 <p1:ContrastA>1</p1:ContrastA>
                 <p1:ContrastB>1</p1:ContrastB>
@@ -827,7 +827,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:BufferCount">
-                <rx:Count>1000</rx:Count>
+                <rx:Count>60</rx:Count>
                 <rx:Skip xsi:nil="true" />
               </Combinator>
             </Expression>
@@ -978,7 +978,7 @@ def generate():
       </Expression>
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="rx:Delay">
-          <rx:DueTime>PT1S</rx:DueTime>
+          <rx:DueTime>PT2S</rx:DueTime>
         </Combinator>
       </Expression>
       <Expression xsi:type="rx:SelectMany">

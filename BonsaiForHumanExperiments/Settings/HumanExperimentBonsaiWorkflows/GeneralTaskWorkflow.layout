@@ -3,8 +3,8 @@
   <WindowSettings Index="22">
     <Visible>false</Visible>
     <Location>
-      <X>130</X>
-      <Y>130</Y>
+      <X>156</X>
+      <Y>156</Y>
     </Location>
     <Size>
       <Width>336</Width>
@@ -17,12 +17,12 @@
     <NestedLayout>
       <WindowSettings Index="0">
         <Location>
-          <X>631</X>
-          <Y>27</Y>
+          <X>521</X>
+          <Y>0</Y>
         </Location>
         <Size>
-          <Width>701</Width>
-          <Height>657</Height>
+          <Width>689</Width>
+          <Height>727</Height>
         </Size>
         <VisualizerTypeName>Bonsai.Gui.TableLayoutPanelVisualizer</VisualizerTypeName>
         <VisualizerSettings>
@@ -44,9 +44,9 @@
               <VisualizerSettings>
                 <TimeSeriesVisualizer>
                   <Capacity>640</Capacity>
-                  <Min>9.5</Min>
-                  <Max>10.5</Max>
-                  <AutoScale>true</AutoScale>
+                  <Min>59.745334322704082</Min>
+                  <Max>62.754665677295918</Max>
+                  <AutoScale>false</AutoScale>
                 </TimeSeriesVisualizer>
               </VisualizerSettings>
             </MashupSettings>
@@ -55,8 +55,8 @@
               <VisualizerSettings>
                 <TimeSeriesVisualizer>
                   <Capacity>640</Capacity>
-                  <Min>9.5</Min>
-                  <Max>10.5</Max>
+                  <Min>0</Min>
+                  <Max>1.1</Max>
                   <AutoScale>true</AutoScale>
                 </TimeSeriesVisualizer>
               </VisualizerSettings>
@@ -65,9 +65,9 @@
               <VisualizerTypeName>Bonsai.Gui.ZedGraph.LineGraphVisualizer</VisualizerTypeName>
               <VisualizerSettings>
                 <LineGraphVisualizer>
-                  <Capacity>3</Capacity>
-                  <XMin>30</XMin>
-                  <XMax>90</XMax>
+                  <Capacity>10</Capacity>
+                  <XMin>0</XMin>
+                  <XMax>1</XMax>
                   <YMin>-0.1</YMin>
                   <YMax>1.1</YMax>
                   <AutoScaleX>true</AutoScaleX>
@@ -93,9 +93,9 @@
               <VisualizerTypeName>Bonsai.Gui.ZedGraph.BarGraphVisualizer</VisualizerTypeName>
               <VisualizerSettings>
                 <BarGraphVisualizer>
-                  <Capacity>3</Capacity>
+                  <Capacity>10</Capacity>
                   <Min>0</Min>
-                  <Max>6</Max>
+                  <Max>1.1</Max>
                   <AutoScale>true</AutoScale>
                 </BarGraphVisualizer>
               </VisualizerSettings>
@@ -114,10 +114,25 @@
           </TableLayoutPanelVisualizer>
         </VisualizerSettings>
       </WindowSettings>
+      <WindowSettings Index="1">
+        <Visible>false</Visible>
+        <Location>
+          <X>467</X>
+          <Y>139</Y>
+        </Location>
+        <Size>
+          <Width>336</Width>
+          <Height>125</Height>
+        </Size>
+        <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
+        <VisualizerSettings>
+          <ObjectTextVisualizer />
+        </VisualizerSettings>
+      </WindowSettings>
       <WindowSettings Index="2">
         <Location>
-          <X>151</X>
-          <Y>474</Y>
+          <X>55</X>
+          <Y>361</Y>
         </Location>
         <Size>
           <Width>479</Width>
