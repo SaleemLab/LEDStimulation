@@ -15,7 +15,7 @@
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="port:CreateSerialPort">
           <port:Name>ArdIMU</port:Name>
-          <port:PortName>COM3</port:PortName>
+          <port:PortName>COM9</port:PortName>
           <port:BaudRate>115200</port:BaudRate>
           <port:NewLine>\n</port:NewLine>
           <port:Parity>None</port:Parity>
@@ -57,28 +57,23 @@
 )</scr:Expression>
       </Expression>
       <Expression xsi:type="io:CsvWriter">
-        <io:FileName>imu_test.csv</io:FileName>
+        <io:FileName>imu_walking_test.csv</io:FileName>
         <io:Append>false</io:Append>
         <io:Overwrite>false</io:Overwrite>
         <io:Suffix>Timestamp</io:Suffix>
         <io:IncludeHeader>true</io:IncludeHeader>
       </Expression>
-      <Expression xsi:type="Disable">
-        <Builder xsi:type="scr:ExpressionTransform">
-          <scr:Expression>Math.Sqrt(it.AccelX*it.AccelX + it.AccelY*it.AccelY + it.AccelZ*it.AccelZ)</scr:Expression>
-        </Builder>
+      <Expression xsi:type="scr:ExpressionTransform">
+        <scr:Expression>Math.Sqrt(it.AccelX*it.AccelX + it.AccelY*it.AccelY + it.AccelZ*it.AccelZ)</scr:Expression>
       </Expression>
-      <Expression xsi:type="Disable">
-        <Builder xsi:type="Combinator">
-          <Combinator xsi:type="rx:BufferCount">
-            <rx:Count>100</rx:Count>
-            <rx:Skip>1</rx:Skip>
-          </Combinator>
-        </Builder>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:BufferCount">
+          <rx:Count>100</rx:Count>
+          <rx:Skip>1</rx:Skip>
+        </Combinator>
       </Expression>
-      <Expression xsi:type="Disable">
-        <Builder xsi:type="ipy:PythonTransform">
-          <ipy:Script>import math
+      <Expression xsi:type="ipy:PythonTransform">
+        <ipy:Script>import math
 
 @returns(float)
 def process(buffer):
@@ -94,7 +89,6 @@ def process(buffer):
     
     # Return the Standard Deviation
     return math.sqrt(variance)</ipy:Script>
-        </Builder>
       </Expression>
       <Expression xsi:type="scr:ExpressionTransform">
         <scr:Expression>Math.Atan2(2.0 * (it.QuatReal * it.QuatK + it.QuatI * it.QuatJ), 1.0 - 2.0 * (it.QuatJ * it.QuatJ + it.QuatK * it.QuatK)) * (180.0 / Math.PI)</scr:Expression>
