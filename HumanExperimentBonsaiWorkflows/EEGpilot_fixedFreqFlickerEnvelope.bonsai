@@ -144,7 +144,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="port:CreateSerialPort">
                 <port:Name>ArdPWM</port:Name>
-                <port:PortName>COM6</port:PortName>
+                <port:PortName>COM3</port:PortName>
                 <port:BaudRate>115200</port:BaudRate>
                 <port:NewLine>\r\n</port:NewLine>
                 <port:Parity>None</port:Parity>
@@ -901,7 +901,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>sine</Value>
+                <Value>sineEnvelope</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="ExternalizedMapping">

@@ -144,7 +144,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="port:CreateSerialPort">
                 <port:Name>ArdPWM</port:Name>
-                <port:PortName>COM7</port:PortName>
+                <port:PortName>COM6</port:PortName>
                 <port:BaudRate>115200</port:BaudRate>
                 <port:NewLine>\r\n</port:NewLine>
                 <port:Parity>None</port:Parity>
@@ -742,7 +742,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:CreateTrialPayload">
-                <p1:Context>Staircase</p1:Context>
+                <p1:Context>Standing</p1:Context>
                 <p1:Method>MOCS</p1:Method>
                 <p1:StimulusType>se</p1:StimulusType>
                 <p1:BaseFrequency>200</p1:BaseFrequency>
@@ -861,8 +861,9 @@
         <Workflow>
           <Nodes>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="wie:KeyUp">
-                <wie:Filter>L</wie:Filter>
+              <Combinator xsi:type="wie:KeyDown">
+                <wie:Filter>R</wie:Filter>
+                <wie:SuppressRepetitions>false</wie:SuppressRepetitions>
               </Combinator>
             </Expression>
             <Expression xsi:type="Unit" />
@@ -871,12 +872,32 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="wie:KeyUp">
-                <wie:Filter>A</wie:Filter>
+                <wie:Filter>L</wie:Filter>
               </Combinator>
             </Expression>
             <Expression xsi:type="Unit" />
             <Expression xsi:type="rx:PublishSubject">
               <Name>LeftResponse</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="wie:KeyDown">
+                <wie:Filter>Q</wie:Filter>
+                <wie:SuppressRepetitions>false</wie:SuppressRepetitions>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Unit" />
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>RightNoResponse</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="wie:KeyDown">
+                <wie:Filter>M</wie:Filter>
+                <wie:SuppressRepetitions>false</wie:SuppressRepetitions>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Unit" />
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>LeftNoResponse</Name>
             </Expression>
           </Nodes>
           <Edges>
@@ -884,6 +905,10 @@
             <Edge From="1" To="2" Label="Source1" />
             <Edge From="3" To="4" Label="Source1" />
             <Edge From="4" To="5" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -1163,8 +1188,132 @@ def generate():
                     <Name>GetResponse</Name>
                     <Workflow>
                       <Nodes>
+                        <Expression xsi:type="Disable">
+                          <Builder xsi:type="GroupWorkflow">
+                            <Name>DoubleClickResps</Name>
+                            <Workflow>
+                              <Nodes>
+                                <Expression xsi:type="SubscribeSubject">
+                                  <Name>RightResponse</Name>
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="IntProperty">
+                                    <Value>1</Value>
+                                  </Combinator>
+                                </Expression>
+                                <Expression xsi:type="SubscribeSubject">
+                                  <Name>LeftResponse</Name>
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="IntProperty">
+                                    <Value>-1</Value>
+                                  </Combinator>
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="rx:Amb" />
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="rx:Throttle">
+                                    <rx:DueTime>PT0.25S</rx:DueTime>
+                                  </Combinator>
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="rx:BufferTrigger">
+                                    <rx:Count xsi:nil="true" />
+                                  </Combinator>
+                                </Expression>
+                                <Expression xsi:type="MemberSelector">
+                                  <Selector>Count</Selector>
+                                </Expression>
+                                <Expression xsi:type="rx:Condition">
+                                  <Name>OneClick</Name>
+                                  <Workflow>
+                                    <Nodes>
+                                      <Expression xsi:type="WorkflowInput">
+                                        <Name>Source1</Name>
+                                      </Expression>
+                                      <Expression xsi:type="Equal">
+                                        <Operand xsi:type="IntProperty">
+                                          <Value>1</Value>
+                                        </Operand>
+                                      </Expression>
+                                      <Expression xsi:type="WorkflowOutput" />
+                                    </Nodes>
+                                    <Edges>
+                                      <Edge From="0" To="1" Label="Source1" />
+                                      <Edge From="1" To="2" Label="Source1" />
+                                    </Edges>
+                                  </Workflow>
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="IntProperty">
+                                    <Value>1</Value>
+                                  </Combinator>
+                                </Expression>
+                                <Expression xsi:type="rx:Condition">
+                                  <Name>MoreThanOneClick</Name>
+                                  <Workflow>
+                                    <Nodes>
+                                      <Expression xsi:type="WorkflowInput">
+                                        <Name>Source1</Name>
+                                      </Expression>
+                                      <Expression xsi:type="GreaterThan">
+                                        <Operand xsi:type="IntProperty">
+                                          <Value>1</Value>
+                                        </Operand>
+                                      </Expression>
+                                      <Expression xsi:type="WorkflowOutput" />
+                                    </Nodes>
+                                    <Edges>
+                                      <Edge From="0" To="1" Label="Source1" />
+                                      <Edge From="1" To="2" Label="Source1" />
+                                    </Edges>
+                                  </Workflow>
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="IntProperty">
+                                    <Value>0</Value>
+                                  </Combinator>
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="rx:Merge" />
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="rx:Zip" />
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="rx:First" />
+                                </Expression>
+                                <Expression xsi:type="WorkflowOutput" />
+                              </Nodes>
+                              <Edges>
+                                <Edge From="0" To="1" Label="Source1" />
+                                <Edge From="1" To="4" Label="Source1" />
+                                <Edge From="2" To="3" Label="Source1" />
+                                <Edge From="3" To="4" Label="Source2" />
+                                <Edge From="4" To="5" Label="Source1" />
+                                <Edge From="4" To="6" Label="Source1" />
+                                <Edge From="4" To="13" Label="Source1" />
+                                <Edge From="5" To="6" Label="Source2" />
+                                <Edge From="6" To="7" Label="Source1" />
+                                <Edge From="7" To="8" Label="Source1" />
+                                <Edge From="7" To="10" Label="Source1" />
+                                <Edge From="8" To="9" Label="Source1" />
+                                <Edge From="9" To="12" Label="Source1" />
+                                <Edge From="10" To="11" Label="Source1" />
+                                <Edge From="11" To="12" Label="Source2" />
+                                <Edge From="12" To="13" Label="Source2" />
+                                <Edge From="13" To="14" Label="Source1" />
+                                <Edge From="14" To="15" Label="Source1" />
+                              </Edges>
+                            </Workflow>
+                          </Builder>
+                        </Expression>
                         <Expression xsi:type="SubscribeSubject">
                           <Name>RightResponse</Name>
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="rx:First" />
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="IntProperty">
@@ -1175,6 +1324,9 @@ def generate():
                           <Name>LeftResponse</Name>
                         </Expression>
                         <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="rx:First" />
+                        </Expression>
+                        <Expression xsi:type="Combinator">
                           <Combinator xsi:type="IntProperty">
                             <Value>-1</Value>
                           </Combinator>
@@ -1182,74 +1334,100 @@ def generate():
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="rx:Amb" />
                         </Expression>
-                        <Expression xsi:type="Combinator">
-                          <Combinator xsi:type="rx:Throttle">
-                            <rx:DueTime>PT0.25S</rx:DueTime>
-                          </Combinator>
+                        <Expression xsi:type="scr:ExpressionCondition">
+                          <scr:Name>LeftResp</scr:Name>
+                          <scr:Expression>it==-1</scr:Expression>
                         </Expression>
-                        <Expression xsi:type="Combinator">
-                          <Combinator xsi:type="rx:BufferTrigger">
-                            <rx:Count xsi:nil="true" />
-                          </Combinator>
-                        </Expression>
-                        <Expression xsi:type="MemberSelector">
-                          <Selector>Count</Selector>
-                        </Expression>
-                        <Expression xsi:type="rx:Condition">
-                          <Name>OneClick</Name>
+                        <Expression xsi:type="rx:SelectMany">
+                          <Name>Left Yes/No</Name>
                           <Workflow>
                             <Nodes>
                               <Expression xsi:type="WorkflowInput">
                                 <Name>Source1</Name>
                               </Expression>
-                              <Expression xsi:type="Equal">
-                                <Operand xsi:type="IntProperty">
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>LeftNoResponse</Name>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="IntProperty">
+                                  <Value>0</Value>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>LeftResponse</Name>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="IntProperty">
                                   <Value>1</Value>
-                                </Operand>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Amb" />
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Zip" />
                               </Expression>
                               <Expression xsi:type="WorkflowOutput" />
                             </Nodes>
                             <Edges>
-                              <Edge From="0" To="1" Label="Source1" />
+                              <Edge From="0" To="6" Label="Source1" />
                               <Edge From="1" To="2" Label="Source1" />
+                              <Edge From="2" To="5" Label="Source1" />
+                              <Edge From="3" To="4" Label="Source1" />
+                              <Edge From="4" To="5" Label="Source2" />
+                              <Edge From="5" To="6" Label="Source2" />
+                              <Edge From="6" To="7" Label="Source1" />
                             </Edges>
                           </Workflow>
                         </Expression>
-                        <Expression xsi:type="Combinator">
-                          <Combinator xsi:type="IntProperty">
-                            <Value>1</Value>
-                          </Combinator>
+                        <Expression xsi:type="scr:ExpressionCondition">
+                          <scr:Name>RightResp</scr:Name>
+                          <scr:Expression>it==1</scr:Expression>
                         </Expression>
-                        <Expression xsi:type="rx:Condition">
-                          <Name>MoreThanOneClick</Name>
+                        <Expression xsi:type="rx:SelectMany">
+                          <Name>Right Yes/No</Name>
                           <Workflow>
                             <Nodes>
                               <Expression xsi:type="WorkflowInput">
                                 <Name>Source1</Name>
                               </Expression>
-                              <Expression xsi:type="GreaterThan">
-                                <Operand xsi:type="IntProperty">
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>RightNoResponse</Name>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="IntProperty">
+                                  <Value>0</Value>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>RightResponse</Name>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="IntProperty">
                                   <Value>1</Value>
-                                </Operand>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Amb" />
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Zip" />
                               </Expression>
                               <Expression xsi:type="WorkflowOutput" />
                             </Nodes>
                             <Edges>
-                              <Edge From="0" To="1" Label="Source1" />
+                              <Edge From="0" To="6" Label="Source1" />
                               <Edge From="1" To="2" Label="Source1" />
+                              <Edge From="2" To="5" Label="Source1" />
+                              <Edge From="3" To="4" Label="Source1" />
+                              <Edge From="4" To="5" Label="Source2" />
+                              <Edge From="5" To="6" Label="Source2" />
+                              <Edge From="6" To="7" Label="Source1" />
                             </Edges>
                           </Workflow>
-                        </Expression>
-                        <Expression xsi:type="Combinator">
-                          <Combinator xsi:type="IntProperty">
-                            <Value>0</Value>
-                          </Combinator>
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="rx:Merge" />
-                        </Expression>
-                        <Expression xsi:type="Combinator">
-                          <Combinator xsi:type="rx:Zip" />
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="rx:First" />
@@ -1257,24 +1435,20 @@ def generate():
                         <Expression xsi:type="WorkflowOutput" />
                       </Nodes>
                       <Edges>
-                        <Edge From="0" To="1" Label="Source1" />
-                        <Edge From="1" To="4" Label="Source1" />
+                        <Edge From="1" To="2" Label="Source1" />
                         <Edge From="2" To="3" Label="Source1" />
-                        <Edge From="3" To="4" Label="Source2" />
+                        <Edge From="3" To="7" Label="Source1" />
                         <Edge From="4" To="5" Label="Source1" />
-                        <Edge From="4" To="6" Label="Source1" />
-                        <Edge From="4" To="13" Label="Source1" />
-                        <Edge From="5" To="6" Label="Source2" />
-                        <Edge From="6" To="7" Label="Source1" />
+                        <Edge From="5" To="6" Label="Source1" />
+                        <Edge From="6" To="7" Label="Source2" />
                         <Edge From="7" To="8" Label="Source1" />
                         <Edge From="7" To="10" Label="Source1" />
                         <Edge From="8" To="9" Label="Source1" />
                         <Edge From="9" To="12" Label="Source1" />
                         <Edge From="10" To="11" Label="Source1" />
                         <Edge From="11" To="12" Label="Source2" />
-                        <Edge From="12" To="13" Label="Source2" />
+                        <Edge From="12" To="13" Label="Source1" />
                         <Edge From="13" To="14" Label="Source1" />
-                        <Edge From="14" To="15" Label="Source1" />
                       </Edges>
                     </Workflow>
                   </Expression>
@@ -1347,7 +1521,7 @@ def generate():
         </PropertyMappings>
       </Expression>
       <Expression xsi:type="io:CsvWriter">
-        <io:FileName>C:\\Data\laura\20260603\sine_laura_Trial.csv</io:FileName>
+        <io:FileName>C:\\Data\laura\20260610\sine_laura_Trial.csv</io:FileName>
         <io:Append>false</io:Append>
         <io:Overwrite>false</io:Overwrite>
         <io:Suffix>Timestamp</io:Suffix>
@@ -1566,7 +1740,7 @@ def generate():
                     <zg:SymbolType>Circle</zg:SymbolType>
                     <zg:LineWidth>1</zg:LineWidth>
                     <zg:CurveSettings />
-                    <zg:Capacity>10</zg:Capacity>
+                    <zg:Capacity>3</zg:Capacity>
                     <zg:XMin xsi:nil="true" />
                     <zg:XMax xsi:nil="true" />
                     <zg:YMin>-0.1</zg:YMin>
@@ -1651,7 +1825,7 @@ def generate():
                     <zg:BaseAxis>X</zg:BaseAxis>
                     <zg:BarType>Cluster</zg:BarType>
                     <zg:CurveSettings />
-                    <zg:Capacity>10</zg:Capacity>
+                    <zg:Capacity>3</zg:Capacity>
                     <zg:Min xsi:nil="true" />
                     <zg:Max xsi:nil="true" />
                   </Expression>
