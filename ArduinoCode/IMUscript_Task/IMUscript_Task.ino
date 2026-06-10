@@ -11,8 +11,8 @@
 BNO080 myIMU;
 
 // --- Sync Pin Definitions (Leonardo) ---
-const int stimStatePin = 1;   // Channel 1: Stim ON/OFF
-const int stimChangePin = 0;  // Channel 2: stimChange toggling
+const int stimStatePin = 0;   // Channel 1: Stim ON/OFF
+const int stimChangePin = 1;  // Channel 2: stimChange toggling
 
 // --- Volatile Variables for ISRs ---
 // Declared 'volatile' because they are modified inside an interrupt
