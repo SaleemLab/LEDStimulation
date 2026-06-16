@@ -9,29 +9,57 @@
 #define FADE_LUT_SIZE 64                   // Change this to 64, 128, 256, 512, etc.
 #define FADE_LUT_MAX (FADE_LUT_SIZE - 1)   // Used for safe zero-indexed math
 
-volatile unsigned long printSequenceNum = 0;  // for serial debugging
-
-// 8-Bit Gamma-correction LUTS (Replace with your calibrated 256-item arrays!)
-const uint16_t PROGMEM ChA1LUT[256] = {
-  // ... Paste your 256 8-bit Gamma 2.2 values here (0 to 255) ...
+// --- OPTIMIZATION: 8-Bit PROGMEM Arrays ---
+const uint8_t PROGMEM ChA1LUT[256] = {
+  0, 4, 6, 8, 9, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 23, 
+  24, 25, 26, 27, 28, 29, 30, 31, 32, 34, 35, 36, 37, 38, 39, 40, 
+  41, 42, 43, 44, 45, 46, 47, 48, 50, 51, 52, 53, 54, 55, 56, 57, 
+  58, 59, 60, 61, 62, 63, 64, 65, 67, 68, 69, 70, 71, 72, 73, 74, 
+  75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 
+  91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 105, 105, 106, 
+  107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 
+  123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 
+  139, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 
+  154, 155, 156, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 
+  168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 182, 
+  183, 184, 185, 186, 187, 188, 189, 190, 191, 191, 192, 193, 194, 195, 196, 197, 
+  198, 199, 200, 201, 202, 202, 203, 204, 205, 206, 207, 208, 209, 209, 210, 211, 
+  212, 213, 214, 215, 216, 216, 217, 218, 219, 220, 221, 222, 222, 223, 224, 225, 
+  226, 227, 228, 228, 229, 230, 231, 232, 233, 234, 234, 235, 236, 237, 238, 239, 
+  240, 241, 241, 242, 243, 244, 245, 246, 246, 247, 248, 249, 250, 251, 252, 253
 };
 
-const uint16_t PROGMEM ChA2LUT[256] = {
-  // ... Paste your 256 8-bit Gamma 2.2 values here (0 to 255) ...
+const uint8_t PROGMEM ChB1LUT[256] = {
+  0, 4, 6, 7, 8, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 22, 
+  23, 24, 25, 26, 28, 29, 30, 31, 32, 34, 35, 36, 37, 38, 40, 41, 
+  42, 43, 44, 45, 47, 48, 49, 50, 51, 52, 54, 55, 56, 57, 58, 59, 
+  60, 62, 62, 64, 65, 66, 67, 68, 69, 70, 72, 73, 74, 75, 76, 77, 
+  78, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 91, 92, 93, 94, 95, 
+  96, 97, 98, 99, 100, 101, 102, 104, 105, 106, 107, 108, 109, 110, 111, 112, 
+  113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 
+  129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 
+  145, 146, 147, 148, 149, 150, 151, 151, 152, 153, 154, 155, 156, 157, 158, 159, 
+  160, 161, 162, 163, 164, 164, 165, 166, 167, 168, 169, 170, 171, 171, 172, 173, 
+  174, 175, 176, 177, 178, 179, 180, 181, 181, 182, 183, 184, 185, 186, 187, 188, 
+  188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 200, 201, 202, 
+  203, 204, 204, 205, 206, 207, 208, 209, 210, 210, 211, 212, 213, 214, 215, 215, 
+  216, 217, 218, 219, 220, 221, 222, 222, 223, 224, 225, 226, 226, 227, 228, 229, 
+  230, 230, 231, 232, 233, 234, 234, 235, 236, 237, 237, 238, 239, 240, 240, 241, 
+  242, 242, 243, 244, 244, 245, 246, 246, 247, 248, 249, 249, 250, 251, 252, 253
 };
 
-const uint16_t *currentChALUT;
-const uint16_t *currentChBLUT;
+const uint8_t *currentChALUT;
+const uint8_t *currentChBLUT;
 
 // PWM variables
 long prescaler;
-uint16_t TOP;  // set by the clock
-long TopLumi;  // use to limit max luminance
+uint16_t TOP;  
+long TopLumi;  
 long MidLumi;
 
-// UPDATED: 31.25 kHz to kill saccadic CFF artifacts
+// 31.25 kHz target to kill saccadic CFF artifacts
 long desiredPWMFrequency = 31250;  
-float actualPWMFreq = 31250.0;     // Hardware-accurate frequency for DDS calculations
+float actualPWMFreq = 31249.2;     // Hardware-accurate frequency for DDS calculations
 
 // channel selection
 bool useChA = true;
@@ -41,9 +69,6 @@ bool useChB = true;
 const byte numChars = 50;
 char receivedChars[numChars];  
 bool newData = false;
-
-// stimulus selection char
-char* FirstChar;
 
 // Array to hold the wavetable
 uint16_t sineWaveTable[TABLE_SIZE];
@@ -57,24 +82,31 @@ volatile uint32_t phaseIncrementB = 0;
 volatile uint32_t envAccumulator = 0;
 volatile uint32_t envIncrement = 0;
 
-volatile uint16_t contrastMultIntA = 256;
-volatile uint16_t contrastMultIntB = 256;
-volatile uint16_t contrastMultInt = 0;
+volatile uint16_t contrastMultIntA = 255; // Default scaled to 255 Max
+volatile uint16_t contrastMultIntB = 255;
 
-// FIXED: Upgraded to 32-bit to prevent infinite loop crashes on long stimuli
+// Tracks full sine wave cycles safely up to 4.2 billion
 volatile uint32_t completedCycles = 0; 
 
 // --- Raised Cosine Temporal Window Variables ---
-uint16_t raisedCosineLUT[FADE_LUT_SIZE]; 
-volatile unsigned long currentTick = 0;
+uint8_t raisedCosineLUT[FADE_LUT_SIZE]; // 8-bit array saves memory and fetches faster
+volatile unsigned long currentTick = 0; // The ultimate Master Clock
 volatile unsigned long fadeInterrupts = 0;
 volatile unsigned long fadeOutStartInterrupt = 0;
-volatile uint32_t envStep = 0; // DDS phase step
+volatile uint32_t envStep = 0; 
+
+// OPTIMIZATION: 32-bit addition accumulator to replace heavy multiplication in ISR
+volatile uint32_t fadePhase = 0; 
+
+// --- ATOMIC FLAG FIX FOR ISR STARVATION AND USB BLOCKING ---
+volatile bool stimulusActive = false; 
+volatile unsigned long targetTotalInterrupts = 0; 
 
 // Function to calculate exact DDS phase increment 
 uint32_t calcPhaseInc(float freq) {
-  uint64_t scaledFreq = (uint64_t)(freq * 10000.0); // Safe 200Hz scale
-  return (uint32_t)((scaledFreq * 4294967296ULL) / ((uint64_t)(actualPWMFreq * 10000.0)));
+  // 4294967296.0 / 31250.0 = 137438.953125
+  // This executes instantly and is mathematically exact in IEEE 754.
+  return (uint32_t)(freq * 137438.953125f + 0.5f);
 }
 
 void setup() {
@@ -89,22 +121,18 @@ void setup() {
 
   Serial.begin(115200);
 
-  // set default LUTs
   currentChALUT = ChA1LUT;
-  currentChBLUT = ChA1LUT;
+  currentChBLUT = ChB1LUT;
 
-  // Generate the Modular Raised Cosine Envelope LUT (0 to 256 scale)
+  // Generate the Modular Raised Cosine Envelope LUT (0 to 255 scale)
   for (int i = 0; i < FADE_LUT_SIZE; i++) {
     float angle = PI * (float)i / (float)FADE_LUT_MAX;         
     float val = (1.0 - cos(angle)) / 2.0;        
-    raisedCosineLUT[i] = (uint16_t)(val * 256.0);
-    if (raisedCosineLUT[i] > 256) raisedCosineLUT[i] = 256; 
+    raisedCosineLUT[i] = (uint8_t)(val * 255.0); // Maximum set to 255!
+    if (raisedCosineLUT[i] > 255) raisedCosineLUT[i] = 255; 
   }
 
-  // Constrain the desired PWM frequency
-  desiredPWMFrequency = constrainFrequency(desiredPWMFrequency);
-
-  // Calculate the prescaler and TOP value for the constrained frequency
+  // Calculate the prescaler and TOP value
   TOP = calculatePrescalerAndTOP(desiredPWMFrequency, prescaler);
 
   // Store the exact mathematical frequency the hardware actually achieved for DDS math
@@ -116,14 +144,13 @@ void setup() {
   TopLumi = TOP;  
   MidLumi = TOP / 2;
 
-  // Generate the sine wave LUT based on the Timer1 config and TopLumi
+  // Generate the sine wave LUT
   generateSineWaveTable(TopLumi);
 
   if (useChA) { setChA(TopLumi / 2); }  
   if (useChB) { setChB(TopLumi / 2); }  
 }
 
-// loop runs checking for new serial input
 void loop() {
   GetSerialInput();
   if (newData) {
@@ -161,7 +188,7 @@ void ActionSerial() {
   char *token;
   uint8_t idx = 0;
 #define MAX_VALS 50  
-  char *serialVals[MAX_VALS];
+  char *serialVals[MAX_VALS] = {NULL}; // Safely initialized array
   token = strtok(receivedChars, ",");
 
   while (token != NULL) {
@@ -170,42 +197,31 @@ void ActionSerial() {
     token = strtok(NULL, ",");
   }
 
-  FirstChar = serialVals[0];
+  char *FirstChar = serialVals[0];
 
   if (strcmp(FirstChar, "s") == 0)  
   {
     long stimulusDuration = atof(serialVals[1]);
-    float frequency = atof(serialVals[2]);
-    float phaseA = atof(serialVals[3]);
-    float phaseB = atof(serialVals[4]);
-    float contrastA = atof(serialVals[5]);
-    float contrastB = atof(serialVals[6]);
+    float freqA = atof(serialVals[2]);
+    float freqB = atof(serialVals[3]);
+    float phaseA = atof(serialVals[4]);
+    float phaseB = atof(serialVals[5]);
+    float contrastA = atof(serialVals[6]);
+    float contrastB = atof(serialVals[7]);
 
-    outputSinewave(frequency, stimulusDuration, phaseA, phaseB, contrastA, contrastB);
+    outputSinewave(freqA, freqB, stimulusDuration, phaseA, phaseB, contrastA, contrastB);
 
-  } else if (strcmp(FirstChar, "se") == 0)  
+  } 
+  else if (strcmp(FirstChar, "se") == 0)  
   {
     long stimulusDuration = atof(serialVals[1]);
-    float frequency = atof(serialVals[2]);
-    float envFrequency = atof(serialVals[3]);
-    float maxContrastA = atof(serialVals[4]); 
-    float maxContrastB = atof(serialVals[5]); 
+    float freqA = atof(serialVals[2]);
+    float freqB = atof(serialVals[3]);
+    float envFrequency = atof(serialVals[4]);
+    float maxContrastA = atof(serialVals[5]); 
+    float maxContrastB = atof(serialVals[6]); 
 
-    Serial.println(F("Stim: Sinusoidal env"));
-    Serial.flush();
-    Serial.print(F("Stim duration: "));
-    Serial.println(stimulusDuration);
-    Serial.print(F("Frequency: "));
-    Serial.println(frequency);
-    Serial.print(F("Envelope freq: "));
-    Serial.println(envFrequency);
-    Serial.print(F("Contrast A: "));
-    Serial.println(maxContrastA);
-    Serial.print(F("Contrast B: "));
-    Serial.println(maxContrastB);
-    Serial.flush();
-
-    SineContrastConv(stimulusDuration, frequency, envFrequency, maxContrastA, maxContrastB);
+    SineContrastConv(stimulusDuration, freqA, freqB, envFrequency, maxContrastA, maxContrastB);
 
   } else if (strcmp(FirstChar, "fs") == 0)  
   {
@@ -300,44 +316,46 @@ void ActionSerial() {
 void generateSineWaveTable(long TOP) {
   for (int i = 0; i < TABLE_SIZE; i++) {
     float angle = (2.0 * PI * i) / TABLE_SIZE;                        
-    sineWaveTable[i] = (uint16_t)((sin(angle) + 1.0) * (TOP / 2.0));  
+    sineWaveTable[i] = (uint16_t)(((sin(angle) + 1.0) * (TOP / 2.0)) + 0.5);  
   }
 }
 
-void outputSinewave(float sinewaveFrequency, long duration, float phaseA, float phaseB, float contrastA, float contrastB) {
+void outputSinewave(float freqA, float freqB, long duration, float phaseA, float phaseB, float contrastA, float contrastB) {
 
   phaseAccumulatorA = (uint32_t)(phaseA * 4294967296.0);
   phaseAccumulatorB = (uint32_t)(phaseB * 4294967296.0);
 
-  contrastMultIntA = (uint16_t)(contrastA * 256.0);
-  contrastMultIntB = (uint16_t)(contrastB * 256.0);
+  // OPTIMIZATION: Maxed at 255 to save ISR from 32-bit math
+  contrastMultIntA = (uint16_t)(contrastA * 255.0);
+  contrastMultIntB = (uint16_t)(contrastB * 255.0);
 
-  phaseIncrementA = calcPhaseInc(sinewaveFrequency);
-  phaseIncrementB = phaseIncrementA;
+  phaseIncrementA = calcPhaseInc(freqA);
+  phaseIncrementB = calcPhaseInc(freqB);
 
-  // --- TEMPORAL WINDOW (RAISED COSINE) SETUP ---
-  unsigned long totalInterrupts = (unsigned long)((duration / 1000.0) * actualPWMFreq); 
+  // --- TEMPORAL WINDOW & MASTER CLOCK SETUP ---
+  targetTotalInterrupts = (unsigned long)((duration / 1000.0) * actualPWMFreq); 
   
-  float fadeTimeMs = FADE_DURATION_MS; // Uses the global macro defined at the top
+  float fadeTimeMs = FADE_DURATION_MS; 
   
   if (fadeTimeMs > 0.0) {
     fadeInterrupts = (unsigned long)(actualPWMFreq * (fadeTimeMs / 1000.0));
-    // Safety clamp: if duration is < 200ms, cap fades to half the duration
-    if (fadeInterrupts > totalInterrupts / 2) {
-      fadeInterrupts = totalInterrupts / 2; 
+    if (fadeInterrupts > targetTotalInterrupts / 2) {
+      fadeInterrupts = targetTotalInterrupts / 2; 
     }
-    fadeOutStartInterrupt = totalInterrupts - fadeInterrupts;
+    fadeOutStartInterrupt = targetTotalInterrupts - fadeInterrupts;
     
-    // FIXED: Division rounds UP to mathematically guarantee the fadeout reaches absolute zero
+    // Mathematically forces division to round UP
     envStep = (((uint32_t)FADE_LUT_MAX << 16) + fadeInterrupts - 1) / fadeInterrupts;
   } else {
-    // SAFELY DISABLE ENVELOPE 
     fadeInterrupts = 0;
     fadeOutStartInterrupt = 4294967295UL; 
     envStep = 0;
   }
+  
   currentTick = 0;
-  // -------------------------------------------------
+  completedCycles = 0;
+  fadePhase = 0; // Reset fast 32-bit adder
+  stimulusActive = true; 
 
   if (useChA) { setChA(MidLumi); }
   if (useChB) { setChB(MidLumi); }
@@ -345,28 +363,26 @@ void outputSinewave(float sinewaveFrequency, long duration, float phaseA, float 
   PORTC |= (1 << PORTC6);                     
   PORTD |= (1 << PIND4);                      
 
-  TIMSK0 &= ~_BV(TOIE0); // Disable Timer0 to prevent jitter
+  TIMSK0 &= ~_BV(TOIE0); 
+  UDIEN &= ~(1 << SOFE); // FIX: Disable USB Heartbeat to fix 10.5ms drift
   
   setTimer1Callback(sinewaveInterrupt);
-  startTimer1Interrupt(); // Engage Timer 1 Overflow 
+  startTimer1Interrupt(); 
 
-  // ATOMIC READ: Safely wait for the tick-counter to finish
-  unsigned long safeTick = 0;
-  while (true) {
-    noInterrupts();
-    safeTick = currentTick;
-    interrupts();
-    
-    if (safeTick >= totalInterrupts) break;
-    
-    delayMicroseconds(1);  
+  // FIX: Jitter-free wait loop (No cli() / sei())
+  while (stimulusActive) {
+    // Peacefully idle
   }
 
   stopTimer1Interrupt();    
-  TIMSK0 |= _BV(TOIE0);     // Re-enable Timer0 (millis/micros)
+  TIMSK0 |= _BV(TOIE0);     
+  UDIEN |= (1 << SOFE);  // Re-enable USB Heartbeat
 
   PORTD &= ~(1 << PIND4);   
   PORTC &= ~(1 << PORTC6);  
+  if (useChA) { setChA(TopLumi / 2); }  
+  if (useChB) { setChB(TopLumi / 2); }  
+  delayMicroseconds(2000);
   Serial.print(F("-1\n"));
 
   if (useChA) { setChA(TopLumi / 2); }  
@@ -374,105 +390,106 @@ void outputSinewave(float sinewaveFrequency, long duration, float phaseA, float 
 }
 
 void sinewaveInterrupt() {
-  
-  uint16_t currentEnvelope = 256; 
+  uint8_t currentEnvelope = 255; 
 
   if (currentTick < fadeInterrupts) {
-    uint32_t phase = currentTick * envStep; 
-    uint16_t envIndex = phase >> 16;
+    fadePhase += envStep; 
+    uint16_t envIndex = fadePhase >> 16;
     if (envIndex > FADE_LUT_MAX) envIndex = FADE_LUT_MAX;
     currentEnvelope = raisedCosineLUT[envIndex];
-    
-  } else if (currentTick >= fadeOutStartInterrupt) {
-    uint32_t ticksIntoFadeOut = currentTick - fadeOutStartInterrupt;
-    uint32_t phase = ticksIntoFadeOut * envStep;
-    uint16_t shiftPhase = phase >> 16;
+  } else if (currentTick == fadeOutStartInterrupt) {
+    fadePhase = 0; 
+    currentEnvelope = raisedCosineLUT[FADE_LUT_MAX];
+  } else if (currentTick > fadeOutStartInterrupt) {
+    fadePhase += envStep;
+    uint16_t shiftPhase = fadePhase >> 16;
     uint16_t envIndex = (shiftPhase >= FADE_LUT_MAX) ? 0 : (FADE_LUT_MAX - shiftPhase);
     currentEnvelope = raisedCosineLUT[envIndex];
   }
+  
   currentTick++;
+  if (currentTick >= targetTotalInterrupts) {
+    stimulusActive = false;
+  }
 
-  uint16_t effectiveContrastA = ((uint32_t)contrastMultIntA * currentEnvelope) >> 8;
-  uint16_t effectiveContrastB = ((uint32_t)contrastMultIntB * currentEnvelope) >> 8;
+  // Cast to uint16_t before multiplying to prevent signed integer overflow!
+  uint16_t effectiveContrastA = ((uint16_t)contrastMultIntA * (uint16_t)currentEnvelope) >> 8;
+  uint16_t effectiveContrastB = ((uint16_t)contrastMultIntB * (uint16_t)currentEnvelope) >> 8;
 
   uint32_t oldPhaseA = phaseAccumulatorA;
-  
   phaseAccumulatorA += phaseIncrementA;
   phaseAccumulatorB += phaseIncrementB;
 
   if (phaseAccumulatorA < oldPhaseA) {
-    completedCycles++;          
-    PORTD ^= (1 << PIND4); 
+    completedCycles++;
+    PIND = (1 << PIND4); 
   }
 
-  uint8_t indexA = phaseAccumulatorA >> 24;
-  uint8_t indexB = phaseAccumulatorB >> 24;
+  uint8_t indexA = ((uint8_t*)&phaseAccumulatorA)[3];
+  uint8_t indexB = ((uint8_t*)&phaseAccumulatorB)[3];
 
-  // FIXED: PROGMEM Array Bounds Clamp (Max index 255)
-  long tempA = (long)sineWaveTable[indexA] - MidLumi;
-  long ocrValA_calc = MidLumi + ((tempA * effectiveContrastA) >> 8);
+  // Pure 16-bit math. No software multipliers required.
+  int16_t tempA = (int16_t)sineWaveTable[indexA] - (int16_t)MidLumi;
+  int16_t ocrValA_calc = (int16_t)MidLumi + ((tempA * (int16_t)effectiveContrastA) >> 8);
   if (ocrValA_calc < 0) ocrValA_calc = 0;
   if (ocrValA_calc > 255) ocrValA_calc = 255;
-  uint16_t ocrValA = (uint16_t)ocrValA_calc; 
+  uint8_t ocrValA = (uint8_t)ocrValA_calc; 
   
-  long tempB = (long)sineWaveTable[indexB] - MidLumi;
-  long ocrValB_calc = MidLumi + ((tempB * effectiveContrastB) >> 8);
+  int16_t tempB = (int16_t)sineWaveTable[indexB] - (int16_t)MidLumi;
+  int16_t ocrValB_calc = (int16_t)MidLumi + ((tempB * (int16_t)effectiveContrastB) >> 8);
   if (ocrValB_calc < 0) ocrValB_calc = 0;
   if (ocrValB_calc > 255) ocrValB_calc = 255;
-  uint16_t ocrValB = (uint16_t)ocrValB_calc; 
+  uint8_t ocrValB = (uint8_t)ocrValB_calc;
 
   if (useChA) { setChA(ocrValA); }  
   if (useChB) { setChB(ocrValB); }  
 }
 
 /////////////////////////////////// SINE WAVE FLICKER WITH CONTRAST ENVELOPE (DDS) //////////////////////////
-void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFreq, float maxContrastA, float maxContrastB) {
+void SineContrastConv(float duration, float freqA, float freqB, float envelopeFreq, float maxContrastA, float maxContrastB) {
 
-  contrastMultIntA = (uint16_t)(maxContrastA * 256.0);
-  contrastMultIntB = (uint16_t)(maxContrastB * 256.0);
-  contrastMultInt = 0; 
+  // OPTIMIZATION: Scaled to 255 Max limit
+  contrastMultIntA = (uint16_t)(maxContrastA * 255.0);
+  contrastMultIntB = (uint16_t)(maxContrastB * 255.0);
 
   phaseAccumulatorA = 0;
   phaseAccumulatorB = 0;
-  phaseIncrementA = calcPhaseInc(sinewaveFrequency);
-  phaseIncrementB = phaseIncrementA;
+  phaseIncrementA = calcPhaseInc(freqA);
+  phaseIncrementB = calcPhaseInc(freqB);
 
-  // FIXED: 192/256 equals precisely 270 degrees. Envelope now starts at mathematical zero.
-  envAccumulator = (192UL << 24); 
+  envAccumulator = (192UL << 24); // Start at exactly 270 degrees (Absolute Trough)
   envIncrement = calcPhaseInc(envelopeFreq);
 
-  // Explicitly disable the raised cosine fade for this mode
   fadeInterrupts = 0; 
   fadeOutStartInterrupt = 4294967295UL; 
 
-  long targetCycles = (long)((duration / 1000.0) * sinewaveFrequency);
-  completedCycles = 0; 
+  targetTotalInterrupts = (unsigned long)((duration / 1000.0) * actualPWMFreq);
+  currentTick = 0; 
+  completedCycles = 0;
+  stimulusActive = true;
 
   if (useChA) { setChA(MidLumi); }  
   if (useChB) { setChB(MidLumi); }  
 
   PORTC |= (1 << PORTC6);     
   TIMSK0 &= ~_BV(TOIE0); 
+  UDIEN &= ~(1 << SOFE); // USB Heartbeat disable
   
   setTimer1Callback(sinewaveEnvelopeInterrupt);
   startTimer1Interrupt();
 
-  // FIXED: ATOMIC READ
-  uint32_t safeCycles = 0;
-  while (true) {
-    noInterrupts();
-    safeCycles = completedCycles;
-    interrupts();
-    
-    if (safeCycles >= targetCycles) break;
-    delayMicroseconds(1);  
+  // FIX: Jitter-free wait loop
+  while (stimulusActive) {
+      // Peacefully idle
   }
   
   stopTimer1Interrupt();    
   TIMSK0 |= _BV(TOIE0); 
+  UDIEN |= (1 << SOFE); // USB Heartbeat enable
 
   PORTD &= ~(1 << PIND4);   
   PORTC &= ~(1 << PORTC6);  
+  delayMicroseconds(2000);
   Serial.print(F("-1\n"));
   Serial.flush();
   
@@ -481,7 +498,11 @@ void SineContrastConv(float duration, float sinewaveFrequency, float envelopeFre
 }
 
 void sinewaveEnvelopeInterrupt() {
-  
+  currentTick++;
+  if (currentTick >= targetTotalInterrupts) {
+    stimulusActive = false;
+  }
+
   uint32_t oldPhaseA = phaseAccumulatorA;
   phaseAccumulatorA += phaseIncrementA;
   phaseAccumulatorB += phaseIncrementB;
@@ -494,30 +515,30 @@ void sinewaveEnvelopeInterrupt() {
   envAccumulator += envIncrement;
 
   if (envAccumulator < oldEnvAccumulator) {
-      PORTD ^= (1 << PIND4); // Toggle pin 4 per envelope cycle 
+      PIND = (1 << PIND4); 
   }
 
-  uint8_t indexA = phaseAccumulatorA >> 24;
-  uint8_t indexB = phaseAccumulatorB >> 24;
-  uint8_t indexEnv = envAccumulator >> 24;
+  uint8_t indexA = ((uint8_t*)&phaseAccumulatorA)[3];
+  uint8_t indexB = ((uint8_t*)&phaseAccumulatorB)[3];
+  uint8_t indexEnv = ((uint8_t*)&envAccumulator)[3];
 
-  contrastMultInt = ((unsigned long)sineWaveTable[indexEnv] * 256) / TopLumi;  
+  uint16_t contrastMultInt = sineWaveTable[indexEnv];  
 
-  uint16_t currentContrastIntA = ((uint32_t)contrastMultInt * contrastMultIntA) >> 8;
-  uint16_t currentContrastIntB = ((uint32_t)contrastMultInt * contrastMultIntB) >> 8;
+  // Cast to uint16_t before multiplying to prevent signed integer overflow!
+  uint16_t currentContrastIntA = ((uint16_t)contrastMultInt * (uint16_t)contrastMultIntA) >> 8;
+  uint16_t currentContrastIntB = ((uint16_t)contrastMultInt * (uint16_t)contrastMultIntB) >> 8;
 
-  // FIXED: PROGMEM Array Bounds Clamp (Max index 255)
-  long tempA = (long)sineWaveTable[indexA] - MidLumi;
-  long ocrValA_calc = MidLumi + ((tempA * currentContrastIntA) >> 8);
+  int16_t tempA = (int16_t)sineWaveTable[indexA] - (int16_t)MidLumi;
+  int16_t ocrValA_calc = (int16_t)MidLumi + ((tempA * (int16_t)currentContrastIntA) >> 8);
   if (ocrValA_calc < 0) ocrValA_calc = 0;
   if (ocrValA_calc > 255) ocrValA_calc = 255;
-  uint16_t ocrValA = (uint16_t)ocrValA_calc;
+  uint8_t ocrValA = (uint8_t)ocrValA_calc; 
 
-  long tempB = (long)sineWaveTable[indexB] - MidLumi;
-  long ocrValB_calc = MidLumi + ((tempB * currentContrastIntB) >> 8);
+  int16_t tempB = (int16_t)sineWaveTable[indexB] - (int16_t)MidLumi;
+  int16_t ocrValB_calc = (int16_t)MidLumi + ((tempB * (int16_t)currentContrastIntB) >> 8);
   if (ocrValB_calc < 0) ocrValB_calc = 0;
   if (ocrValB_calc > 255) ocrValB_calc = 255;
-  uint16_t ocrValB = (uint16_t)ocrValB_calc; 
+  uint8_t ocrValB = (uint8_t)ocrValB_calc; 
 
   if (useChA) { setChA(ocrValA); }  
   if (useChB) { setChB(ocrValB); }  
@@ -529,12 +550,12 @@ void SteppedFrequencySweep(float startFreq, float endFreq, float stepFreq, int c
 
   phaseAccumulatorA = (uint32_t)(phaseA * 4294967296.0);
   phaseAccumulatorB = (uint32_t)(phaseB * 4294967296.0);
-  contrastMultIntA = (uint16_t)(contrastA * 256.0);
-  contrastMultIntB = (uint16_t)(contrastB * 256.0);
+  contrastMultIntA = (uint16_t)(contrastA * 255.0);
+  contrastMultIntB = (uint16_t)(contrastB * 255.0);
 
-  // Disable the fade for sweeps
   fadeInterrupts = 0; 
   fadeOutStartInterrupt = 4294967295UL; 
+  fadePhase = 0; 
 
   PORTC |= (1 << PORTC6);  
   PORTD |= (1 << PIND4);   
@@ -549,6 +570,7 @@ void SteppedFrequencySweep(float startFreq, float endFreq, float stepFreq, int c
   setTimer1Callback(sinewaveInterrupt);
   
   TIMSK0 &= ~_BV(TOIE0); 
+  UDIEN &= ~(1 << SOFE); // Disable USB Heartbeat
   startTimer1Interrupt();
 
   while ((sweepingUp && currentFreq <= endFreq) || (!sweepingUp && currentFreq >= endFreq)) {
@@ -556,20 +578,24 @@ void SteppedFrequencySweep(float startFreq, float endFreq, float stepFreq, int c
     uint32_t newInc = calcPhaseInc(currentFreq);
     noInterrupts(); 
     phaseIncrementA = newInc;
-    phaseIncrementB = newInc;
+    phaseIncrementB = newInc; 
     interrupts();
     
-    completedCycles = 0; 
+    uint32_t startCycles1, startCycles2;
+    // Lock-free double read logic
+    do {
+      startCycles1 = completedCycles;
+      startCycles2 = completedCycles;
+    } while (startCycles1 != startCycles2);
     
-    // FIXED: ATOMIC READ
-    uint32_t safeCycles = 0;
+    uint32_t safeCycles1, safeCycles2;
     while (true) {
-      noInterrupts();
-      safeCycles = completedCycles;
-      interrupts();
+      do {
+        safeCycles1 = completedCycles;
+        safeCycles2 = completedCycles;
+      } while (safeCycles1 != safeCycles2);
       
-      if (safeCycles >= cyclesPerFreq) break;
-      delayMicroseconds(1); 
+      if ((safeCycles1 - startCycles1) >= (uint32_t)cyclesPerFreq) break;
     }
 
     if (sweepingUp) {
@@ -581,9 +607,11 @@ void SteppedFrequencySweep(float startFreq, float endFreq, float stepFreq, int c
 
   stopTimer1Interrupt();
   TIMSK0 |= _BV(TOIE0); 
+  UDIEN |= (1 << SOFE);  // Re-enable USB
   
   PORTD &= ~(1 << PIND4);   
   PORTC &= ~(1 << PORTC6);  
+  delayMicroseconds(2000);
   Serial.print(F("-1\n"));
 
   if (useChA) { setChA(TopLumi / 2); } 
@@ -604,91 +632,68 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
 
   phaseAccumulatorA = (uint32_t)(phaseA * 4294967296.0);
   phaseAccumulatorB = (uint32_t)(phaseB * 4294967296.0);
-  contrastMultIntA = (uint16_t)(contrastA * 256.0);
-  contrastMultIntB = (uint16_t)(contrastB * 256.0);
+  contrastMultIntA = (uint16_t)(contrastA * 255.0);
+  contrastMultIntB = (uint16_t)(contrastB * 255.0);
 
-  // Disable fade for sweeps
   fadeInterrupts = 0; 
   fadeOutStartInterrupt = 4294967295UL;
+  fadePhase = 0;
 
   unsigned long totalDurationUs = 0;
-  unsigned long timeForOneWaySweepUs = 0;
   bool isSweeping = false;
-
-  const float dt_sec_step = (float)TARGET_RECONFIG_INTERVAL_US / 1000000.0f;
-  float step_mult_change_factor = 0.0f;  
 
   if (sweepFactorPerSec > 0.000001f && fmax > fmin && (fmax / fmin) > 1.000001f) {
     float timeForOneWaySweepSec_calc = log(fmax / fmin) / sweepFactorPerSec;
 
     if (timeForOneWaySweepSec_calc > 0.0000001f) {
       isSweeping = true;
-      timeForOneWaySweepUs = (unsigned long)(timeForOneWaySweepSec_calc * 1000000.0f);
-      totalDurationUs = 2 * timeForOneWaySweepUs;
-      step_mult_change_factor = sweepFactorPerSec * dt_sec_step; 
-
-      if (totalDurationUs == 0 && timeForOneWaySweepSec_calc > 0.0000001f) {
-        totalDurationUs = 2;  
-        if (timeForOneWaySweepUs == 0) timeForOneWaySweepUs = 1;
-      } else if (totalDurationUs == 0) {
-        isSweeping = false;
-      }
-    } else {
-      isSweeping = false;  
-    }
+      totalDurationUs = 2UL * (unsigned long)(timeForOneWaySweepSec_calc * 1000000.0f);
+    } 
   }
 
-  if (!isSweeping) {
+  if (!isSweeping || totalDurationUs == 0) {
     totalDurationUs = TARGET_RECONFIG_INTERVAL_US;
-    timeForOneWaySweepUs = totalDurationUs / 2;  
-  }
-
-  if (totalDurationUs == 0) {
-    totalDurationUs = TARGET_RECONFIG_INTERVAL_US;
-    timeForOneWaySweepUs = totalDurationUs / 2;
     isSweeping = false;
   }
 
   float actual_calc_freq = fmin;       
-  bool sweeping_up = true;             
-  bool just_switched_to_down = false;  
 
-  float currentSinewaveFrequency = actual_calc_freq;
-  if (currentSinewaveFrequency > fmax) currentSinewaveFrequency = fmax;
-  if (currentSinewaveFrequency < fmin) currentSinewaveFrequency = fmin;
-  if (currentSinewaveFrequency <= 0.0f) currentSinewaveFrequency = 0.0001f;
-
-  phaseIncrementA = calcPhaseInc(currentSinewaveFrequency);
+  phaseIncrementA = calcPhaseInc(actual_calc_freq);
   phaseIncrementB = phaseIncrementA;
 
   PORTC |= (1 << PORTC6);  
   PORTD |= (1 << PIND4);   
   
   TIMSK0 &= ~_BV(TOIE0); 
+  UDIEN &= ~(1 << SOFE); // Disable USB
+  
+  unsigned long totalInterrupts = (unsigned long)((totalDurationUs / 1000000.0) * actualPWMFreq);
+  currentTick = 0;
+  completedCycles = 0;
+  
   setTimer1Callback(sinewaveInterrupt);
   startTimer1Interrupt();
 
-  long targetCycles = (long)((totalDurationUs / 1000000.0) * ((fmax+fmin)/2.0));
-  completedCycles = 0;
-
-  // FIXED: ATOMIC READ
-  uint32_t safeCycles = 0;
+  unsigned long safeTick1, safeTick2;
+  float sweepStepMultiplier = exp(sweepFactorPerSec * (TARGET_RECONFIG_INTERVAL_US / 1000000.0));
   
   while (true) {
-      noInterrupts();
-      safeCycles = completedCycles;
-      interrupts();
+      // Lock-free atomic double read
+      do {
+        safeTick1 = currentTick;
+        safeTick2 = currentTick;
+      } while (safeTick1 != safeTick2);
       
-      if (safeCycles >= targetCycles) break;
+      if (safeTick1 >= totalInterrupts) break;
     
-    float sweepProgress = (float)safeCycles / (float)targetCycles;
+    float sweepProgress = (float)safeTick1 / (float)totalInterrupts;
     
     if (isSweeping) {
       if (sweepProgress < 0.5) {  
-        actual_calc_freq = fmin * exp(sweepFactorPerSec * (sweepProgress * totalDurationUs / 1000000.0));
+        actual_calc_freq *= sweepStepMultiplier; 
         if (actual_calc_freq > fmax) actual_calc_freq = fmax;
       } else {                    
-        actual_calc_freq = fmax * exp(-sweepFactorPerSec * ((sweepProgress - 0.5) * totalDurationUs / 1000000.0));
+        actual_calc_freq /= sweepStepMultiplier;
         if (actual_calc_freq < fmin) actual_calc_freq = fmin;
       }
       
@@ -704,9 +709,11 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
 
   stopTimer1Interrupt(); 
   TIMSK0 |= _BV(TOIE0); 
+  UDIEN |= (1 << SOFE); // Re-enable USB
      
   PORTD &= ~(1 << PIND4);   
   PORTC &= ~(1 << PORTC6);  
+  delayMicroseconds(2000);
   Serial.print(F("-1\n"));
 
   if (useChA) { setChA(TopLumi / 2); }  
@@ -715,12 +722,12 @@ void FrequencySweep(float fmin, float fmax, float sweepFactorPerSec,
 
 /////////////////////////////////// SOME GENERIC PWM FUNCTIONS ///////////////////////////////////////////
 
-void setChA(uint16_t ocrValue) {
-  OCR1A = pgm_read_word_near(currentChALUT + ocrValue);
+__attribute__((always_inline)) inline void setChA(uint8_t ocrValue) {
+  OCR1A = pgm_read_byte_near(currentChALUT + ocrValue);
 }
 
-void setChB(uint16_t ocrValue) {
-  OCR1B = pgm_read_word_near(currentChBLUT + ocrValue);
+__attribute__((always_inline)) inline void setChB(uint8_t ocrValue) {
+  OCR1B = pgm_read_byte_near(currentChBLUT + ocrValue);
 }
 
 void setDutyCycle(float dutyCyclePercentage_A, float dutyCyclePercentage_B, long TopLumi) {
@@ -732,7 +739,7 @@ void setDutyCycle(float dutyCyclePercentage_A, float dutyCyclePercentage_B, long
   if (dutyCyclePercentage_B > 100.0) { dutyCyclePercentage_B = 100.0; }
   uint16_t ocrValueB = (long)((dutyCyclePercentage_B / 100.0) * TopLumi);
 
-  PORTD ^= (1 << PIND4);  
+  PIND = (1 << PIND4);  
   setChA(ocrValueA);
   setChB(ocrValueB);
 }
@@ -756,6 +763,7 @@ void setDutyCycleTime(float dutyCyclePercentage_A, float dutyCyclePercentage_B, 
   }
   PORTD &= ~(1 << PIND4);   
   PORTC &= ~(1 << PORTC6);  
+  delayMicroseconds(2000);
   Serial.print(F("-1\n"));
   Serial.flush();
   if (useChA) { setChA(TopLumi / 2); }  
@@ -763,9 +771,8 @@ void setDutyCycleTime(float dutyCyclePercentage_A, float dutyCyclePercentage_B, 
 }
 
 void cycleDutyCycles(float stepSize, float waitTime, int nReps, long TopLumi) {
-  float dutyCycle = 0;
-
   for (int irep = 0; irep < nReps; irep++) {
+    float dutyCycle = 0;
     while (dutyCycle <= 1) {
       Serial.print(dutyCycle);
       Serial.print(F("\n"));
@@ -776,6 +783,7 @@ void cycleDutyCycles(float stepSize, float waitTime, int nReps, long TopLumi) {
       delay(waitTime);
     }
   }
+  delayMicroseconds(2000);
   Serial.print(F("-1\n"));
   if (useChA) { setChA(TopLumi / 2); }  
   if (useChB) { setChB(TopLumi / 2); }  
@@ -830,7 +838,7 @@ long calculatePrescalerAndTOP(long desiredFrequency, long &prescaler) {
 
   for (int i = 0; i < 5; i++) {
     long currentPrescaler = possiblePrescalers[i];
-    long calculatedTOP = (CLOCK_FREQ / (2 * currentPrescaler * desiredFrequency)) - 1;
+    long calculatedTOP = (CLOCK_FREQ / (2 * currentPrescaler * desiredFrequency));
 
     if (calculatedTOP >= 0 && calculatedTOP <= 65535) {
       prescaler = currentPrescaler;
@@ -875,10 +883,6 @@ void configureTimer1(long prescaler, long TOP) {
   ICR1 = TOP;
 }
 
-long constrainFrequency(long frequency) {
-  return frequency - (frequency % TABLE_SIZE);
-}
-
 ////////////////////////////// Timer 1 Overflow Interrupt control /////////////////////////////////
 
 void (*timer1Callback)() = nullptr;  
@@ -888,15 +892,14 @@ void setTimer1Callback(void (*callback)()) {
 }
 
 void startTimer1Interrupt() {
-  TIFR1 |= (1 << TOV1);     // Clear any pending overflow flag
-  TIMSK1 |= (1 << TOIE1);   // Enable Timer 1 Overflow Interrupt
+  TIFR1 |= (1 << TOV1);     
+  TIMSK1 |= (1 << TOIE1);   
 }
 
 void stopTimer1Interrupt() {
-  TIMSK1 &= ~(1 << TOIE1);  // Disable Timer 1 Overflow Interrupt
+  TIMSK1 &= ~(1 << TOIE1);  
 }
 
-// ISR for Timer 1 Overflow - This triggers at the exact "BOTTOM" of the PWM cycle.
 ISR(TIMER1_OVF_vect) {
   if (timer1Callback) {
     timer1Callback();  
