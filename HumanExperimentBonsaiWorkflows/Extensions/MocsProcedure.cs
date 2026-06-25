@@ -5,8 +5,8 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using Bonsai;
 
-[Description("Method of Constant Stimuli (MOCS) generator. Outputs randomized Tuple (Intensity as Item1, Side as Item2).")]
-public class MocsProcedure : Transform<object, Tuple<double, int>>
+[Description("Method of Constant Stimuli (MOCS) generator. Outputs Tuple (Item1: Intensity, Item2: Side, Item3: CurrentBlock, Item4: IsLastTrial).")]
+public class MocsProcedure : Transform<object, Tuple<double, int, int, bool>>
 {
     public MocsProcedure()
     {
@@ -21,17 +21,21 @@ public class MocsProcedure : Transform<object, Tuple<double, int>>
     [Description("How many times each intensity (paired with a Left and Right) is placed in the bucket before reshuffling.")]
     public int Repetitions { get; set; }
 
-    public override IObservable<Tuple<double, int>> Process(IObservable<object> source)
+    public override IObservable<Tuple<double, int, int, bool>> Process(IObservable<object> source)
     {
         return Observable.Defer(() => {
             Random rng = new Random();
             
+            // The queue only needs to store the Intensity and Side internally
             List<Tuple<double, int>> trialQueue = new List<Tuple<double, int>>();
+            int currentBlock = 0; // Tracks the current block number
 
             // Helper function to refill, shuffle, and pop the next trial
-            Func<Tuple<double, int>> getNext = () => {
+            Func<Tuple<double, int, int, bool>> getNext = () => {
                 if (trialQueue.Count == 0)
                 {
+                    currentBlock++; // Increment to next block (starts at 1 on first refill)
+
                     // Safety check: Prevent crash if user types 0
                     int safeReps = Repetitions <= 0 ? 1 : Repetitions;
 
@@ -57,13 +61,17 @@ public class MocsProcedure : Transform<object, Tuple<double, int>>
                 }
 
                 // Pop the last value
-                Tuple<double, int> nextTrial = trialQueue[trialQueue.Count - 1];
+                Tuple<double, int> nextStim = trialQueue[trialQueue.Count - 1];
                 trialQueue.RemoveAt(trialQueue.Count - 1);
-                return nextTrial;
+                
+                // Check if this was the last trial in the block
+                bool isLastTrial = (trialQueue.Count == 0);
+
+                return Tuple.Create(nextStim.Item1, nextStim.Item2, currentBlock, isLastTrial);
             };
 
             // Generate the very first value at t=0
-            Tuple<double, int> initialTrial = getNext();
+            Tuple<double, int, int, bool> initialTrial = getNext();
 
             // Return the stream, starting with the initial value
             return source.Select(_ => getNext())

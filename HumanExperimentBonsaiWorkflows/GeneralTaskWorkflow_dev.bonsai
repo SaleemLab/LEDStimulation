@@ -194,6 +194,7 @@
         <Property Name="MaxIntensity" Category="Staircase" />
         <Property Name="CorrectRule" Category="Staircase" />
         <Property Name="IncorrectRule" Category="Staircase" />
+        <Property Name="AlternateStatesEveryNBlocks" />
       </Expression>
       <Expression xsi:type="GroupWorkflow">
         <Name>TrialManager</Name>
@@ -276,7 +277,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:MocsProcedure">
                 <p1:Intensities>
-                  <p1:double>20</p1:double>
+                  <p1:double>10</p1:double>
                 </p1:Intensities>
                 <p1:Repetitions>1</p1:Repetitions>
               </Combinator>
@@ -294,13 +295,135 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:MocsProcedure">
                 <p1:Intensities>
-                  <p1:double>20</p1:double>
+                  <p1:double>10</p1:double>
                 </p1:Intensities>
                 <p1:Repetitions>1</p1:Repetitions>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
               <Name>MOCS_Walking</Name>
+            </Expression>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="AlternateStatesEveryNBlocks" />
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>UpdateContext</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source2</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item3</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:BehaviorSubject">
+                    <Name>WalkingBlockCount</Name>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="Value" DisplayName="AlternateStatesEveryNBlocks" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="IntProperty">
+                      <Value>2</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:CombineLatest" />
+                  </Expression>
+                  <Expression xsi:type="Mod" />
+                  <Expression xsi:type="scr:ExpressionCondition">
+                    <scr:Expression>it==0</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item4</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionCondition">
+                    <scr:Expression>it.Item2</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="StringProperty">
+                      <Value>Standing</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item3</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:BehaviorSubject">
+                    <Name>StandingBlockCount</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:CombineLatest" />
+                  </Expression>
+                  <Expression xsi:type="Mod" />
+                  <Expression xsi:type="scr:ExpressionCondition">
+                    <scr:Expression>it==0</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item4</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionCondition">
+                    <scr:Expression>it.Item2</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="StringProperty">
+                      <Value>Walking</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Merge" />
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>TrialCompleted</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Sample" />
+                  </Expression>
+                  <Expression xsi:type="MulticastSubject">
+                    <Name>Context</Name>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="0" To="8" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="5" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source2" />
+                  <Edge From="4" To="15" Label="Source2" />
+                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="6" To="7" Label="Source1" />
+                  <Edge From="7" To="9" Label="Source1" />
+                  <Edge From="8" To="9" Label="Source2" />
+                  <Edge From="9" To="10" Label="Source1" />
+                  <Edge From="10" To="11" Label="Source1" />
+                  <Edge From="11" To="22" Label="Source1" />
+                  <Edge From="12" To="13" Label="Source1" />
+                  <Edge From="12" To="18" Label="Source1" />
+                  <Edge From="13" To="14" Label="Source1" />
+                  <Edge From="14" To="15" Label="Source1" />
+                  <Edge From="15" To="16" Label="Source1" />
+                  <Edge From="16" To="17" Label="Source1" />
+                  <Edge From="17" To="19" Label="Source1" />
+                  <Edge From="18" To="19" Label="Source2" />
+                  <Edge From="19" To="20" Label="Source1" />
+                  <Edge From="20" To="21" Label="Source1" />
+                  <Edge From="21" To="22" Label="Source2" />
+                  <Edge From="22" To="24" Label="Source1" />
+                  <Edge From="23" To="24" Label="Source2" />
+                  <Edge From="24" To="25" Label="Source1" />
+                  <Edge From="25" To="26" Label="Source1" />
+                </Edges>
+              </Workflow>
             </Expression>
           </Nodes>
           <Edges>
@@ -321,9 +444,12 @@
             <Edge From="14" To="15" Label="Source3" />
             <Edge From="14" To="19" Label="Source3" />
             <Edge From="15" To="16" Label="Source1" />
+            <Edge From="15" To="22" Label="Source1" />
             <Edge From="17" To="18" Label="Source1" />
             <Edge From="18" To="19" Label="Source1" />
             <Edge From="19" To="20" Label="Source1" />
+            <Edge From="19" To="22" Label="Source2" />
+            <Edge From="21" To="22" Label="Source3" />
           </Edges>
         </Workflow>
       </Expression>
@@ -716,6 +842,15 @@
                 </Edges>
               </Workflow>
             </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item1</Selector>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Zip" />
+            </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Merge" />
             </Expression>
@@ -744,7 +879,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:CreateTrialPayload">
-                <p1:Context>Standing</p1:Context>
+                <p1:Context>Walking</p1:Context>
                 <p1:Method>MOCS</p1:Method>
                 <p1:StimulusType>s</p1:StimulusType>
                 <p1:BaseFrequency>200</p1:BaseFrequency>
@@ -770,17 +905,21 @@
             <Edge From="7" To="8" Label="Source1" />
             <Edge From="7" To="10" Label="Source1" />
             <Edge From="8" To="9" Label="Source1" />
-            <Edge From="9" To="12" Label="Source1" />
+            <Edge From="9" To="15" Label="Source1" />
             <Edge From="10" To="11" Label="Source1" />
-            <Edge From="11" To="12" Label="Source2" />
-            <Edge From="12" To="18" Label="Source1" />
-            <Edge From="13" To="15" Label="Source1" />
+            <Edge From="11" To="12" Label="Source1" />
+            <Edge From="11" To="13" Label="Source1" />
+            <Edge From="12" To="14" Label="Source1" />
+            <Edge From="13" To="14" Label="Source2" />
             <Edge From="14" To="15" Label="Source2" />
-            <Edge From="15" To="16" Label="Source1" />
-            <Edge From="16" To="18" Label="Source2" />
-            <Edge From="17" To="18" Label="Source3" />
+            <Edge From="15" To="21" Label="Source1" />
+            <Edge From="16" To="18" Label="Source1" />
+            <Edge From="17" To="18" Label="Source2" />
             <Edge From="18" To="19" Label="Source1" />
-            <Edge From="19" To="20" Label="Source1" />
+            <Edge From="19" To="21" Label="Source2" />
+            <Edge From="20" To="21" Label="Source3" />
+            <Edge From="21" To="22" Label="Source1" />
+            <Edge From="22" To="23" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -1920,7 +2059,7 @@ def generate():
                     <zg:SymbolType>Circle</zg:SymbolType>
                     <zg:LineWidth>1</zg:LineWidth>
                     <zg:CurveSettings />
-                    <zg:Capacity>5</zg:Capacity>
+                    <zg:Capacity>1</zg:Capacity>
                     <zg:XMin xsi:nil="true" />
                     <zg:XMax xsi:nil="true" />
                     <zg:YMin>-0.1</zg:YMin>
@@ -1996,7 +2135,7 @@ def generate():
                     <zg:BaseAxis>X</zg:BaseAxis>
                     <zg:BarType>Cluster</zg:BarType>
                     <zg:CurveSettings />
-                    <zg:Capacity xsi:nil="true" />
+                    <zg:Capacity>1</zg:Capacity>
                     <zg:Min xsi:nil="true" />
                     <zg:Max xsi:nil="true" />
                   </Expression>
