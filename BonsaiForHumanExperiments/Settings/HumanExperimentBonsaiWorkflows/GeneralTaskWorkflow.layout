@@ -175,11 +175,11 @@
     <NestedLayout>
       <WindowSettings Index="0">
         <Location>
-          <X>605</X>
-          <Y>15</Y>
+          <X>543</X>
+          <Y>37</Y>
         </Location>
         <Size>
-          <Width>689</Width>
+          <Width>607</Width>
           <Height>727</Height>
         </Size>
         <VisualizerTypeName>Bonsai.Gui.TableLayoutPanelVisualizer</VisualizerTypeName>
@@ -202,9 +202,9 @@
               <VisualizerSettings>
                 <TimeSeriesVisualizer>
                   <Capacity>640</Capacity>
-                  <Min>59.745334322704082</Min>
-                  <Max>62.754665677295918</Max>
-                  <AutoScale>false</AutoScale>
+                  <Min>57</Min>
+                  <Max>63</Max>
+                  <AutoScale>true</AutoScale>
                 </TimeSeriesVisualizer>
               </VisualizerSettings>
             </MashupSettings>
@@ -223,9 +223,9 @@
               <VisualizerTypeName>Bonsai.Gui.ZedGraph.LineGraphVisualizer</VisualizerTypeName>
               <VisualizerSettings>
                 <LineGraphVisualizer>
-                  <Capacity>3</Capacity>
-                  <XMin>38</XMin>
-                  <XMax>42</XMax>
+                  <Capacity>10</Capacity>
+                  <XMin>60</XMin>
+                  <XMax>200</XMax>
                   <YMin>-0.1</YMin>
                   <YMax>1.1</YMax>
                   <AutoScaleX>true</AutoScaleX>
@@ -251,9 +251,9 @@
               <VisualizerTypeName>Bonsai.Gui.ZedGraph.BarGraphVisualizer</VisualizerTypeName>
               <VisualizerSettings>
                 <BarGraphVisualizer>
-                  <Capacity>3</Capacity>
+                  <Capacity>10</Capacity>
                   <Min>0</Min>
-                  <Max>1.1</Max>
+                  <Max>35</Max>
                   <AutoScale>true</AutoScale>
                 </BarGraphVisualizer>
               </VisualizerSettings>
@@ -289,12 +289,12 @@
       </WindowSettings>
       <WindowSettings Index="2">
         <Location>
-          <X>35</X>
-          <Y>429</Y>
+          <X>-42</X>
+          <Y>163</Y>
         </Location>
         <Size>
-          <Width>525</Width>
-          <Height>234</Height>
+          <Width>548</Width>
+          <Height>258</Height>
         </Size>
         <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
         <VisualizerSettings>
@@ -303,12 +303,12 @@
       </WindowSettings>
       <WindowSettings Index="3">
         <Location>
-          <X>20</X>
-          <Y>156</Y>
+          <X>83</X>
+          <Y>205</Y>
         </Location>
         <Size>
-          <Width>571</Width>
-          <Height>239</Height>
+          <Width>485</Width>
+          <Height>82</Height>
         </Size>
         <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
         <VisualizerSettings>

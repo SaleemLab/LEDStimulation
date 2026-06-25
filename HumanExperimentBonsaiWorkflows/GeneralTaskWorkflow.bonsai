@@ -40,7 +40,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>MOCS</Value>
+                <Value>Staicase</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
@@ -220,9 +220,8 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:StaircaseProcedure">
-                <p1:InitialIntensity>60</p1:InitialIntensity>
+                <p1:InitialIntensity>40</p1:InitialIntensity>
                 <p1:StepSizes>
-                  <p1:double>5</p1:double>
                   <p1:double>2</p1:double>
                 </p1:StepSizes>
                 <p1:MovingAverageWindow>8</p1:MovingAverageWindow>
@@ -247,9 +246,8 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:StaircaseProcedure">
-                <p1:InitialIntensity>60</p1:InitialIntensity>
+                <p1:InitialIntensity>40</p1:InitialIntensity>
                 <p1:StepSizes>
-                  <p1:double>5</p1:double>
                   <p1:double>2</p1:double>
                 </p1:StepSizes>
                 <p1:MovingAverageWindow>8</p1:MovingAverageWindow>
@@ -278,9 +276,17 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:MocsProcedure">
                 <p1:Intensities>
-                  <p1:double>20</p1:double>
-                  <p1:double>30</p1:double>
-                  <p1:double>40</p1:double>
+                  <p1:double>70</p1:double>
+                  <p1:double>72</p1:double>
+                  <p1:double>74</p1:double>
+                  <p1:double>76</p1:double>
+                  <p1:double>78</p1:double>
+                  <p1:double>80</p1:double>
+                  <p1:double>82</p1:double>
+                  <p1:double>84</p1:double>
+                  <p1:double>86</p1:double>
+                  <p1:double>200</p1:double>
+                  <p1:double>200</p1:double>
                 </p1:Intensities>
                 <p1:Repetitions>2</p1:Repetitions>
               </Combinator>
@@ -298,9 +304,17 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:MocsProcedure">
                 <p1:Intensities>
-                  <p1:double>20</p1:double>
-                  <p1:double>30</p1:double>
-                  <p1:double>40</p1:double>
+                  <p1:double>70</p1:double>
+                  <p1:double>72</p1:double>
+                  <p1:double>74</p1:double>
+                  <p1:double>76</p1:double>
+                  <p1:double>78</p1:double>
+                  <p1:double>80</p1:double>
+                  <p1:double>82</p1:double>
+                  <p1:double>84</p1:double>
+                  <p1:double>86</p1:double>
+                  <p1:double>200</p1:double>
+                  <p1:double>200</p1:double>
                 </p1:Intensities>
                 <p1:Repetitions>2</p1:Repetitions>
               </Combinator>
@@ -743,8 +757,8 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:CreateTrialPayload">
                 <p1:Context>Standing</p1:Context>
-                <p1:Method>MOCS</p1:Method>
-                <p1:StimulusType>s</p1:StimulusType>
+                <p1:Method>Staicase</p1:Method>
+                <p1:StimulusType>se</p1:StimulusType>
                 <p1:BaseFrequency>200</p1:BaseFrequency>
                 <p1:Duration>1000</p1:Duration>
                 <p1:EnvFrequency>4</p1:EnvFrequency>
@@ -922,7 +936,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="port:CreateSerialPort">
                 <port:Name>ArdIMU</port:Name>
-                <port:PortName>COM9</port:PortName>
+                <port:PortName>COM8</port:PortName>
                 <port:BaudRate>115200</port:BaudRate>
                 <port:NewLine>\r\n</port:NewLine>
                 <port:Parity>None</port:Parity>
@@ -968,7 +982,7 @@
               </PropertyMappings>
             </Expression>
             <Expression xsi:type="io:CsvWriter">
-              <io:FileName>C:\\Data\laura\20260610\sine_laura_IMU.csv</io:FileName>
+              <io:FileName>C:\\Data\Natalie\20260619\sine_Natalie_IMU.csv</io:FileName>
               <io:Append>false</io:Append>
               <io:Overwrite>false</io:Overwrite>
               <io:Suffix>Timestamp</io:Suffix>
@@ -1015,7 +1029,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>laura</Value>
+                <Value>Natalie</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="ExternalizedMapping">
@@ -1526,47 +1540,49 @@ def generate():
                           <Combinator xsi:type="rx:First" />
                         </Expression>
                         <Expression xsi:type="WorkflowOutput" />
-                        <Expression xsi:type="GroupWorkflow">
-                          <Name>ClickRespGiven</Name>
-                          <Workflow>
-                            <Nodes>
-                              <Expression xsi:type="WorkflowInput">
-                                <Name>Source1</Name>
-                              </Expression>
-                              <Expression xsi:type="ExternalizedMapping">
-                                <Property Name="FileName" DisplayName="StimEndSound" />
-                              </Expression>
-                              <Expression xsi:type="Combinator">
-                                <Combinator xsi:type="al:AudioReader">
-                                  <al:FileName>mixkit-modern-technology-select-3124.wav</al:FileName>
-                                  <al:BufferLength>500</al:BufferLength>
-                                  <al:SampleRate>44100</al:SampleRate>
-                                </Combinator>
-                              </Expression>
-                              <Expression xsi:type="Combinator">
-                                <Combinator xsi:type="rx:CombineLatest" />
-                              </Expression>
-                              <Expression xsi:type="MemberSelector">
-                                <Selector>Item2</Selector>
-                              </Expression>
-                              <Expression xsi:type="Combinator">
-                                <Combinator xsi:type="al:AudioPlayback">
-                                  <al:DeviceName>Generic Software on Speakers/Headphones (Realtek(R) Audio)</al:DeviceName>
-                                  <al:SampleRate>44100</al:SampleRate>
-                                  <al:State>Playing</al:State>
-                                </Combinator>
-                              </Expression>
-                              <Expression xsi:type="WorkflowOutput" />
-                            </Nodes>
-                            <Edges>
-                              <Edge From="0" To="3" Label="Source1" />
-                              <Edge From="1" To="2" Label="Source1" />
-                              <Edge From="2" To="3" Label="Source2" />
-                              <Edge From="3" To="4" Label="Source1" />
-                              <Edge From="4" To="5" Label="Source1" />
-                              <Edge From="5" To="6" Label="Source1" />
-                            </Edges>
-                          </Workflow>
+                        <Expression xsi:type="Disable">
+                          <Builder xsi:type="GroupWorkflow">
+                            <Name>ClickRespGiven</Name>
+                            <Workflow>
+                              <Nodes>
+                                <Expression xsi:type="WorkflowInput">
+                                  <Name>Source1</Name>
+                                </Expression>
+                                <Expression xsi:type="ExternalizedMapping">
+                                  <Property Name="FileName" DisplayName="StimEndSound" />
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="al:AudioReader">
+                                    <al:FileName>mixkit-modern-technology-select-3124.wav</al:FileName>
+                                    <al:BufferLength>500</al:BufferLength>
+                                    <al:SampleRate>44100</al:SampleRate>
+                                  </Combinator>
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="rx:CombineLatest" />
+                                </Expression>
+                                <Expression xsi:type="MemberSelector">
+                                  <Selector>Item2</Selector>
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="al:AudioPlayback">
+                                    <al:DeviceName>Generic Software on Speakers/Headphones (Realtek(R) Audio)</al:DeviceName>
+                                    <al:SampleRate>44100</al:SampleRate>
+                                    <al:State>Playing</al:State>
+                                  </Combinator>
+                                </Expression>
+                                <Expression xsi:type="WorkflowOutput" />
+                              </Nodes>
+                              <Edges>
+                                <Edge From="0" To="3" Label="Source1" />
+                                <Edge From="1" To="2" Label="Source1" />
+                                <Edge From="2" To="3" Label="Source2" />
+                                <Edge From="3" To="4" Label="Source1" />
+                                <Edge From="4" To="5" Label="Source1" />
+                                <Edge From="5" To="6" Label="Source1" />
+                              </Edges>
+                            </Workflow>
+                          </Builder>
                         </Expression>
                       </Nodes>
                       <Edges>
@@ -1657,7 +1673,7 @@ def generate():
         </PropertyMappings>
       </Expression>
       <Expression xsi:type="io:CsvWriter">
-        <io:FileName>C:\\Data\laura\20260610\sine_laura_Trial.csv</io:FileName>
+        <io:FileName>C:\\Data\Natalie\20260619\sine_Natalie_Trial.csv</io:FileName>
         <io:Append>false</io:Append>
         <io:Overwrite>false</io:Overwrite>
         <io:Suffix>Timestamp</io:Suffix>
@@ -1876,7 +1892,7 @@ def generate():
                     <zg:SymbolType>Circle</zg:SymbolType>
                     <zg:LineWidth>1</zg:LineWidth>
                     <zg:CurveSettings />
-                    <zg:Capacity>1</zg:Capacity>
+                    <zg:Capacity>10</zg:Capacity>
                     <zg:XMin xsi:nil="true" />
                     <zg:XMax xsi:nil="true" />
                     <zg:YMin>-0.1</zg:YMin>
@@ -1961,7 +1977,7 @@ def generate():
                     <zg:BaseAxis>X</zg:BaseAxis>
                     <zg:BarType>Cluster</zg:BarType>
                     <zg:CurveSettings />
-                    <zg:Capacity>1</zg:Capacity>
+                    <zg:Capacity>10</zg:Capacity>
                     <zg:Min xsi:nil="true" />
                     <zg:Max xsi:nil="true" />
                   </Expression>

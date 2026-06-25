@@ -40,7 +40,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="StringProperty">
-                <Value>MOCS</Value>
+                <Value>Staircase</Value>
               </Combinator>
             </Expression>
             <Expression xsi:type="rx:BehaviorSubject">
@@ -222,7 +222,6 @@
               <Combinator xsi:type="p1:StaircaseProcedure">
                 <p1:InitialIntensity>60</p1:InitialIntensity>
                 <p1:StepSizes>
-                  <p1:double>5</p1:double>
                   <p1:double>2</p1:double>
                 </p1:StepSizes>
                 <p1:MovingAverageWindow>8</p1:MovingAverageWindow>
@@ -249,7 +248,6 @@
               <Combinator xsi:type="p1:StaircaseProcedure">
                 <p1:InitialIntensity>60</p1:InitialIntensity>
                 <p1:StepSizes>
-                  <p1:double>5</p1:double>
                   <p1:double>2</p1:double>
                 </p1:StepSizes>
                 <p1:MovingAverageWindow>8</p1:MovingAverageWindow>
@@ -743,8 +741,8 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p1:CreateTrialPayload">
                 <p1:Context>Standing</p1:Context>
-                <p1:Method>MOCS</p1:Method>
-                <p1:StimulusType>s</p1:StimulusType>
+                <p1:Method>Staircase</p1:Method>
+                <p1:StimulusType>se</p1:StimulusType>
                 <p1:BaseFrequency>200</p1:BaseFrequency>
                 <p1:Duration>1000</p1:Duration>
                 <p1:EnvFrequency>4</p1:EnvFrequency>
@@ -827,7 +825,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:BufferCount">
-                <rx:Count>176</rx:Count>
+                <rx:Count>1000</rx:Count>
                 <rx:Skip xsi:nil="true" />
               </Combinator>
             </Expression>
@@ -922,7 +920,7 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="port:CreateSerialPort">
                 <port:Name>ArdIMU</port:Name>
-                <port:PortName>COM9</port:PortName>
+                <port:PortName>COM7</port:PortName>
                 <port:BaudRate>115200</port:BaudRate>
                 <port:NewLine>\r\n</port:NewLine>
                 <port:Parity>None</port:Parity>
@@ -968,7 +966,7 @@
               </PropertyMappings>
             </Expression>
             <Expression xsi:type="io:CsvWriter">
-              <io:FileName>C:\\Data\laura\20260610\sine_laura_IMU.csv</io:FileName>
+              <io:FileName>C:\\Data\laura\20260617\sine_laura_IMU.csv</io:FileName>
               <io:Append>false</io:Append>
               <io:Overwrite>false</io:Overwrite>
               <io:Suffix>Timestamp</io:Suffix>
