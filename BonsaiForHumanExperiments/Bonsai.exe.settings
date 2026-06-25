@@ -3,14 +3,22 @@
   <WindowState>Maximized</WindowState>
   <EditorTheme>Light</EditorTheme>
   <AnnotationPanelSize>140</AnnotationPanelSize>
-  <ExplorerSplitterDistance>570</ExplorerSplitterDistance>
+  <ExplorerSplitterDistance>300</ExplorerSplitterDistance>
   <DesktopBounds>
-    <X>333</X>
-    <Y>135</Y>
+    <X>3299</X>
+    <Y>-16</Y>
     <Width>700</Width>
     <Height>450</Height>
   </DesktopBounds>
   <RecentlyUsedFiles>
+    <RecentlyUsedFile>
+      <Timestamp>2026-06-25T12:44:34.3112228+01:00</Timestamp>
+      <Name>D:\Code\LEDStimulation\HumanExperimentBonsaiWorkflows\GeneralTaskWorkflow_dev.bonsai</Name>
+    </RecentlyUsedFile>
+    <RecentlyUsedFile>
+      <Timestamp>2026-06-25T12:30:53.8692195+01:00</Timestamp>
+      <Name>D:\Code\LEDStimulation\HumanExperimentBonsaiWorkflows\GeneralTaskWorkflow.bonsai</Name>
+    </RecentlyUsedFile>
     <RecentlyUsedFile>
       <Timestamp>2026-06-23T15:38:08.2177431+01:00</Timestamp>
       <Name>C:\Users\Saleem Lab\Documents\LEDStimulation\HumanExperimentBonsaiWorkflows\GeneralTaskWorkflow.bonsai</Name>
@@ -54,10 +62,6 @@
     <RecentlyUsedFile>
       <Timestamp>2026-05-28T16:29:37.9649504+01:00</Timestamp>
       <Name>C:\Users\Saleem Lab\Documents\LEDStimulation\HumanExperimentBonsaiWorkflows\LEDstimulation_StateDependent.bonsai</Name>
-    </RecentlyUsedFile>
-    <RecentlyUsedFile>
-      <Timestamp>2026-05-15T09:54:30.9956643+01:00</Timestamp>
-      <Name>D:\Code\LEDStimulation\HumanExperimentBonsaiWorkflows\GeneralTaskWorkflow.bonsai</Name>
     </RecentlyUsedFile>
     <RecentlyUsedFile>
       <Timestamp>2026-05-14T17:19:16.8818593+01:00</Timestamp>
