@@ -9,6 +9,7 @@
                  xmlns:p2="clr-namespace:Bonsai.Numerics.Distributions;assembly=Bonsai.Numerics"
                  xmlns:io="clr-namespace:Bonsai.IO;assembly=Bonsai.System"
                  xmlns:ipy="clr-namespace:Bonsai.Scripting.IronPython;assembly=Bonsai.Scripting.IronPython"
+                 xmlns:lsl="clr-namespace:EmotionalCities.Lsl;assembly=EmotionalCities.Lsl"
                  xmlns:al="clr-namespace:Bonsai.Audio;assembly=Bonsai.Audio"
                  xmlns:zg="clr-namespace:Bonsai.Gui.ZedGraph;assembly=Bonsai.Gui.ZedGraph"
                  xmlns:gui="clr-namespace:Bonsai.Gui;assembly=Bonsai.Gui"
@@ -144,9 +145,9 @@
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="port:CreateSerialPort">
                 <port:Name>ArdPWM</port:Name>
-                <port:PortName>COM11</port:PortName>
+                <port:PortName>COM6</port:PortName>
                 <port:BaudRate>115200</port:BaudRate>
-                <port:NewLine>\r\n</port:NewLine>
+                <port:NewLine>\r</port:NewLine>
                 <port:Parity>None</port:Parity>
                 <port:ParityReplace>63</port:ParityReplace>
                 <port:DataBits>8</port:DataBits>
@@ -197,7 +198,7 @@
         <Property Name="AlternateStatesEveryNBlocks" />
       </Expression>
       <Expression xsi:type="GroupWorkflow">
-        <Name>TrialManager</Name>
+        <Name>TrialAndBlockManager</Name>
         <Workflow>
           <Nodes>
             <Expression xsi:type="SubscribeSubject">
@@ -1045,88 +1046,115 @@
           </Edges>
         </Workflow>
       </Expression>
-      <Expression xsi:type="Disable">
-        <Builder xsi:type="GroupWorkflow">
-          <Name>IMU</Name>
-          <Workflow>
-            <Nodes>
-              <Expression xsi:type="ExternalizedMapping">
-                <Property Name="PortName" DisplayName="IMUport" />
-              </Expression>
-              <Expression xsi:type="Combinator">
-                <Combinator xsi:type="port:CreateSerialPort">
-                  <port:Name>ArdIMU</port:Name>
-                  <port:PortName>COM8</port:PortName>
-                  <port:BaudRate>115200</port:BaudRate>
-                  <port:NewLine>\r\n</port:NewLine>
-                  <port:Parity>None</port:Parity>
-                  <port:ParityReplace>63</port:ParityReplace>
-                  <port:DataBits>8</port:DataBits>
-                  <port:StopBits>One</port:StopBits>
-                  <port:Handshake>None</port:Handshake>
-                  <port:DiscardNull>false</port:DiscardNull>
-                  <port:DtrEnable>true</port:DtrEnable>
-                  <port:RtsEnable>false</port:RtsEnable>
-                  <port:ReadBufferSize>4096</port:ReadBufferSize>
-                  <port:WriteBufferSize>2048</port:WriteBufferSize>
-                  <port:ReceivedBytesThreshold>1</port:ReceivedBytesThreshold>
-                </Combinator>
-              </Expression>
-              <Expression xsi:type="Combinator">
-                <Combinator xsi:type="port:SerialReadLine">
-                  <port:PortName>ArdIMU</port:PortName>
-                  <port:NewLine>\r\n</port:NewLine>
-                </Combinator>
-              </Expression>
-              <Expression xsi:type="Parse">
-                <Pattern>%s</Pattern>
-              </Expression>
-              <Expression xsi:type="Combinator">
-                <Combinator xsi:type="rx:Retry" />
-              </Expression>
-              <Expression xsi:type="Combinator">
-                <Combinator xsi:type="rx:Timestamp" />
-              </Expression>
-              <Expression xsi:type="MemberSelector">
-                <Selector>Timestamp.TimeOfDay.TotalMilliseconds</Selector>
-              </Expression>
-              <Expression xsi:type="Combinator">
-                <Combinator xsi:type="rx:Zip" />
-              </Expression>
-              <Expression xsi:type="SubscribeSubject">
-                <Name>IMUName</Name>
-              </Expression>
-              <Expression xsi:type="PropertyMapping">
-                <PropertyMappings>
-                  <Property Name="FileName" />
-                </PropertyMappings>
-              </Expression>
-              <Expression xsi:type="io:CsvWriter">
-                <io:FileName>C:\\Data\Natalie\20260619\sine_Natalie_IMU.csv</io:FileName>
-                <io:Append>false</io:Append>
-                <io:Overwrite>false</io:Overwrite>
-                <io:Suffix>Timestamp</io:Suffix>
-                <io:IncludeHeader>true</io:IncludeHeader>
-              </Expression>
-              <Expression xsi:type="rx:BehaviorSubject">
-                <Name>IMUData</Name>
-              </Expression>
-            </Nodes>
-            <Edges>
-              <Edge From="0" To="1" Label="Source1" />
-              <Edge From="2" To="3" Label="Source1" />
-              <Edge From="3" To="4" Label="Source1" />
-              <Edge From="4" To="5" Label="Source1" />
-              <Edge From="4" To="7" Label="Source1" />
-              <Edge From="5" To="6" Label="Source1" />
-              <Edge From="6" To="7" Label="Source2" />
-              <Edge From="7" To="10" Label="Source1" />
-              <Edge From="8" To="9" Label="Source1" />
-              <Edge From="9" To="10" Label="Source2" />
-              <Edge From="10" To="11" Label="Source1" />
-            </Edges>
-          </Workflow>
-        </Builder>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>IMU</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="PortName" DisplayName="IMUport" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="port:CreateSerialPort">
+                <port:Name>ArdIMU</port:Name>
+                <port:PortName>COM8</port:PortName>
+                <port:BaudRate>115200</port:BaudRate>
+                <port:NewLine>\r\n</port:NewLine>
+                <port:Parity>None</port:Parity>
+                <port:ParityReplace>63</port:ParityReplace>
+                <port:DataBits>8</port:DataBits>
+                <port:StopBits>One</port:StopBits>
+                <port:Handshake>None</port:Handshake>
+                <port:DiscardNull>false</port:DiscardNull>
+                <port:DtrEnable>true</port:DtrEnable>
+                <port:RtsEnable>false</port:RtsEnable>
+                <port:ReadBufferSize>4096</port:ReadBufferSize>
+                <port:WriteBufferSize>2048</port:WriteBufferSize>
+                <port:ReceivedBytesThreshold>1</port:ReceivedBytesThreshold>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="port:SerialReadLine">
+                <port:PortName>ArdIMU</port:PortName>
+                <port:NewLine>\r\n</port:NewLine>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Parse">
+              <Pattern>%s</Pattern>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Retry" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Timestamp" />
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Timestamp.TimeOfDay.TotalMilliseconds</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Zip" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>IMUName</Name>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="FileName" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="io:CsvWriter">
+              <io:FileName>C:\\Data\eddtest\20260629\sine_eddtest_IMU.csv</io:FileName>
+              <io:Append>false</io:Append>
+              <io:Overwrite>false</io:Overwrite>
+              <io:Suffix>Timestamp</io:Suffix>
+              <io:IncludeHeader>true</io:IncludeHeader>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>IMUData</Name>
+            </Expression>
+            <Expression xsi:type="Disable">
+              <Builder xsi:type="Parse">
+                <Separator>,</Separator>
+              </Builder>
+            </Expression>
+            <Expression xsi:type="ipy:PythonTransform">
+              <ipy:Script>import clr
+from System import Array, Single
+
+@returns(Array[Single]) # Tells Bonsai to output a clean array of floats
+def process(value):
+    # Split the raw comma-separated serial string
+    parts = value.split(',')
+    
+    # Convert all 12 items into numbers in one shot
+    numeric_data = [float(x) for x in parts if x.strip()]
+    
+    # Return it as a clean numeric array that LSL loves
+    return Array[Single](numeric_data)</ipy:Script>
+            </Expression>
+            <Expression xsi:type="lsl:StreamOutlet">
+              <lsl:Name>BonsaiIMU</lsl:Name>
+              <lsl:ChannelCount>1</lsl:ChannelCount>
+              <lsl:Selector />
+              <lsl:SampleRate>0</lsl:SampleRate>
+            </Expression>
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="2" To="12" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="4" To="7" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="6" To="7" Label="Source2" />
+            <Edge From="7" To="10" Label="Source1" />
+            <Edge From="8" To="9" Label="Source1" />
+            <Edge From="9" To="10" Label="Source2" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="12" To="13" Label="Source1" />
+            <Edge From="13" To="14" Label="Source1" />
+          </Edges>
+        </Workflow>
       </Expression>
       <Expression xsi:type="ExternalizedMapping">
         <Property Name="StimulusID" Category="Logging" />
@@ -1794,7 +1822,7 @@ def generate():
         </PropertyMappings>
       </Expression>
       <Expression xsi:type="io:CsvWriter">
-        <io:FileName>C:\\Data\eddtest\20260625\sine_eddtest_Trial.csv</io:FileName>
+        <io:FileName>C:\\Data\eddtest\20260629\sine_eddtest_Trial.csv</io:FileName>
         <io:Append>false</io:Append>
         <io:Overwrite>false</io:Overwrite>
         <io:Suffix>Timestamp</io:Suffix>
@@ -2257,10 +2285,8 @@ def generate():
               <scr:Name>CurrentTrialValues</scr:Name>
               <scr:Expression>String.Format("Context: {0}, Method: {1}, StimType: {2}, TargetSide: {3}, Intensity: {4}Hz, FreqA: {5}Hz, FreqB: {6}Hz, Duration: {7}ms, EnvFreq: {8}Hz, PhaseA: {9}, PhaseB: {10}, ContrastA: {11}, ContrastB: {12}, DiscrimResponse: {13}, DetectResponse: {14}, IsCorrect: {15}", it.OriginalPayload.Context, it.OriginalPayload.Method, it.OriginalPayload.StimulusType, it.OriginalPayload.TargetSide, it.OriginalPayload.Intensity, it.OriginalPayload.FreqA, it.OriginalPayload.FreqB, it.OriginalPayload.Duration, it.OriginalPayload.EnvFrequency, it.OriginalPayload.PhaseA, it.OriginalPayload.PhaseB, it.OriginalPayload.ContrastA, it.OriginalPayload.ContrastB, it.DiscriminationResponse, it.DetectionResponse, it.IsCorrect)</scr:Expression>
             </Expression>
-            <Expression xsi:type="Disable">
-              <Builder xsi:type="SubscribeSubject">
-                <Name>IMUData</Name>
-              </Builder>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>IMUData</Name>
             </Expression>
           </Nodes>
           <Edges>
