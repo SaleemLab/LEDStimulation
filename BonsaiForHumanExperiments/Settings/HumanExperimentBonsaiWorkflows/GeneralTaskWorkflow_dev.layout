@@ -92,12 +92,12 @@
   </WindowSettings>
   <WindowSettings Index="18">
     <Location>
-      <X>180</X>
-      <Y>557</Y>
+      <X>204</X>
+      <Y>392</Y>
     </Location>
     <Size>
-      <Width>336</Width>
-      <Height>65</Height>
+      <Width>410</Width>
+      <Height>157</Height>
     </Size>
     <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
     <VisualizerSettings>
@@ -108,8 +108,8 @@
     <NestedLayout>
       <WindowSettings Index="0">
         <Location>
-          <X>23</X>
-          <Y>119</Y>
+          <X>592</X>
+          <Y>35</Y>
         </Location>
         <Size>
           <Width>622</Width>
@@ -156,9 +156,9 @@
               <VisualizerTypeName>Bonsai.Gui.ZedGraph.LineGraphVisualizer</VisualizerTypeName>
               <VisualizerSettings>
                 <LineGraphVisualizer>
-                  <Capacity>1</Capacity>
-                  <XMin>9.5</XMin>
-                  <XMax>10.5</XMax>
+                  <Capacity>3</Capacity>
+                  <XMin>20</XMin>
+                  <XMax>30</XMax>
                   <YMin>-0.1</YMin>
                   <YMax>1.1</YMax>
                   <AutoScaleX>true</AutoScaleX>
@@ -171,8 +171,8 @@
               <VisualizerSettings>
                 <LineGraphVisualizer>
                   <Capacity>1</Capacity>
-                  <XMin>9.5</XMin>
-                  <XMax>10.5</XMax>
+                  <XMin>28.5</XMin>
+                  <XMax>31.5</XMax>
                   <YMin>-0.1</YMin>
                   <YMax>1.1</YMax>
                   <AutoScaleX>true</AutoScaleX>
@@ -184,9 +184,9 @@
               <VisualizerTypeName>Bonsai.Gui.ZedGraph.BarGraphVisualizer</VisualizerTypeName>
               <VisualizerSettings>
                 <BarGraphVisualizer>
-                  <Capacity>1</Capacity>
+                  <Capacity>3</Capacity>
                   <Min>0</Min>
-                  <Max>5</Max>
+                  <Max>9</Max>
                   <AutoScale>true</AutoScale>
                 </BarGraphVisualizer>
               </VisualizerSettings>
@@ -197,7 +197,7 @@
                 <BarGraphVisualizer>
                   <Capacity>1</Capacity>
                   <Min>0</Min>
-                  <Max>2.5</Max>
+                  <Max>1.1</Max>
                   <AutoScale>true</AutoScale>
                 </BarGraphVisualizer>
               </VisualizerSettings>
@@ -207,12 +207,12 @@
       </WindowSettings>
       <WindowSettings Index="2">
         <Location>
-          <X>193</X>
-          <Y>385</Y>
+          <X>270</X>
+          <Y>214</Y>
         </Location>
         <Size>
           <Width>336</Width>
-          <Height>82</Height>
+          <Height>173</Height>
         </Size>
         <VisualizerTypeName>Bonsai.Design.ObjectTextVisualizer</VisualizerTypeName>
         <VisualizerSettings>
