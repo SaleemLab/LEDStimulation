@@ -1,3 +1,6 @@
+
+imuData = readtable('imu_walking_test2026-06-04T11_13_04.csv')
+
 % 1. Create a clean time axis in seconds
 t = (imuData.TimeUs - imuData.TimeUs(1)) / 1e6;
 
