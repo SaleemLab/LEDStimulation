@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <style>
+    .bg { fill: url(#bgGrad); stroke: #cbd5e1; stroke-width: 2; stroke-dasharray: 8 6; rx: 16px; }
+    .icon-bg { fill: #fdf4ff; stroke: #f0abfc; stroke-width: 1.5; }
+    .tag-bg { fill: #fae8ff; rx: 6px; }
+    .tag-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; fill: #a21caf; letter-spacing: 0.08em; }
+    .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 700; fill: #0f172a; }
+    .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; fill: #475569; }
+    .source-box { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1; rx: 8px; }
+    .source-text { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 12px; fill: #64748b; }
+    .source-highlight { fill: #c026d3; font-weight: 600; }
+  </style>
+
+  <!-- Card Background -->
+  <rect x="15" y="15" width="770" height="390" class="bg" filter="url(#shadow)" />
+
+  <!-- Badge -->
+  <g transform="translate(325, 45)">
+    <rect width="150" height="26" class="tag-bg"/>
+    <text x="75" y="17" text-anchor="middle" class="tag-text">IMAGE PLACEHOLDER</text>
+  </g>
+
+  <!-- Central Icon: Miniature Diffuser Housing Exploded View -->
+  <g transform="translate(320, 95)">
+    <!-- Diffuser Housing Main Body -->
+    <rect x="40" y="25" width="80" height="70" rx="10" fill="#fae8ff" stroke="#c026d3" stroke-width="2"/>
+    <circle cx="80" cy="60" r="22" fill="#ffffff" stroke="#c026d3" stroke-width="1.5"/>
+
+    <!-- LED Emitter Chip inside -->
+    <rect x="73" y="53" width="14" height="14" rx="2" fill="#f59e0b"/>
+    
+    <!-- Diffusion Lens Front Plate -->
+    <g transform="translate(130, 25)">
+      <rect x="0" y="0" width="20" height="70" rx="6" fill="#38bdf8" fill-opacity="0.5" stroke="#0284c7" stroke-width="1.5"/>
+      <line x1="-15" y1="35" x2="-2" y2="35" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="2 2"/>
+    </g>
+
+    <!-- Boom Arm Mount Tab -->
+    <path d="M 40 40 L 10 40 L 10 80 L 40 80" fill="#e879f9" stroke="#a21caf" stroke-width="2"/>
+    <circle cx="25" cy="60" r="4" fill="#ffffff" stroke="#a21caf" stroke-width="1.5"/>
+  </g>
+
+  <!-- Typography -->
+  <text x="400" y="260" text-anchor="middle" class="title">Miniature LED &amp; Diffuser Optics Details</text>
+  <text x="400" y="288" text-anchor="middle" class="subtitle">CAD Render / Macro Photo of Miniature Diffuser Housing &amp; LED Seating</text>
+
+  <!-- Source Reference Box -->
+  <g transform="translate(150, 325)">
+    <rect width="500" height="42" class="source-box"/>
+    <text x="250" y="26" text-anchor="middle" class="source-text">Target asset: <tspan class="source-highlight">Hardware/glasses/diffuser_fullipt.ipt</tspan></text>
+  </g>
+</svg>

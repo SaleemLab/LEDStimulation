@@ -2,6 +2,9 @@
 
 Because LED forward current, MOSFET switching dynamics, and optical diffusion exhibit non-linearities (especially near switching thresholds), the system uses Look-Up Tables (LUTs) stored in microcontroller Flash memory (`PROGMEM`) to achieve true linear luminance scaling.
 
+!!! note "Work in Progress"
+    This documentation section is currently a work in progress.
+
 ---
 
 ## Processing Pipeline
@@ -12,7 +15,7 @@ graph TD
     Script --> FitCurve[Non-Linear Curve Fitting & Monotonic Inversion]
     FitCurve --> MapScript[Calibration/mapLUTs.m]
     MapScript --> GenArray[generateGammaCorrectionLUT.m]
-    GenArray --> CHeader[PROGMEM const uint16_t gammaLUT[] Array]
+    GenArray --> CHeader["PROGMEM const uint16_t gammaLUT[] Array"]
 ```
 
 ---
@@ -43,6 +46,6 @@ Located in [`Calibration/`](file:///d:/Code/LEDStimulation/Calibration/):
    generateGammaCorrectionLUT(lut, 'ChA_GammaLUT');
    ```
 4. **Embed in Firmware:**
-   - Copy the generated C array into the firmware header/sketch (e.g., `StimulusControlViaSerial_Leonardo_v8.ino`).
-   - Flash the updated firmware to the microcontroller.
+   - Copy the generated C array into the firmware header/sketch (e.g., `StimulusControlViaSerial_Leonardo_DDS_8bit_2freq.ino` or `LEDStimController_Teensy41_DDS.ino`).
+   - Flash the updated firmware to the microcontroller (or upload dynamically via `loadlut` if using Teensy 4.1).
 5. **Runtime Selection:** Use `agc, 1` or `agc, 2` to switch between calibrated LUT profiles for different ambient/attenuation modes.

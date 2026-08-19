@@ -2,6 +2,9 @@
 
 This document details the switching dynamics, temporal resolution limits, thermal considerations, and synchronization constraints of the stimulation platform.
 
+!!! note "Work in Progress"
+    This documentation section is currently a work in progress.
+
 ---
 
 ## 1. Switching Dynamics & Rise/Fall Limitations

@@ -99,7 +99,7 @@ Comprehensive guides, schematics, and technical specifications are available in 
 │   ├── Enclosure/                # Baseplate CAD & 3D printed magnetic diffusion clamps
 │   ├── glasses/                  # Pupil Labs Neon glasses boom arm & miniature diffuser
 │   ├── LED_board/                # KiCad dual-channel LED array PCB
-│   └── LED_board_humans/         # KiCad human experiment LED PCB
+│   └── LED_board_humans/         # KiCad 3-colour LED array PCB (WIP redesign with layout improvements)
 ├── HumanExpAnalysis/             # MATLAB scripts for IMU movement and behavioural analysis
 ├── LabRecorderFiles/             # Multi-modal LabStreamingLayer (LSL) recording configurations
 └── docs/                         # Modular technical documentation

@@ -2,6 +2,9 @@
 
 [Bonsai](https://bonsai-rx.org/) is an open-source visual reactive programming environment used here to coordinate experiment state, stream serial commands to the microcontroller, record behavioural sensors, and synchronize multi-modal data streams.
 
+!!! note "Work in Progress"
+    This documentation section is currently a work in progress.
+
 ---
 
 ## 1. Environment Setup

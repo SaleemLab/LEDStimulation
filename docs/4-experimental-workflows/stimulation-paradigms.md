@@ -2,6 +2,9 @@
 
 This section documents the primary visual stimulation paradigms implemented in the Bonsai workflows. These protocols are adaptable for both animal physiology and human psychophysics setups.
 
+!!! note "Work in Progress"
+    This documentation section is currently a work in progress.
+
 ---
 
 ## Paradigm Summary

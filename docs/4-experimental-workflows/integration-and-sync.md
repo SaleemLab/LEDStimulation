@@ -2,6 +2,9 @@
 
 Complex experiments often require synchronized acquisition across multiple data streams: visual stimulation timestamps, high-speed eye tracking, inertial motion measurements, and neural electrophysiology or imaging.
 
+!!! note "Work in Progress"
+    This documentation section is currently a work in progress.
+
 ---
 
 ## Synchronization Architecture
@@ -18,7 +21,7 @@ graph TD
         Neon[Pupil Labs Neon Eye Tracker] -- LSL Outlet: Gaze & Pupil Video --> LSL_Router
         IMU[IMU / Motion Sensor Stream] -- LSL Outlet: Accelerometer/Gyro --> LSL_Router
         
-        LSL_Router --> LabRecorder[LabRecorder (XDF Multi-Stream File)]
+        LSL_Router --> LabRecorder["LabRecorder (XDF Multi-Stream File)"]
     end
     
     SyncBox -. Hardware Clocks .-> LabRecorder

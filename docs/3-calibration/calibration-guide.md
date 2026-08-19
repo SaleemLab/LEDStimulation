@@ -2,6 +2,9 @@
 
 Precise visual neuroscience and psychophysics require quantitative radiometric and photometric calibration. This guide covers the procedure for measuring absolute power, determining baseline operating points, and linearizing stimulus output.
 
+!!! note "Work in Progress"
+    This documentation section is currently a work in progress.
+
 ---
 
 ## Calibration Workflow
@@ -17,13 +20,16 @@ graph LR
 
 ---
 
-## 1. Required Equipment
+## 1. Calibration Equipment
 
-- **Optical Power Meter Console:** (e.g. Thorlabs PM100D or PM400).
-- **Calibrated Photodiode Sensor:**
-  - Must have appropriate spectral sensitivity covering the UV (365–405 nm) and Visible (500–550 nm) ranges.
-  - Sensor calibration file / wavelength responsiveness table loaded on the console.
-- **Mounting:** Position the sensor at the exact plane of the subject's eye / retina relative to the diffusion surface.
+!!! note "Single Measurement Device Required"
+    Only **one** calibrated optical measurement device is required for the calibration pipeline. Choose one of the following setups:
+
+    * **Option 1 (Standard):** Optical Power Meter Console (e.g., Thorlabs PM100D, PM100USB, or PM400) + Calibrated Photodiode Sensor (e.g., Thorlabs S120VC, S121C, S130VC, or S120C) covering UV (365–405 nm) and Visible (500–550 nm) bands.
+    * **Option 2 (High-Speed / DAQ):** Amplified Si Photodiode (e.g., Thorlabs PDA100A2) connected to a data acquisition system or oscilloscope.
+    * **Option 3 (Spectroradiometric):** Calibrated Fiber Spectrometer (e.g., Ocean Optics USB2000+/STS or Thorlabs CCS series).
+
+* **Sensor Mounting:** Position the sensor detector plane at the exact plane of the subject's eye / retina relative to the diffusion surface.
 
 ---
 

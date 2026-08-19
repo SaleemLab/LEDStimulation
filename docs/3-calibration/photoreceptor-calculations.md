@@ -2,6 +2,9 @@
 
 To map physical LED emission intensities (measured in $\mu\text{W}$) to biologically meaningful activation of specific photoreceptors, the system calculates effective photoisomerisation rates per photoreceptor type per second ($R^*/\text{photoreceptor/s}$).
 
+!!! note "Work in Progress"
+    This documentation section is currently a work in progress.
+
 ---
 
 ## Quantification Framework

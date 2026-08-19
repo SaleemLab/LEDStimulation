@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <style>
+    .bg { fill: url(#bgGrad); stroke: #cbd5e1; stroke-width: 2; stroke-dasharray: 8 6; rx: 16px; }
+    .icon-bg { fill: #f0fdf4; stroke: #bbf7d0; stroke-width: 1.5; }
+    .tag-bg { fill: #dcfce7; rx: 6px; }
+    .tag-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; fill: #15803d; letter-spacing: 0.08em; }
+    .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 700; fill: #0f172a; }
+    .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; fill: #475569; }
+    .source-box { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1; rx: 8px; }
+    .source-text { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 12px; fill: #64748b; }
+    .source-highlight { fill: #16a34a; font-weight: 600; }
+  </style>
+
+  <!-- Card Background -->
+  <rect x="15" y="15" width="770" height="390" class="bg" filter="url(#shadow)" />
+
+  <!-- Badge -->
+  <g transform="translate(325, 45)">
+    <rect width="150" height="26" class="tag-bg"/>
+    <text x="75" y="17" text-anchor="middle" class="tag-text">IMAGE PLACEHOLDER</text>
+  </g>
+
+  <!-- Central Icon: 3D Isometric Enclosure Frame Box -->
+  <g transform="translate(330, 90)">
+    <!-- Base Plate -->
+    <polygon points="70,125 150,95 80,70 0,100" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
+    <polygon points="70,130 150,100 150,95 70,125" fill="#94a3b8" stroke="#475569" stroke-width="1.5"/>
+    <polygon points="0,105 70,130 70,125 0,100" fill="#64748b" stroke="#475569" stroke-width="1.5"/>
+
+    <!-- 4 Vertical MakerBeam Extrusions -->
+    <line x1="0" y1="100" x2="0" y2="40" stroke="#1e293b" stroke-width="4"/>
+    <line x1="150" y1="95" x2="150" y2="35" stroke="#1e293b" stroke-width="4"/>
+    <line x1="80" y1="70" x2="80" y2="10" stroke="#1e293b" stroke-width="4"/>
+    <line x1="70" y1="125" x2="70" y2="65" stroke="#1e293b" stroke-width="4"/>
+
+    <!-- Top Frame & Diffuser -->
+    <polygon points="70,65 150,35 80,10 0,40" fill="#38bdf8" fill-opacity="0.35" stroke="#0284c7" stroke-width="2"/>
+
+    <!-- Corner Magnetic Clamps -->
+    <circle cx="70" cy="65" r="4" fill="#16a34a"/>
+    <circle cx="150" cy="35" r="4" fill="#16a34a"/>
+    <circle cx="80" cy="10" r="4" fill="#16a34a"/>
+    <circle cx="0" cy="40" r="4" fill="#16a34a"/>
+  </g>
+
+  <!-- Typography -->
+  <text x="400" y="260" text-anchor="middle" class="title">Fully Assembled Full-Field Panel Enclosure</text>
+  <text x="400" y="288" text-anchor="middle" class="subtitle">Photograph / 3D CAD Assembly of MakerBeam Chassis, Baseplate &amp; Diffuser</text>
+
+  <!-- Source Reference Box -->
+  <g transform="translate(160, 325)">
+    <rect width="480" height="42" class="source-box"/>
+    <text x="240" y="26" text-anchor="middle" class="source-text">Target asset: <tspan class="source-highlight">Hardware/Enclosure/</tspan> assembly photo or CAD render</text>
+  </g>
+</svg>
