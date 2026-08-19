@@ -1,0 +1,2130 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="High-precision temporal visual stimulation platform for neuroscience and psychophysics.">
+      
+      
+        <meta name="author" content="Saleem Lab">
+      
+      
+      
+        <link rel="prev" href="../../1-hardware/bill-of-materials/">
+      
+      
+        <link rel="next" href="../serial-api-reference/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Architecture & Timers - Full-Field LED Visual Stimulator</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="https://unpkg.com/katex@0/dist/katex.min.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="deep-purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#firmware-architecture-system-principles" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Full-Field LED Visual Stimulator" class="md-header__button md-logo" aria-label="Full-Field LED Visual Stimulator" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Full-Field LED Visual Stimulator
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Architecture & Timers
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="deep-purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="deep-purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/SaleemLab/LEDStimulation" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    SaleemLab/LEDStimulation
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Full-Field LED Visual Stimulator" class="md-nav__button md-logo" aria-label="Full-Field LED Visual Stimulator" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Full-Field LED Visual Stimulator
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/SaleemLab/LEDStimulation" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    SaleemLab/LEDStimulation
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. Hardware
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    1. Hardware
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../1-hardware/circuit-and-driver/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Circuit & Driver
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../1-hardware/custom-pcbs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom PCBs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enclosure & Optics
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Enclosure & Optics
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../1-hardware/enclosure-and-optics/panel-enclosure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Panel Enclosure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../1-hardware/enclosure-and-optics/wearable-glasses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wearable Glasses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../1-hardware/bill-of-materials/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bill of Materials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. Firmware
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    2. Firmware
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture & Timers
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture & Timers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-canonical-system-architecture-dds_8bit_2freq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Canonical System Architecture (DDS_8bit_2freq)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-core-architectural-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Core Architectural Principles
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Core Architectural Principles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-direct-digital-synthesis-dds-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1. Direct Digital Synthesis (DDS) Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-high-frequency-carrier-generation-timer1-pwm-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2. High-Frequency Carrier Generation &amp; Timer1 PWM Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.2. High-Frequency Carrier Generation &amp; Timer1 PWM Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-calculating-prescaler-and-top" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Calculating Prescaler and TOP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-register-level-timer1-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Register-Level Timer1 Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-fast-inline-output-writes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Fast Inline Output Writes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-synchronous-interrupt-coupling-timer1_ovf_vect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Synchronous Interrupt Coupling (TIMER1_OVF_vect)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-dual-independent-channels-frequencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3. Dual Independent Channels &amp; Frequencies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-raised-cosine-temporal-windowing-fade-inout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4. Raised Cosine Temporal Windowing (Fade In/Out)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-jitter-elimination-usb-heartbeat-suppression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5. Jitter Elimination &amp; USB Heartbeat Suppression
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-lock-free-atomic-synchronization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6. Lock-Free Atomic Synchronization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-sinewave-trial-execution-lifecycle-end-to-end-walkthrough" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Sinewave Trial Execution Lifecycle (End-to-End Walkthrough)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Sinewave Trial Execution Lifecycle (End-to-End Walkthrough)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-serial-command-ingestion-parsing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Serial Command Ingestion &amp; Parsing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-pre-computing-trial-parameters-arming-the-hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Pre-Computing Trial Parameters &amp; Arming the Hardware
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-synchronous-waveform-synthesis-sinewaveinterrupt-3125-khz" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Synchronous Waveform Synthesis (sinewaveInterrupt() @ 31.25 kHz)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-additional-stimulus-engines-from-v8-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Additional Stimulus Engines (from v8 Firmware)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Additional Stimulus Engines (from v8 Firmware)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-real-time-gaussian-white-noise-wn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1. Real-Time Gaussian White Noise (wn)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-frozen-white-noise-fwn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2. Frozen White Noise (fwn)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-contrast-switching-adaptation-noise-cs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3. Contrast-Switching Adaptation Noise (cs)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-gamma-linearization-look-up-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Gamma Linearization &amp; Look-Up Tables
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serial-api-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serial API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../firmware-variants/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firmware Variants
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. Calibration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    3. Calibration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../3-calibration/calibration-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calibration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../3-calibration/gamma-lut-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gamma LUT Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../3-calibration/photoreceptor-calculations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Photoreceptor Calculations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4. Experimental Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    4. Experimental Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../4-experimental-workflows/bonsai-overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bonsai Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../4-experimental-workflows/stimulation-paradigms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stimulation Paradigms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../4-experimental-workflows/integration-and-sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integration & Sync
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5. Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    5. Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../5-reference/performance-and-sync/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance & Dynamics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-canonical-system-architecture-dds_8bit_2freq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Canonical System Architecture (DDS_8bit_2freq)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-core-architectural-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Core Architectural Principles
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Core Architectural Principles">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-direct-digital-synthesis-dds-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1. Direct Digital Synthesis (DDS) Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-high-frequency-carrier-generation-timer1-pwm-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2. High-Frequency Carrier Generation &amp; Timer1 PWM Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.2. High-Frequency Carrier Generation &amp; Timer1 PWM Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-calculating-prescaler-and-top" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Calculating Prescaler and TOP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-register-level-timer1-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Register-Level Timer1 Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-fast-inline-output-writes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Fast Inline Output Writes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-synchronous-interrupt-coupling-timer1_ovf_vect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Synchronous Interrupt Coupling (TIMER1_OVF_vect)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-dual-independent-channels-frequencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3. Dual Independent Channels &amp; Frequencies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-raised-cosine-temporal-windowing-fade-inout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4. Raised Cosine Temporal Windowing (Fade In/Out)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-jitter-elimination-usb-heartbeat-suppression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5. Jitter Elimination &amp; USB Heartbeat Suppression
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-lock-free-atomic-synchronization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6. Lock-Free Atomic Synchronization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-sinewave-trial-execution-lifecycle-end-to-end-walkthrough" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Sinewave Trial Execution Lifecycle (End-to-End Walkthrough)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Sinewave Trial Execution Lifecycle (End-to-End Walkthrough)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-serial-command-ingestion-parsing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Serial Command Ingestion &amp; Parsing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-pre-computing-trial-parameters-arming-the-hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Pre-Computing Trial Parameters &amp; Arming the Hardware
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-synchronous-waveform-synthesis-sinewaveinterrupt-3125-khz" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Synchronous Waveform Synthesis (sinewaveInterrupt() @ 31.25 kHz)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-additional-stimulus-engines-from-v8-firmware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Additional Stimulus Engines (from v8 Firmware)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Additional Stimulus Engines (from v8 Firmware)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-real-time-gaussian-white-noise-wn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1. Real-Time Gaussian White Noise (wn)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-frozen-white-noise-fwn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2. Frozen White Noise (fwn)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-contrast-switching-adaptation-noise-cs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3. Contrast-Switching Adaptation Noise (cs)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-gamma-linearization-look-up-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Gamma Linearization &amp; Look-Up Tables
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="firmware-architecture-system-principles">Firmware Architecture &amp; System Principles</h1>
+<p>The visual stimulation platform utilizes bare-metal microcontroller firmware to deliver sub-millisecond temporal precision, high carrier frequencies, and artifact-free luminance modulation.</p>
+<p>We use primarily the <strong>Arduino Leonardo (ATmega32U4 @ 16 MHz)</strong>, which possesses several hardware properties that make it well suited for high-precision optical stimulation:</p>
+<ul>
+<li><strong>Native USB Communication (CDC):</strong> The ATmega32U4 features native on-chip USB communication, avoiding the transfer latency, buffer bloat, and jitter introduced by external USB-to-UART bridge chips (e.g., FTDI / CH340).</li>
+<li><strong>Deterministic 16-bit Timer Registers:</strong> Direct bare-metal control of hardware <code>Timer1</code> allows 31.25 kHz Phase Correct PWM with cycle-accurate register writes (<code>OCR1A</code>, <code>OCR1B</code>).</li>
+<li><strong>Sub-Microsecond Timing Determinism:</strong> Without an underlying RTOS or thread scheduler, interrupt service routines execute with sub-microsecond predictability.</li>
+<li><strong>Cost &amp; Accessibility:</strong> Standardized, open-source form factor that is cost-effective and readily replicable across research laboratories.</li>
+</ul>
+<p>Other microcontrollers can also be used if higher bit-depth, clock speed, or sample rates are desired—such as the <strong>PJRC Teensy 4.1 (ARM Cortex-M7 @ 600 MHz)</strong>, for which a 12-bit, 36.62 kHz DDS implementation (<a href="file:///d:/Code/LEDStimulation/ArduinoCode/LEDStimController_Teensy41_DDS/LEDStimController_Teensy41_DDS.ino"><code>LEDStimController_Teensy41_DDS.ino</code></a>) is provided.</p>
+<p>The primary canonical firmware is <strong><a href="file:///d:/Code/LEDStimulation/ArduinoCode/StimulusControlViaSerial_Leonardo_DDS_8bit_2freq/StimulusControlViaSerial_Leonardo_DDS_8bit_2freq.ino"><code>StimulusControlViaSerial_Leonardo_DDS_8bit_2freq.ino</code></a></strong>, implementing a <strong>Direct Digital Synthesis (DDS)</strong> engine running at a <strong>31.25 kHz</strong> carrier frequency.</p>
+<hr />
+<h2 id="1-canonical-system-architecture-dds_8bit_2freq">1. Canonical System Architecture (<code>DDS_8bit_2freq</code>)</h2>
+<p>The canonical firmware synchronizes carrier PWM generation and stimulus waveform synthesis at <strong>31.25 kHz</strong> using Direct Digital Synthesis (DDS).</p>
+<ul>
+<li><strong>Command Ingestion:</strong> ASCII commands received over USB Serial at 115200 baud are parsed and configured into stimulus state parameters (frequencies, phases, contrasts, durations).</li>
+<li><strong>High-Frequency Carrier:</strong> Hardware <code>Timer1</code> generates a 31.25 kHz Phase Correct PWM carrier on Pin 9 (Channel A) and Pin 10 (Channel B).</li>
+<li><strong>Synchronous Interrupt Pacing:</strong> The <code>TIMER1_OVF_vect</code> interrupt fires synchronously on every PWM cycle at 31.25 kHz (<span class="arithmatex">\(32\ \mu\text{s}\)</span> period), invoking a dynamic callback function pointer (<code>timer1Callback</code>).</li>
+<li><strong>DDS Waveform Synthesis:</strong> The 32-bit phase accumulators advance each cycle, indexing into a 256-sample sine wavetable, and applying raised cosine onset/offset envelopes or contrast envelopes.</li>
+<li><strong>Optical Linearization:</strong> The calculated luminance index is mapped through Flash-resident (<code>PROGMEM</code>) gamma Look-Up Tables before being written directly to <code>OCR1A</code> and <code>OCR1B</code>.</li>
+</ul>
+<hr />
+<h2 id="2-core-architectural-principles">2. Core Architectural Principles</h2>
+<h3 id="21-direct-digital-synthesis-dds-engine">2.1. Direct Digital Synthesis (DDS) Engine</h3>
+<p>Rather than stepping through a wavetable with variable timer interrupts, the DDS engine uses <strong>32-bit fixed-point phase accumulators</strong> updated at every single PWM carrier cycle (<span class="arithmatex">\(31.25\text{ kHz}\)</span>):</p>
+<div class="arithmatex">\[\Delta\theta = \text{round}\left(f_{\text{stimulus}} \times \frac{2^{32}}{f_{\text{PWM}}}\right)\]</div>
+<p>On an ATmega32U4 running at 16 MHz with a <span class="arithmatex">\(31.25\text{ kHz}\)</span> PWM carrier, the scaling constant is pre-computed with IEEE 754 precision:</p>
+<div class="arithmatex">\[\frac{2^{32}}{31250} = 137438.953125\]</div>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kt">uint32_t</span><span class="w"> </span><span class="nf">calcPhaseInc</span><span class="p">(</span><span class="kt">float</span><span class="w"> </span><span class="n">freq</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="c1">// 4294967296.0 / 31250.0 = 137438.953125</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)(</span><span class="n">freq</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">137438.953125f</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">);</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li><strong>Instantaneous Frequency &amp; Phase Transitions:</strong> Frequency changes require simply writing a new 32-bit phase increment value (<code>phaseIncrementA = calcPhaseInc(newFreq)</code>). There are zero phase discontinuities, zero timer reconfiguration delays, and no waveform glitches.</li>
+<li><strong>Wavetable Indexing:</strong> The most significant byte of the 32-bit accumulator directly selects the sample from a 256-point sinusoidal wavetable:
+  <div class="language-cpp highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kt">uint8_t</span><span class="w"> </span><span class="n">indexA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="kt">uint8_t</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">phaseAccumulatorA</span><span class="p">)[</span><span class="mi">3</span><span class="p">];</span><span class="w"> </span><span class="c1">// Instantaneous byte extraction</span>
+</span></code></pre></div></li>
+</ul>
+<hr />
+<h3 id="22-high-frequency-carrier-generation-timer1-pwm-configuration">2.2. High-Frequency Carrier Generation &amp; Timer1 PWM Configuration</h3>
+<p><code>Timer1</code> on the ATmega32U4 is configured in <strong>16-bit Phase Correct PWM mode (Mode 10)</strong>. In this dual-slope mode, the timer counts continuously up from <span class="arithmatex">\(0\)</span> to <code>ICR1</code> (TOP) and then counts down from <code>ICR1</code> back to <span class="arithmatex">\(0\)</span>.</p>
+<p>The resulting PWM carrier frequency is given by:</p>
+<div class="arithmatex">\[f_{\text{PWM}} = \frac{f_{\text{CPU}}}{2 \times N \times \text{TOP}}\]</div>
+<p>For a target frequency of <span class="arithmatex">\(31.25\text{ kHz}\)</span> with a <span class="arithmatex">\(16\text{ MHz}\)</span> CPU clock, the prescaler is <span class="arithmatex">\(N = 1\)</span> and <span class="arithmatex">\(\text{TOP} = 256\)</span>:</p>
+<div class="arithmatex">\[f_{\text{PWM}} = \frac{16\text{ MHz}}{2 \times 1 \times 256} = 31.25\text{ kHz}\]</div>
+<ul>
+<li><strong>Elimination of Saccadic CFF Artifacts:</strong> The Critical Flicker Fusion (CFF) threshold in rodents and primates is typically <span class="arithmatex">\(&lt; 60-100\text{ Hz}\)</span>. Operating at <span class="arithmatex">\(31.25\text{ kHz}\)</span> guarantees that rapid eye movements or micro-saccades can never visually resolve carrier switching.</li>
+<li><strong>Photodiode &amp; Recording Immunity:</strong> High-speed electrophysiological amplifiers and photodiodes are immune to carrier ringing at <span class="arithmatex">\(31.25\text{ kHz}\)</span>.</li>
+<li><strong>Acoustic Silence:</strong> Prevents audible coil whine from inductors or ceramic capacitors in the driver circuitry.</li>
+</ul>
+<h4 id="step-1-calculating-prescaler-and-top">Step 1: Calculating Prescaler and TOP</h4>
+<p>The firmware calculates the optimal prescaler (<span class="arithmatex">\(N \in \{1, 8, 64, 256, 1024\}\)</span>) and <code>TOP</code> value dynamically to maximize bit-depth resolution:</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">long</span><span class="w"> </span><span class="nf">calculatePrescalerAndTOP</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="n">desiredFrequency</span><span class="p">,</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="o">&amp;</span><span class="n">prescaler</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="kt">long</span><span class="w"> </span><span class="n">TOP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="kt">long</span><span class="w"> </span><span class="n">possiblePrescalers</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">256</span><span class="p">,</span><span class="w"> </span><span class="mi">1024</span><span class="w"> </span><span class="p">};</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">currentPrescaler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">possiblePrescalers</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">calculatedTOP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">CLOCK_FREQ</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">currentPrescaler</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">desiredFrequency</span><span class="p">));</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">calculatedTOP</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">calculatedTOP</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">65535</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">      </span><span class="n">prescaler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">currentPrescaler</span><span class="p">;</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">      </span><span class="n">TOP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calculatedTOP</span><span class="p">;</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">      </span><span class="k">break</span><span class="p">;</span><span class="w">  </span><span class="c1">// Select the smallest valid prescaler for maximum resolution</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">TOP</span><span class="p">;</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>For <span class="arithmatex">\(31250\text{ Hz}\)</span>, the algorithm selects <code>prescaler = 1</code> and <code>TOP = 256</code> (<span class="arithmatex">\(8\text{-bit}\)</span> resolution).</p>
+<h4 id="step-2-register-level-timer1-setup">Step 2: Register-Level Timer1 Setup</h4>
+<p>The <code>configureTimer1()</code> function directly writes to the ATmega32U4 control registers (<code>TCCR1A</code>, <code>TCCR1B</code>, <code>ICR1</code>):</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">configureTimer1</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="n">prescaler</span><span class="p">,</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">TOP</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="c1">// Reset Timer1 control registers</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="n">TCCR1A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="n">TCCR1B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="c1">// Enable non-inverting PWM output on Pin 9 (OC1A) and Pin 10 (OC1B)</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="n">TCCR1A</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">COM1A1</span><span class="p">);</span><span class="w">  </span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="n">TCCR1A</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">COM1B1</span><span class="p">);</span><span class="w">  </span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="c1">// Configure Phase Correct PWM with ICR1 as TOP (Mode 10)</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="n">TCCR1B</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">WGM13</span><span class="p">);</span><span class="w">   </span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="n">TCCR1B</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">WGM12</span><span class="p">);</span><span class="w">  </span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">  </span><span class="n">TCCR1A</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">WGM11</span><span class="p">);</span><span class="w">  </span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">  </span><span class="n">TCCR1A</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">WGM10</span><span class="p">);</span><span class="w">  </span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">  </span><span class="c1">// Apply clock prescaler</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">  </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">prescaler</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="w">    </span><span class="n">TCCR1B</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">CS10</span><span class="p">);</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w">               </span><span class="c1">// Prescaler = 1 (No division)</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">8</span><span class="p">:</span><span class="w">    </span><span class="n">TCCR1B</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">CS11</span><span class="p">);</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w">               </span><span class="c1">// Prescaler = 8</span>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">64</span><span class="p">:</span><span class="w">   </span><span class="n">TCCR1B</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">CS11</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">CS10</span><span class="p">);</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w"> </span><span class="c1">// Prescaler = 64</span>
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">256</span><span class="p">:</span><span class="w">  </span><span class="n">TCCR1B</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">CS12</span><span class="p">);</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w">               </span><span class="c1">// Prescaler = 256</span>
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">1024</span><span class="p">:</span><span class="w"> </span><span class="n">TCCR1B</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">CS12</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">CS10</span><span class="p">);</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w"> </span><span class="c1">// Prescaler = 1024</span>
+</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a>
+</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a><span class="w">  </span><span class="c1">// Set the TOP counter limit (ICR1 = 256)</span>
+</span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a><span class="w">  </span><span class="n">ICR1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TOP</span><span class="p">;</span>
+</span><span id="__span-3-27"><a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li><code>COM1A1</code> &amp; <code>COM1B1</code>: Enable non-inverting compare mode on OC1A (Pin 9) and OC1B (Pin 10). The pin clears on compare match when counting up, and sets on compare match when counting down.</li>
+<li><code>WGM13 = 1</code> (with <code>WGM12=0</code>, <code>WGM11=0</code>, <code>WGM10=0</code>): Sets dual-slope Phase Correct PWM with <code>ICR1</code> acting as the TOP limit.</li>
+<li><code>CS10 = 1</code>: Connects the 16 MHz system clock directly without prescaling (<span class="arithmatex">\(N=1\)</span>).</li>
+<li><code>ICR1 = 256</code>: Establishes the peak counter value.</li>
+</ul>
+<h4 id="step-3-fast-inline-output-writes">Step 3: Fast Inline Output Writes</h4>
+<p>Luminance duty cycles are updated by writing directly to <code>OCR1A</code> and <code>OCR1B</code>, reading calibrated values from <code>PROGMEM</code> Flash tables:</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">__attribute__</span><span class="p">((</span><span class="n">always_inline</span><span class="p">))</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">setChA</span><span class="p">(</span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">ocrValue</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="n">OCR1A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pgm_read_byte_near</span><span class="p">(</span><span class="n">currentChALUT</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ocrValue</span><span class="p">);</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">}</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">__attribute__</span><span class="p">((</span><span class="n">always_inline</span><span class="p">))</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">setChB</span><span class="p">(</span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">ocrValue</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="n">OCR1B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pgm_read_byte_near</span><span class="p">(</span><span class="n">currentChBLUT</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ocrValue</span><span class="p">);</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<h4 id="step-4-synchronous-interrupt-coupling-timer1_ovf_vect">Step 4: Synchronous Interrupt Coupling (<code>TIMER1_OVF_vect</code>)</h4>
+<p>In Phase Correct PWM mode, the timer overflow interrupt flag (<code>TOV1</code>) is set every time the counter reaches bottom (<span class="arithmatex">\(0\)</span>). The firmware uses this interrupt to synchronously trigger the DDS waveform synthesis at <span class="arithmatex">\(31.25\text{ kHz}\)</span>:</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">timer1Callback</span><span class="p">)()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">;</span><span class="w">  </span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kt">void</span><span class="w"> </span><span class="nf">setTimer1Callback</span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">callback</span><span class="p">)())</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="n">timer1Callback</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">callback</span><span class="p">;</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">}</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="kt">void</span><span class="w"> </span><span class="nf">startTimer1Interrupt</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="n">TIFR1</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">TOV1</span><span class="p">);</span><span class="w">     </span><span class="c1">// Clear any pending overflow flag</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="n">TIMSK1</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">TOIE1</span><span class="p">);</span><span class="w">   </span><span class="c1">// Enable Timer1 Overflow Interrupt</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="p">}</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="kt">void</span><span class="w"> </span><span class="nf">stopTimer1Interrupt</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">  </span><span class="n">TIMSK1</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">TOIE1</span><span class="p">);</span><span class="w">  </span><span class="c1">// Disable Timer1 Overflow Interrupt</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="p">}</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="n">ISR</span><span class="p">(</span><span class="n">TIMER1_OVF_vect</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">timer1Callback</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">    </span><span class="n">timer1Callback</span><span class="p">();</span><span class="w">       </span><span class="c1">// Executes DDS synthesis at 31.25 kHz</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="p">}</span>
+</span></code></pre></div>
+<hr />
+<h3 id="23-dual-independent-channels-frequencies">2.3. Dual Independent Channels &amp; Frequencies</h3>
+<p><code>StimulusControlViaSerial_Leonardo_DDS_8bit_2freq</code> maintains independent 32-bit phase accumulators and phase increments for Channel A and Channel B:</p>
+<ul>
+<li><strong>Dichoptic Stimulation:</strong> Present distinct frequencies simultaneously to each eye (e.g., <span class="arithmatex">\(5\text{ Hz}\)</span> on Left Eye, <span class="arithmatex">\(7\text{ Hz}\)</span> on Right Eye).</li>
+<li><strong>Chromatic &amp; Dual-Wavelength Probing:</strong> Drive Green (<span class="arithmatex">\(530\text{ nm}\)</span>) and UV (<span class="arithmatex">\(395\text{ nm}\)</span>) LEDs with independent phase relationships (<span class="arithmatex">\(0^\circ\)</span> in-phase vs. <span class="arithmatex">\(180^\circ\)</span> antiphase) and independent contrast levels.</li>
+</ul>
+<hr />
+<h3 id="24-raised-cosine-temporal-windowing-fade-inout">2.4. Raised Cosine Temporal Windowing (Fade In/Out)</h3>
+<p>Sudden rectangular onsets of bright visual flicker can trigger retinal startle responses and severe transient visual evoked potentials (VEPs).</p>
+<p>The firmware applies a smooth <strong>Modular Raised Cosine Temporal Window</strong> (default <span class="arithmatex">\(100\text{ ms}\)</span>):</p>
+<ul>
+<li>A 64-entry pre-computed envelope table (<code>raisedCosineLUT[64]</code>) scales the contrast from <span class="arithmatex">\(0 \to 100\%\)</span> at stimulus onset and <span class="arithmatex">\(100\% \to 0\)</span> at stimulus offset.</li>
+<li>A 32-bit addition accumulator (<code>fadePhase += envStep</code>) steps through the envelope table without runtime multiplication or floating-point trigonometry.</li>
+</ul>
+<hr />
+<h3 id="25-jitter-elimination-usb-heartbeat-suppression">2.5. Jitter Elimination &amp; USB Heartbeat Suppression</h3>
+<p>Under normal Arduino operation, the USB Start-of-Frame (SOF) interrupt fires every <span class="arithmatex">\(1.0\text{ ms}\)</span>, and <code>Timer0</code> fires every <span class="arithmatex">\(1.024\text{ ms}\)</span> for <code>millis()</code>. These interrupts cause microsecond-scale jitter and cumulative timing drift (<span class="arithmatex">\(\approx 10.5\text{ ms}\)</span> slip over long trials).</p>
+<p>During active stimulation, the firmware temporarily suppresses these interrupts:</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">TIMSK0</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="n">_BV</span><span class="p">(</span><span class="n">TOIE0</span><span class="p">);</span><span class="w">  </span><span class="c1">// Disable Timer0 millis() interrupt</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">UDIEN</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">SOFE</span><span class="p">);</span><span class="w">  </span><span class="c1">// Disable USB Start-of-Frame interrupt</span>
+</span></code></pre></div>
+<p>Upon trial completion, both interrupts are re-enabled, ensuring zero timing slip during stimulation while retaining full USB communication.</p>
+<hr />
+<h3 id="26-lock-free-atomic-synchronization">2.6. Lock-Free Atomic Synchronization</h3>
+<p>To avoid global interrupt blocking (<code>cli()</code> / <code>sei()</code>) that could introduce carrier jitter, the firmware uses a double-read atomic pattern to safely read multi-byte cycle counters between the main loop and ISR:</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kt">uint32_t</span><span class="w"> </span><span class="n">safeCycles1</span><span class="p">,</span><span class="w"> </span><span class="n">safeCycles2</span><span class="p">;</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">do</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="n">safeCycles1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">completedCycles</span><span class="p">;</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="n">safeCycles2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">completedCycles</span><span class="p">;</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">}</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">safeCycles1</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">safeCycles2</span><span class="p">);</span>
+</span></code></pre></div>
+<hr />
+<h2 id="3-sinewave-trial-execution-lifecycle-end-to-end-walkthrough">3. Sinewave Trial Execution Lifecycle (End-to-End Walkthrough)</h2>
+<p>When host software (e.g. Bonsai or Python) requests a sinusoidal flicker trial, the firmware executes a precise sequence across serial ingestion, parameter arming, interrupt-driven synthesis, and completion handshake.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>[Host PC]  -- "s,5000,4.0,4.0,0.0,0.5,0.8,0.8\r" --&gt;  [Serial Parser]
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>                                                              |
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>                                                    [outputSinewave()]
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>                                                    (Arm DDS, Phase, Fade)
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>                                                              |
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>                                            [Disable Timer0 &amp; USB SOF]
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>                                            [Attach Timer1 OVF Callback]
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>                                                              |
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>                                          [31.25 kHz sinewaveInterrupt()]
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>                                          (DDS step, Fade, LUT, OCR1A/B)
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>                                                              |
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>                                           [Target Interrupts Reached]
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>                                                              |
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>                                            [Restore Interrupts &amp; Pins]
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>[Host PC]  &lt;------------- "-1\n" Handshake ----------- [Serial Print]
+</span></code></pre></div>
+<h3 id="step-1-serial-command-ingestion-parsing">Step 1: Serial Command Ingestion &amp; Parsing</h3>
+<p>The main <code>loop()</code> continuously monitors incoming characters over USB CDC:</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">loop</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="n">GetSerialInput</span><span class="p">();</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">newData</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="n">newData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="n">ActionSerial</span><span class="p">();</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>When a carriage return (<code>\r</code>) is received, <code>ActionSerial()</code> tokenizes the comma-separated ASCII string:</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// Example input: "s, 5000, 4.0, 4.0, 0.0, 0.5, 0.8, 0.8"</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">FirstChar</span><span class="p">,</span><span class="w"> </span><span class="s">"s"</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="kt">long</span><span class="w"> </span><span class="n">stimulusDuration</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atof</span><span class="p">(</span><span class="n">serialVals</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span><span class="w"> </span><span class="c1">// Duration (ms)</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="kt">float</span><span class="w"> </span><span class="n">freqA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atof</span><span class="p">(</span><span class="n">serialVals</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span><span class="w">           </span><span class="c1">// Channel A Frequency (Hz)</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="kt">float</span><span class="w"> </span><span class="n">freqB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atof</span><span class="p">(</span><span class="n">serialVals</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span><span class="w">           </span><span class="c1">// Channel B Frequency (Hz)</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="kt">float</span><span class="w"> </span><span class="n">phaseA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atof</span><span class="p">(</span><span class="n">serialVals</span><span class="p">[</span><span class="mi">4</span><span class="p">]);</span><span class="w">         </span><span class="c1">// Channel A Starting Phase (0.0-1.0)</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">  </span><span class="kt">float</span><span class="w"> </span><span class="n">phaseB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atof</span><span class="p">(</span><span class="n">serialVals</span><span class="p">[</span><span class="mi">5</span><span class="p">]);</span><span class="w">         </span><span class="c1">// Channel B Starting Phase (0.0-1.0)</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="kt">float</span><span class="w"> </span><span class="n">contrastA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atof</span><span class="p">(</span><span class="n">serialVals</span><span class="p">[</span><span class="mi">6</span><span class="p">]);</span><span class="w">      </span><span class="c1">// Channel A Contrast (0.0-1.0)</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">  </span><span class="kt">float</span><span class="w"> </span><span class="n">contrastB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atof</span><span class="p">(</span><span class="n">serialVals</span><span class="p">[</span><span class="mi">7</span><span class="p">]);</span><span class="w">      </span><span class="c1">// Channel B Contrast (0.0-1.0)</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">  </span><span class="n">outputSinewave</span><span class="p">(</span><span class="n">freqA</span><span class="p">,</span><span class="w"> </span><span class="n">freqB</span><span class="p">,</span><span class="w"> </span><span class="n">stimulusDuration</span><span class="p">,</span><span class="w"> </span><span class="n">phaseA</span><span class="p">,</span><span class="w"> </span><span class="n">phaseB</span><span class="p">,</span><span class="w"> </span><span class="n">contrastA</span><span class="p">,</span><span class="w"> </span><span class="n">contrastB</span><span class="p">);</span>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="p">}</span>
+</span></code></pre></div>
+<hr />
+<h3 id="step-2-pre-computing-trial-parameters-arming-the-hardware">Step 2: Pre-Computing Trial Parameters &amp; Arming the Hardware</h3>
+<p>Inside <code>outputSinewave()</code>, parameters are converted into fast integer representations before starting interrupts:</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">outputSinewave</span><span class="p">(</span><span class="kt">float</span><span class="w"> </span><span class="n">freqA</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">freqB</span><span class="p">,</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">duration</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">phaseA</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">phaseB</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">contrastA</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">contrastB</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="c1">// 1. Convert phase offsets (0.0-1.0) to full 32-bit phase accumulator starting values</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="n">phaseAccumulatorA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)(</span><span class="n">phaseA</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">4294967296.0</span><span class="p">);</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="n">phaseAccumulatorB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)(</span><span class="n">phaseB</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">4294967296.0</span><span class="p">);</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="c1">// 2. Scale contrast floats (0.0-1.0) to 8-bit integer multipliers (0-255)</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">  </span><span class="n">contrastMultIntA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint16_t</span><span class="p">)(</span><span class="n">contrastA</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">255.0</span><span class="p">);</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">  </span><span class="n">contrastMultIntB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint16_t</span><span class="p">)(</span><span class="n">contrastB</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">255.0</span><span class="p">);</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">  </span><span class="c1">// 3. Compute 32-bit DDS phase increments for both channels</span>
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">  </span><span class="n">phaseIncrementA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calcPhaseInc</span><span class="p">(</span><span class="n">freqA</span><span class="p">);</span>
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">  </span><span class="n">phaseIncrementB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calcPhaseInc</span><span class="p">(</span><span class="n">freqB</span><span class="p">);</span>
+</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>
+</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">  </span><span class="c1">// 4. Calculate total PWM carrier cycles required for the requested trial duration</span>
+</span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="w">  </span><span class="n">targetTotalInterrupts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="p">)((</span><span class="n">duration</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">actualPWMFreq</span><span class="p">);</span>
+</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>
+</span><span id="__span-11-17"><a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="w">  </span><span class="c1">// 5. Configure the 100ms Raised Cosine onset and offset fade boundaries</span>
+</span><span id="__span-11-18"><a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a><span class="w">  </span><span class="kt">float</span><span class="w"> </span><span class="n">fadeTimeMs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FADE_DURATION_MS</span><span class="p">;</span>
+</span><span id="__span-11-19"><a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fadeTimeMs</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-20"><a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a><span class="w">    </span><span class="n">fadeInterrupts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="p">)(</span><span class="n">actualPWMFreq</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">fadeTimeMs</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">));</span>
+</span><span id="__span-11-21"><a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a><span class="w">    </span><span class="n">fadeOutStartInterrupt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">targetTotalInterrupts</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">fadeInterrupts</span><span class="p">;</span>
+</span><span id="__span-11-22"><a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="w">    </span><span class="n">envStep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(((</span><span class="kt">uint32_t</span><span class="p">)</span><span class="n">FADE_LUT_MAX</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">16</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">fadeInterrupts</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">fadeInterrupts</span><span class="p">;</span>
+</span><span id="__span-11-23"><a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-11-24"><a id="__codelineno-11-24" name="__codelineno-11-24" href="#__codelineno-11-24"></a>
+</span><span id="__span-11-25"><a id="__codelineno-11-25" name="__codelineno-11-25" href="#__codelineno-11-25"></a><span class="w">  </span><span class="n">currentTick</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-11-26"><a id="__codelineno-11-26" name="__codelineno-11-26" href="#__codelineno-11-26"></a><span class="w">  </span><span class="n">completedCycles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-11-27"><a id="__codelineno-11-27" name="__codelineno-11-27" href="#__codelineno-11-27"></a><span class="w">  </span><span class="n">fadePhase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-11-28"><a id="__codelineno-11-28" name="__codelineno-11-28" href="#__codelineno-11-28"></a><span class="w">  </span><span class="n">stimulusActive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+</span><span id="__span-11-29"><a id="__codelineno-11-29" name="__codelineno-11-29" href="#__codelineno-11-29"></a>
+</span><span id="__span-11-30"><a id="__codelineno-11-30" name="__codelineno-11-30" href="#__codelineno-11-30"></a><span class="w">  </span><span class="c1">// 6. Set channels to baseline mid-luminance (50% duty cycle)</span>
+</span><span id="__span-11-31"><a id="__codelineno-11-31" name="__codelineno-11-31" href="#__codelineno-11-31"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">useChA</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">setChA</span><span class="p">(</span><span class="n">MidLumi</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-11-32"><a id="__codelineno-11-32" name="__codelineno-11-32" href="#__codelineno-11-32"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">useChB</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">setChB</span><span class="p">(</span><span class="n">MidLumi</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-11-33"><a id="__codelineno-11-33" name="__codelineno-11-33" href="#__codelineno-11-33"></a>
+</span><span id="__span-11-34"><a id="__codelineno-11-34" name="__codelineno-11-34" href="#__codelineno-11-34"></a><span class="w">  </span><span class="c1">// 7. Drive hardware indicator pins HIGH (Pin 5 = Stimulus ON, Pin 4 = Frame/Cycle indicator)</span>
+</span><span id="__span-11-35"><a id="__codelineno-11-35" name="__codelineno-11-35" href="#__codelineno-11-35"></a><span class="w">  </span><span class="n">PORTC</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">PORTC6</span><span class="p">);</span><span class="w"> </span><span class="c1">// Pin 5 HIGH</span>
+</span><span id="__span-11-36"><a id="__codelineno-11-36" name="__codelineno-11-36" href="#__codelineno-11-36"></a><span class="w">  </span><span class="n">PORTD</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">PIND4</span><span class="p">);</span><span class="w">  </span><span class="c1">// Pin 4 HIGH</span>
+</span><span id="__span-11-37"><a id="__codelineno-11-37" name="__codelineno-11-37" href="#__codelineno-11-37"></a>
+</span><span id="__span-11-38"><a id="__codelineno-11-38" name="__codelineno-11-38" href="#__codelineno-11-38"></a><span class="w">  </span><span class="c1">// 8. Temporarily disable Timer0 and USB SOF interrupts to prevent microsecond jitter</span>
+</span><span id="__span-11-39"><a id="__codelineno-11-39" name="__codelineno-11-39" href="#__codelineno-11-39"></a><span class="w">  </span><span class="n">TIMSK0</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="n">_BV</span><span class="p">(</span><span class="n">TOIE0</span><span class="p">);</span>
+</span><span id="__span-11-40"><a id="__codelineno-11-40" name="__codelineno-11-40" href="#__codelineno-11-40"></a><span class="w">  </span><span class="n">UDIEN</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">SOFE</span><span class="p">);</span>
+</span><span id="__span-11-41"><a id="__codelineno-11-41" name="__codelineno-11-41" href="#__codelineno-11-41"></a>
+</span><span id="__span-11-42"><a id="__codelineno-11-42" name="__codelineno-11-42" href="#__codelineno-11-42"></a><span class="w">  </span><span class="c1">// 9. Attach the callback and start the 31.25 kHz Timer1 interrupt</span>
+</span><span id="__span-11-43"><a id="__codelineno-11-43" name="__codelineno-11-43" href="#__codelineno-11-43"></a><span class="w">  </span><span class="n">setTimer1Callback</span><span class="p">(</span><span class="n">sinewaveInterrupt</span><span class="p">);</span>
+</span><span id="__span-11-44"><a id="__codelineno-11-44" name="__codelineno-11-44" href="#__codelineno-11-44"></a><span class="w">  </span><span class="n">startTimer1Interrupt</span><span class="p">();</span>
+</span><span id="__span-11-45"><a id="__codelineno-11-45" name="__codelineno-11-45" href="#__codelineno-11-45"></a>
+</span><span id="__span-11-46"><a id="__codelineno-11-46" name="__codelineno-11-46" href="#__codelineno-11-46"></a><span class="w">  </span><span class="c1">// 10. Jitter-free wait loop (Main loop idles cleanly while ISR drives hardware)</span>
+</span><span id="__span-11-47"><a id="__codelineno-11-47" name="__codelineno-11-47" href="#__codelineno-11-47"></a><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">stimulusActive</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-48"><a id="__codelineno-11-48" name="__codelineno-11-48" href="#__codelineno-11-48"></a><span class="w">    </span><span class="c1">// Peacefully idle</span>
+</span><span id="__span-11-49"><a id="__codelineno-11-49" name="__codelineno-11-49" href="#__codelineno-11-49"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-11-50"><a id="__codelineno-11-50" name="__codelineno-11-50" href="#__codelineno-11-50"></a>
+</span><span id="__span-11-51"><a id="__codelineno-11-51" name="__codelineno-11-51" href="#__codelineno-11-51"></a><span class="w">  </span><span class="c1">// 11. Trial Teardown</span>
+</span><span id="__span-11-52"><a id="__codelineno-11-52" name="__codelineno-11-52" href="#__codelineno-11-52"></a><span class="w">  </span><span class="n">stopTimer1Interrupt</span><span class="p">();</span>
+</span><span id="__span-11-53"><a id="__codelineno-11-53" name="__codelineno-11-53" href="#__codelineno-11-53"></a><span class="w">  </span><span class="n">TIMSK0</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">_BV</span><span class="p">(</span><span class="n">TOIE0</span><span class="p">);</span><span class="w">   </span><span class="c1">// Re-enable Timer0</span>
+</span><span id="__span-11-54"><a id="__codelineno-11-54" name="__codelineno-11-54" href="#__codelineno-11-54"></a><span class="w">  </span><span class="n">UDIEN</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">SOFE</span><span class="p">);</span><span class="w">   </span><span class="c1">// Re-enable USB SOF</span>
+</span><span id="__span-11-55"><a id="__codelineno-11-55" name="__codelineno-11-55" href="#__codelineno-11-55"></a>
+</span><span id="__span-11-56"><a id="__codelineno-11-56" name="__codelineno-11-56" href="#__codelineno-11-56"></a><span class="w">  </span><span class="n">PORTD</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">PIND4</span><span class="p">);</span><span class="w"> </span><span class="c1">// Pin 4 LOW</span>
+</span><span id="__span-11-57"><a id="__codelineno-11-57" name="__codelineno-11-57" href="#__codelineno-11-57"></a><span class="w">  </span><span class="n">PORTC</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">PORTC6</span><span class="p">);</span><span class="w"> </span><span class="c1">// Pin 5 LOW</span>
+</span><span id="__span-11-58"><a id="__codelineno-11-58" name="__codelineno-11-58" href="#__codelineno-11-58"></a>
+</span><span id="__span-11-59"><a id="__codelineno-11-59" name="__codelineno-11-59" href="#__codelineno-11-59"></a><span class="w">  </span><span class="c1">// 12. Reset to baseline and send completion handshake</span>
+</span><span id="__span-11-60"><a id="__codelineno-11-60" name="__codelineno-11-60" href="#__codelineno-11-60"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">useChA</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">setChA</span><span class="p">(</span><span class="n">TopLumi</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-11-61"><a id="__codelineno-11-61" name="__codelineno-11-61" href="#__codelineno-11-61"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">useChB</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">setChB</span><span class="p">(</span><span class="n">TopLumi</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-11-62"><a id="__codelineno-11-62" name="__codelineno-11-62" href="#__codelineno-11-62"></a><span class="w">  </span><span class="n">delayMicroseconds</span><span class="p">(</span><span class="mi">2000</span><span class="p">);</span>
+</span><span id="__span-11-63"><a id="__codelineno-11-63" name="__codelineno-11-63" href="#__codelineno-11-63"></a><span class="w">  </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="s">"-1</span><span class="se">\n</span><span class="s">"</span><span class="p">));</span>
+</span><span id="__span-11-64"><a id="__codelineno-11-64" name="__codelineno-11-64" href="#__codelineno-11-64"></a><span class="p">}</span>
+</span></code></pre></div>
+<hr />
+<h3 id="step-3-synchronous-waveform-synthesis-sinewaveinterrupt-3125-khz">Step 3: Synchronous Waveform Synthesis (<code>sinewaveInterrupt()</code> @ 31.25 kHz)</h3>
+<p>Every <span class="arithmatex">\(32\ \mu\text{s}\)</span>, the Timer1 overflow interrupt triggers <code>sinewaveInterrupt()</code>. The entire routine executes in under <span class="arithmatex">\(4\ \mu\text{s}\)</span> using pure fixed-point arithmetic:</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">sinewaveInterrupt</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">currentEnvelope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">255</span><span class="p">;</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="c1">// 1. Calculate the active Raised Cosine fade envelope (Onset Ramp vs Steady State vs Offset Ramp)</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">currentTick</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">fadeInterrupts</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="n">fadePhase</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">envStep</span><span class="p">;</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">envIndex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fadePhase</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">envIndex</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">FADE_LUT_MAX</span><span class="p">)</span><span class="w"> </span><span class="n">envIndex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FADE_LUT_MAX</span><span class="p">;</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">    </span><span class="n">currentEnvelope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisedCosineLUT</span><span class="p">[</span><span class="n">envIndex</span><span class="p">];</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">currentTick</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">fadeOutStartInterrupt</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">    </span><span class="n">fadePhase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">    </span><span class="n">currentEnvelope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisedCosineLUT</span><span class="p">[</span><span class="n">FADE_LUT_MAX</span><span class="p">];</span>
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">currentTick</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">fadeOutStartInterrupt</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="w">    </span><span class="n">fadePhase</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">envStep</span><span class="p">;</span>
+</span><span id="__span-12-15"><a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">shiftPhase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fadePhase</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
+</span><span id="__span-12-16"><a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">envIndex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">shiftPhase</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">FADE_LUT_MAX</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="n">FADE_LUT_MAX</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">shiftPhase</span><span class="p">);</span>
+</span><span id="__span-12-17"><a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="w">    </span><span class="n">currentEnvelope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raisedCosineLUT</span><span class="p">[</span><span class="n">envIndex</span><span class="p">];</span>
+</span><span id="__span-12-18"><a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-12-19"><a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a>
+</span><span id="__span-12-20"><a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a><span class="w">  </span><span class="c1">// 2. Track master elapsed clock and check for trial completion</span>
+</span><span id="__span-12-21"><a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a><span class="w">  </span><span class="n">currentTick</span><span class="o">++</span><span class="p">;</span>
+</span><span id="__span-12-22"><a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">currentTick</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">targetTotalInterrupts</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-12-23"><a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a><span class="w">    </span><span class="n">stimulusActive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w"> </span><span class="c1">// Signals the main loop to exit</span>
+</span><span id="__span-12-24"><a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-12-25"><a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a>
+</span><span id="__span-12-26"><a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a><span class="w">  </span><span class="c1">// 3. Modulate requested contrast depth by the temporal envelope</span>
+</span><span id="__span-12-27"><a id="__codelineno-12-27" name="__codelineno-12-27" href="#__codelineno-12-27"></a><span class="w">  </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">effectiveContrastA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="kt">uint16_t</span><span class="p">)</span><span class="n">contrastMultIntA</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="kt">uint16_t</span><span class="p">)</span><span class="n">currentEnvelope</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span>
+</span><span id="__span-12-28"><a id="__codelineno-12-28" name="__codelineno-12-28" href="#__codelineno-12-28"></a><span class="w">  </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">effectiveContrastB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="kt">uint16_t</span><span class="p">)</span><span class="n">contrastMultIntB</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="kt">uint16_t</span><span class="p">)</span><span class="n">currentEnvelope</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span>
+</span><span id="__span-12-29"><a id="__codelineno-12-29" name="__codelineno-12-29" href="#__codelineno-12-29"></a>
+</span><span id="__span-12-30"><a id="__codelineno-12-30" name="__codelineno-12-30" href="#__codelineno-12-30"></a><span class="w">  </span><span class="c1">// 4. Advance 32-bit phase accumulators by the DDS phase increments</span>
+</span><span id="__span-12-31"><a id="__codelineno-12-31" name="__codelineno-12-31" href="#__codelineno-12-31"></a><span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">oldPhaseA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">phaseAccumulatorA</span><span class="p">;</span>
+</span><span id="__span-12-32"><a id="__codelineno-12-32" name="__codelineno-12-32" href="#__codelineno-12-32"></a><span class="w">  </span><span class="n">phaseAccumulatorA</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">phaseIncrementA</span><span class="p">;</span>
+</span><span id="__span-12-33"><a id="__codelineno-12-33" name="__codelineno-12-33" href="#__codelineno-12-33"></a><span class="w">  </span><span class="n">phaseAccumulatorB</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">phaseIncrementB</span><span class="p">;</span>
+</span><span id="__span-12-34"><a id="__codelineno-12-34" name="__codelineno-12-34" href="#__codelineno-12-34"></a>
+</span><span id="__span-12-35"><a id="__codelineno-12-35" name="__codelineno-12-35" href="#__codelineno-12-35"></a><span class="w">  </span><span class="c1">// 5. Toggle Pin 4 on full cycle wrap-around to provide hardware cycle tracking</span>
+</span><span id="__span-12-36"><a id="__codelineno-12-36" name="__codelineno-12-36" href="#__codelineno-12-36"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">phaseAccumulatorA</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">oldPhaseA</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-12-37"><a id="__codelineno-12-37" name="__codelineno-12-37" href="#__codelineno-12-37"></a><span class="w">    </span><span class="n">completedCycles</span><span class="o">++</span><span class="p">;</span>
+</span><span id="__span-12-38"><a id="__codelineno-12-38" name="__codelineno-12-38" href="#__codelineno-12-38"></a><span class="w">    </span><span class="n">PIND</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">PIND4</span><span class="p">);</span><span class="w"> </span><span class="c1">// Hardware toggle Pin 4</span>
+</span><span id="__span-12-39"><a id="__codelineno-12-39" name="__codelineno-12-39" href="#__codelineno-12-39"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-12-40"><a id="__codelineno-12-40" name="__codelineno-12-40" href="#__codelineno-12-40"></a>
+</span><span id="__span-12-41"><a id="__codelineno-12-41" name="__codelineno-12-41" href="#__codelineno-12-41"></a><span class="w">  </span><span class="c1">// 6. Fast bitwise extraction of high byte for wavetable lookup (256 entries)</span>
+</span><span id="__span-12-42"><a id="__codelineno-12-42" name="__codelineno-12-42" href="#__codelineno-12-42"></a><span class="w">  </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">indexA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="kt">uint8_t</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">phaseAccumulatorA</span><span class="p">)[</span><span class="mi">3</span><span class="p">];</span>
+</span><span id="__span-12-43"><a id="__codelineno-12-43" name="__codelineno-12-43" href="#__codelineno-12-43"></a><span class="w">  </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">indexB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="kt">uint8_t</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">phaseAccumulatorB</span><span class="p">)[</span><span class="mi">3</span><span class="p">];</span>
+</span><span id="__span-12-44"><a id="__codelineno-12-44" name="__codelineno-12-44" href="#__codelineno-12-44"></a>
+</span><span id="__span-12-45"><a id="__codelineno-12-45" name="__codelineno-12-45" href="#__codelineno-12-45"></a><span class="w">  </span><span class="c1">// 7. Apply contrast depth around MidLumi (50% baseline)</span>
+</span><span id="__span-12-46"><a id="__codelineno-12-46" name="__codelineno-12-46" href="#__codelineno-12-46"></a><span class="w">  </span><span class="kt">int16_t</span><span class="w"> </span><span class="n">tempA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int16_t</span><span class="p">)</span><span class="n">sineWaveTable</span><span class="p">[</span><span class="n">indexA</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="kt">int16_t</span><span class="p">)</span><span class="n">MidLumi</span><span class="p">;</span>
+</span><span id="__span-12-47"><a id="__codelineno-12-47" name="__codelineno-12-47" href="#__codelineno-12-47"></a><span class="w">  </span><span class="kt">int16_t</span><span class="w"> </span><span class="n">ocrValA_calc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int16_t</span><span class="p">)</span><span class="n">MidLumi</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">((</span><span class="n">tempA</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="kt">int16_t</span><span class="p">)</span><span class="n">effectiveContrastA</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">8</span><span class="p">);</span>
+</span><span id="__span-12-48"><a id="__codelineno-12-48" name="__codelineno-12-48" href="#__codelineno-12-48"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ocrValA_calc</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">ocrValA_calc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-12-49"><a id="__codelineno-12-49" name="__codelineno-12-49" href="#__codelineno-12-49"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ocrValA_calc</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="n">ocrValA_calc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">255</span><span class="p">;</span>
+</span><span id="__span-12-50"><a id="__codelineno-12-50" name="__codelineno-12-50" href="#__codelineno-12-50"></a><span class="w">  </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">ocrValA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span><span class="n">ocrValA_calc</span><span class="p">;</span>
+</span><span id="__span-12-51"><a id="__codelineno-12-51" name="__codelineno-12-51" href="#__codelineno-12-51"></a>
+</span><span id="__span-12-52"><a id="__codelineno-12-52" name="__codelineno-12-52" href="#__codelineno-12-52"></a><span class="w">  </span><span class="kt">int16_t</span><span class="w"> </span><span class="n">tempB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int16_t</span><span class="p">)</span><span class="n">sineWaveTable</span><span class="p">[</span><span class="n">indexB</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="kt">int16_t</span><span class="p">)</span><span class="n">MidLumi</span><span class="p">;</span>
+</span><span id="__span-12-53"><a id="__codelineno-12-53" name="__codelineno-12-53" href="#__codelineno-12-53"></a><span class="w">  </span><span class="kt">int16_t</span><span class="w"> </span><span class="n">ocrValB_calc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int16_t</span><span class="p">)</span><span class="n">MidLumi</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">((</span><span class="n">tempB</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="kt">int16_t</span><span class="p">)</span><span class="n">effectiveContrastB</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">8</span><span class="p">);</span>
+</span><span id="__span-12-54"><a id="__codelineno-12-54" name="__codelineno-12-54" href="#__codelineno-12-54"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ocrValB_calc</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">ocrValB_calc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-12-55"><a id="__codelineno-12-55" name="__codelineno-12-55" href="#__codelineno-12-55"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ocrValB_calc</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="n">ocrValB_calc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">255</span><span class="p">;</span>
+</span><span id="__span-12-56"><a id="__codelineno-12-56" name="__codelineno-12-56" href="#__codelineno-12-56"></a><span class="w">  </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">ocrValB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span><span class="n">ocrValB_calc</span><span class="p">;</span>
+</span><span id="__span-12-57"><a id="__codelineno-12-57" name="__codelineno-12-57" href="#__codelineno-12-57"></a>
+</span><span id="__span-12-58"><a id="__codelineno-12-58" name="__codelineno-12-58" href="#__codelineno-12-58"></a><span class="w">  </span><span class="c1">// 8. Lookup gamma-corrected register values and write directly to OCR1A and OCR1B</span>
+</span><span id="__span-12-59"><a id="__codelineno-12-59" name="__codelineno-12-59" href="#__codelineno-12-59"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">useChA</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">setChA</span><span class="p">(</span><span class="n">ocrValA</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-12-60"><a id="__codelineno-12-60" name="__codelineno-12-60" href="#__codelineno-12-60"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">useChB</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">setChB</span><span class="p">(</span><span class="n">ocrValB</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-12-61"><a id="__codelineno-12-61" name="__codelineno-12-61" href="#__codelineno-12-61"></a><span class="p">}</span>
+</span></code></pre></div>
+<hr />
+<h2 id="4-additional-stimulus-engines-from-v8-firmware">4. Additional Stimulus Engines (from v8 Firmware)</h2>
+<p>While the DDS firmware is the primary engine for smooth sinusoidal, frequency sweep, and contrast envelope stimulation, the <strong><a href="file:///d:/Code/LEDStimulation/ArduinoCode/StimulusControlViaSerial_Leonardo_v8/StimulusControlViaSerial_Leonardo_v8.ino"><code>StimulusControlViaSerial_Leonardo_v8.ino</code></a></strong> firmware provides specialized stochastic noise stimuli:</p>
+<pre class="mermaid"><code>graph TD
+    v8["StimulusControlViaSerial_Leonardo_v8&lt;br&gt;&lt;i&gt;Stochastic Stimulus Engine&lt;/i&gt;"]
+
+    v8 --&gt; WN["Gaussian White Noise ('wn')&lt;br&gt;&lt;i&gt;xorshift32 PRNG + Central Limit Theorem&lt;/i&gt;"]
+    v8 --&gt; FWN["Frozen White Noise ('fwn')&lt;br&gt;&lt;i&gt;Reproducible PRNG Seed &amp; Fixed Buffer&lt;/i&gt;"]
+    v8 --&gt; CS["Contrast-Switching Noise ('cs')&lt;br&gt;&lt;i&gt;2-State Alternating Gaussian Distribution&lt;/i&gt;"]</code></pre>
+<h3 id="41-real-time-gaussian-white-noise-wn">4.1. Real-Time Gaussian White Noise (<code>wn</code>)</h3>
+<ul>
+<li><strong>PRNG Engine (<code>xorshift32</code>):</strong> Generates high-entropy 32-bit pseudo-random numbers in just 3 clock cycles.</li>
+<li><strong>Central Limit Theorem (CLT) Gaussian Approximation:</strong> Instead of computationally heavy Box-Muller transformations, sums <span class="arithmatex">\(N = 10\)</span> uniform random variables:
+    $$
+    Z = \frac{\sum_{i=1}^{10} U_i - \mu_{\text{sum}}}{\sigma_{\text{sum}}} \sim \mathcal{N}(0, 1)
+    $$</li>
+<li><strong>Luminance Mapping:</strong> Scales <span class="arithmatex">\(Z\)</span> by <code>target_std</code> and offsets by <code>target_mean</code> to produce dynamic Gaussian luminance frames updated at discrete intervals (e.g. <span class="arithmatex">\(10\text{ ms} = 100\text{ Hz}\)</span>).</li>
+</ul>
+<h3 id="42-frozen-white-noise-fwn">4.2. Frozen White Noise (<code>fwn</code>)</h3>
+<ul>
+<li>Pre-computes a deterministic Gaussian sequence into an SRAM buffer (<code>frozenWhiteNoiseTable[375]</code>) using a specific seed (<code>randSeedNum</code>).</li>
+<li>Loops the exact sequence <code>nReps</code> times to allow trial-averaged neural response analysis (e.g., Spike-Triggered Averaging / Receptive Field Mapping).</li>
+</ul>
+<h3 id="43-contrast-switching-adaptation-noise-cs">4.3. Contrast-Switching Adaptation Noise (<code>cs</code>)</h3>
+<ul>
+<li>Alternates periodically between two Gaussian distributions (e.g., State 1: 5% contrast vs. State 2: 25% contrast) every <code>switchTime</code> ms.</li>
+<li>Used to probe the kinetics of sensory gain control and neural contrast adaptation.</li>
+</ul>
+<hr />
+<h2 id="5-gamma-linearization-look-up-tables">5. Gamma Linearization &amp; Look-Up Tables</h2>
+<p>Both firmware variants use Flash-resident (<code>PROGMEM</code>) Look-Up Tables to perform real-time optical linearization without runtime floating-point power equations:</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">__attribute__</span><span class="p">((</span><span class="n">always_inline</span><span class="p">))</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">setChA</span><span class="p">(</span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">ocrValue</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="n">OCR1A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pgm_read_byte_near</span><span class="p">(</span><span class="n">currentChALUT</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ocrValue</span><span class="p">);</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li><strong>Bank Switching (<code>agc</code>):</strong> The active LUT bank can be dynamically switched between Bank 1 (linear/identity) and Bank 2 (calibrated empirical gamma curve) via serial command.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="https://unpkg.com/katex@0/dist/katex.min.js"></script>
+      
+        <script src="https://unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
+      
+        <script src="../../javascripts/katex.js"></script>
+      
+    
+  </body>
+</html>

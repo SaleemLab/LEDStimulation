@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <style>
+    .bg { fill: url(#bgGrad); stroke: #cbd5e1; stroke-width: 2; stroke-dasharray: 8 6; rx: 16px; }
+    .icon-bg { fill: #fff7ed; stroke: #fed7aa; stroke-width: 1.5; }
+    .tag-bg { fill: #ffedd5; rx: 6px; }
+    .tag-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; fill: #c2410c; letter-spacing: 0.08em; }
+    .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 700; fill: #0f172a; }
+    .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; fill: #475569; }
+    .source-box { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1; rx: 8px; }
+    .source-text { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 12px; fill: #64748b; }
+    .source-highlight { fill: #ea580c; font-weight: 600; }
+  </style>
+
+  <!-- Card Background -->
+  <rect x="15" y="15" width="770" height="390" class="bg" filter="url(#shadow)" />
+
+  <!-- Badge -->
+  <g transform="translate(325, 45)">
+    <rect width="150" height="26" class="tag-bg"/>
+    <text x="75" y="17" text-anchor="middle" class="tag-text">IMAGE PLACEHOLDER</text>
+  </g>
+
+  <!-- Central Icon: Driver Board Schematic / IC Outline -->
+  <g transform="translate(350, 95)">
+    <rect x="-40" y="0" width="180" height="120" rx="10" class="icon-bg"/>
+    
+    <!-- IC Chip Outline -->
+    <rect x="30" y="35" width="40" height="50" rx="4" fill="#ea580c" opacity="0.9"/>
+    <!-- IC Pins -->
+    <line x1="20" y1="45" x2="30" y2="45" stroke="#ea580c" stroke-width="2.5"/>
+    <line x1="20" y1="60" x2="30" y2="60" stroke="#ea580c" stroke-width="2.5"/>
+    <line x1="20" y1="75" x2="30" y2="75" stroke="#ea580c" stroke-width="2.5"/>
+    <line x1="70" y1="45" x2="80" y2="45" stroke="#ea580c" stroke-width="2.5"/>
+    <line x1="70" y1="60" x2="80" y2="60" stroke="#ea580c" stroke-width="2.5"/>
+    <line x1="70" y1="75" x2="80" y2="75" stroke="#ea580c" stroke-width="2.5"/>
+    
+    <!-- Sense Resistor and Inductor/Capacitor symbols -->
+    <rect x="-20" y="52" width="22" height="16" rx="2" fill="none" stroke="#9a3412" stroke-width="2"/>
+    <circle cx="105" cy="60" r="12" fill="none" stroke="#9a3412" stroke-width="2"/>
+
+    <!-- Warning / Prototype Icon -->
+    <polygon points="50,15 42,28 58,28" fill="#f59e0b"/>
+    <text x="50" y="26" font-family="sans-serif" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">!</text>
+  </g>
+
+  <!-- Typography -->
+  <text x="400" y="260" text-anchor="middle" class="title">Constant Current Driver Prototype (Experimental)</text>
+  <text x="400" y="288" text-anchor="middle" class="subtitle">KiCad Schematic / PCB Layout of Experimental Constant-Current Driver</text>
+
+  <!-- Source Reference Box -->
+  <g transform="translate(150, 325)">
+    <rect width="500" height="42" class="source-box"/>
+    <text x="250" y="26" text-anchor="middle" class="source-text">Target asset: <tspan class="source-highlight">Hardware/Constant_current_driver/Constant_current_driver.kicad_pcb</tspan></text>
+  </g>
+</svg>

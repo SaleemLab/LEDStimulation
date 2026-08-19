@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <style>
+    .bg { fill: url(#bgGrad); stroke: #cbd5e1; stroke-width: 2; stroke-dasharray: 8 6; rx: 16px; }
+    .icon-bg { fill: #f0fdf4; stroke: #bbf7d0; stroke-width: 1.5; }
+    .tag-bg { fill: #dcfce7; rx: 6px; }
+    .tag-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; fill: #15803d; letter-spacing: 0.08em; }
+    .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 700; fill: #0f172a; }
+    .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; fill: #475569; }
+    .source-box { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1; rx: 8px; }
+    .source-text { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 12px; fill: #64748b; }
+    .source-highlight { fill: #16a34a; font-weight: 600; }
+  </style>
+
+  <!-- Card Background -->
+  <rect x="15" y="15" width="770" height="390" class="bg" filter="url(#shadow)" />
+
+  <!-- Badge -->
+  <g transform="translate(325, 45)">
+    <rect width="150" height="26" class="tag-bg"/>
+    <text x="75" y="17" text-anchor="middle" class="tag-text">IMAGE PLACEHOLDER</text>
+  </g>
+
+  <!-- Central Icon: Corner & Edge 3D Printed Clamp Assembly -->
+  <g transform="translate(320, 95)">
+    <!-- Base Part -->
+    <path d="M 0 50 L 50 20 L 100 50 L 50 80 Z" fill="#94a3b8" stroke="#334155" stroke-width="1.5"/>
+    <path d="M 0 50 L 0 70 L 50 100 L 50 80 Z" fill="#64748b" stroke="#334155" stroke-width="1.5"/>
+    <path d="M 50 80 L 50 100 L 100 70 L 100 50 Z" fill="#475569" stroke="#334155" stroke-width="1.5"/>
+
+    <!-- Magnet in Base -->
+    <circle cx="50" cy="50" r="8" fill="#e11d48"/>
+
+    <!-- Diffuser Layer (Translucent) -->
+    <path d="M -10 40 L 70 -5 L 170 45 L 90 90 Z" fill="#38bdf8" fill-opacity="0.4" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+    <!-- Top Magnetic Clamp (Hovering / Snapping) -->
+    <g transform="translate(60, -35)">
+      <path d="M 0 50 L 50 20 L 100 50 L 50 80 Z" fill="#86efac" stroke="#16a34a" stroke-width="1.5"/>
+      <path d="M 0 50 L 0 65 L 50 95 L 50 80 Z" fill="#4ade80" stroke="#16a34a" stroke-width="1.5"/>
+      <path d="M 50 80 L 50 95 L 100 65 L 100 50 Z" fill="#22c55e" stroke="#16a34a" stroke-width="1.5"/>
+      <circle cx="50" cy="50" r="8" fill="#e11d48"/>
+      <!-- Snap arrows -->
+      <path d="M 50 75 L 50 105" stroke="#15803d" stroke-width="2" stroke-dasharray="2 2"/>
+      <polygon points="50,110 47,103 53,103" fill="#15803d"/>
+    </g>
+  </g>
+
+  <!-- Typography -->
+  <text x="400" y="260" text-anchor="middle" class="title">Magnetic Diffusion Clamping Details</text>
+  <text x="400" y="288" text-anchor="middle" class="subtitle">3D CAD / Macro Photo of 3D-Printed Corner &amp; Edge Magnet Clamps</text>
+
+  <!-- Source Reference Box -->
+  <g transform="translate(150, 325)">
+    <rect width="500" height="42" class="source-box"/>
+    <text x="250" y="26" text-anchor="middle" class="source-text">Target asset: <tspan class="source-highlight">Hardware/Enclosure/box_corner_screws_and_magnets.stl</tspan></text>
+  </g>
+</svg>
