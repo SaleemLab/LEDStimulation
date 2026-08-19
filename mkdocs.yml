@@ -1,0 +1,85 @@
+site_name: Full-Field LED Visual Stimulator
+site_description: High-precision temporal visual stimulation platform for neuroscience and psychophysics.
+site_author: Saleem Lab
+repo_url: https://github.com/SaleemLab/LEDStimulation
+repo_name: SaleemLab/LEDStimulation
+
+theme:
+  name: material
+  language: en
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.keys
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.arithmatex:
+      generic: true
+  - tables
+  - attr_list
+  - md_in_html
+
+extra_javascript:
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Overview: index.md
+  - 1. Hardware:
+      - Circuit & Driver: 1-hardware/circuit-and-driver.md
+      - Custom PCBs: 1-hardware/custom-pcbs.md
+      - Enclosure & Optics:
+          - Panel Enclosure: 1-hardware/enclosure-and-optics/panel-enclosure.md
+          - Wearable Glasses: 1-hardware/enclosure-and-optics/wearable-glasses.md
+      - Bill of Materials: 1-hardware/bill-of-materials.md
+  - 2. Firmware:
+      - Architecture & Timers: 2-firmware/architecture-and-timers.md
+      - Serial API Reference: 2-firmware/serial-api-reference.md
+      - Firmware Variants: 2-firmware/firmware-variants.md
+  - 3. Calibration:
+      - Calibration Guide: 3-calibration/calibration-guide.md
+      - Gamma LUT Pipeline: 3-calibration/gamma-lut-pipeline.md
+      - Photoreceptor Calculations: 3-calibration/photoreceptor-calculations.md
+  - 4. Experimental Workflows:
+      - Bonsai Overview: 4-experimental-workflows/bonsai-overview.md
+      - Stimulation Paradigms: 4-experimental-workflows/stimulation-paradigms.md
+      - Integration & Sync: 4-experimental-workflows/integration-and-sync.md
+  - 5. Reference:
+      - Performance & Dynamics: 5-reference/performance-and-sync.md

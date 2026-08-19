@@ -76,15 +76,15 @@ Open [Bonsai](https://bonsai-rx.org/) and load one of the pre-built visual stimu
 
 ## Documentation Index
 
-Comprehensive guides, schematics, and technical specifications are available in the **[`docs/`](file:///d:/Code/LEDStimulation/docs/README.md)** directory:
+Comprehensive guides, schematics, and technical specifications are available in the **[`docs/`](docs/index.md)** directory:
 
 | Section | Description |
 | :--- | :--- |
-| **[1. Hardware](file:///d:/Code/LEDStimulation/docs/1-hardware/circuit-and-driver.md)** | [Circuit & Driver](file:///d:/Code/LEDStimulation/docs/1-hardware/circuit-and-driver.md) • [Custom PCBs](file:///d:/Code/LEDStimulation/docs/1-hardware/custom-pcbs.md) • [Panel Enclosure](file:///d:/Code/LEDStimulation/docs/1-hardware/enclosure-and-optics/panel-enclosure.md) • [Wearable Glasses](file:///d:/Code/LEDStimulation/docs/1-hardware/enclosure-and-optics/wearable-glasses.md) • [Bill of Materials](file:///d:/Code/LEDStimulation/docs/1-hardware/bill-of-materials.md) |
-| **[2. Firmware](file:///d:/Code/LEDStimulation/docs/2-firmware/architecture-and-timers.md)** | [Architecture & Hardware Timers](file:///d:/Code/LEDStimulation/docs/2-firmware/architecture-and-timers.md) • [Serial API Reference](file:///d:/Code/LEDStimulation/docs/2-firmware/serial-api-reference.md) • [Firmware Variants](file:///d:/Code/LEDStimulation/docs/2-firmware/firmware-variants.md) |
-| **[3. Calibration](file:///d:/Code/LEDStimulation/docs/3-calibration/calibration-guide.md)** | [Calibration Guide](file:///d:/Code/LEDStimulation/docs/3-calibration/calibration-guide.md) • [Gamma LUT Pipeline](file:///d:/Code/LEDStimulation/docs/3-calibration/gamma-lut-pipeline.md) • [Photoreceptor Calculations](file:///d:/Code/LEDStimulation/docs/3-calibration/photoreceptor-calculations.md) |
-| **[4. Experimental Workflows](file:///d:/Code/LEDStimulation/docs/4-experimental-workflows/bonsai-overview.md)** | [Bonsai Setup](file:///d:/Code/LEDStimulation/docs/4-experimental-workflows/bonsai-overview.md) • [Stimulation Paradigms](file:///d:/Code/LEDStimulation/docs/4-experimental-workflows/stimulation-paradigms.md) • [Integration & Multi-Modal Sync](file:///d:/Code/LEDStimulation/docs/4-experimental-workflows/integration-and-sync.md) |
-| **[5. Reference](file:///d:/Code/LEDStimulation/docs/5-reference/performance-and-sync.md)** | [Performance Characteristics, Switching Dynamics & Thermal Notes](file:///d:/Code/LEDStimulation/docs/5-reference/performance-and-sync.md) |
+| **[1. Hardware](docs/1-hardware/circuit-and-driver.md)** | [Circuit & Driver](docs/1-hardware/circuit-and-driver.md) • [Custom PCBs](docs/1-hardware/custom-pcbs.md) • [Panel Enclosure](docs/1-hardware/enclosure-and-optics/panel-enclosure.md) • [Wearable Glasses](docs/1-hardware/enclosure-and-optics/wearable-glasses.md) • [Bill of Materials](docs/1-hardware/bill-of-materials.md) |
+| **[2. Firmware](docs/2-firmware/architecture-and-timers.md)** | [Architecture & Hardware Timers](docs/2-firmware/architecture-and-timers.md) • [Serial API Reference](docs/2-firmware/serial-api-reference.md) • [Firmware Variants](docs/2-firmware/firmware-variants.md) |
+| **[3. Calibration](docs/3-calibration/calibration-guide.md)** | [Calibration Guide](docs/3-calibration/calibration-guide.md) • [Gamma LUT Pipeline](docs/3-calibration/gamma-lut-pipeline.md) • [Photoreceptor Calculations](docs/3-calibration/photoreceptor-calculations.md) |
+| **[4. Experimental Workflows](docs/4-experimental-workflows/bonsai-overview.md)** | [Bonsai Setup](docs/4-experimental-workflows/bonsai-overview.md) • [Stimulation Paradigms](docs/4-experimental-workflows/stimulation-paradigms.md) • [Integration & Multi-Modal Sync](docs/4-experimental-workflows/integration-and-sync.md) |
+| **[5. Reference](docs/5-reference/performance-and-sync.md)** | [Performance Characteristics, Switching Dynamics & Thermal Notes](docs/5-reference/performance-and-sync.md) |
 
 ---
 
