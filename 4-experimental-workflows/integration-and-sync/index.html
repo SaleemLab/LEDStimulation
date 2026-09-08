@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Saleem Lab" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Integration & Sync - Full-Field LED Visual Stimulator</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="https://unpkg.com/katex@0/dist/katex.min.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Integration \u0026 Sync";
+        var mkdocs_page_input_path = "4-experimental-workflows/integration-and-sync.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Full-Field LED Visual Stimulator
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">1. Hardware</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/circuit-and-driver/">Circuit & Driver</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/custom-pcbs/">Custom PCBs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Enclosure & Optics</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../1-hardware/enclosure-and-optics/panel-enclosure/">Panel Enclosure</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../1-hardware/enclosure-and-optics/wearable-glasses/">Wearable Glasses</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/bill-of-materials/">Bill of Materials</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">2. Firmware</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/architecture-and-timers/">Architecture & Timers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/serial-api-reference/">Serial API Reference</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/firmware-variants/">Firmware Variants</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">3. Calibration</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/calibration-guide/">Calibration Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/gamma-lut-pipeline/">Gamma LUT Pipeline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/photoreceptor-calculations/">Photoreceptor Calculations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">4. Experimental Workflows</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bonsai-overview/">Bonsai Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../stimulation-paradigms/">Stimulation Paradigms</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Integration & Sync</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#synchronization-architecture">Synchronization Architecture</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-hardware-ttl-synchronization-pins">1. Hardware TTL Synchronization Pins</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-pupil-labs-neon-eye-tracking-integration">2. Pupil Labs Neon Eye Tracking Integration</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-inertial-measurement-unit-imu-tracking">3. Inertial Measurement Unit (IMU) Tracking</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-labrecorder-labstreaminglayer-lsl">4. LabRecorder &amp; LabStreamingLayer (LSL)</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">5. Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../5-reference/performance-and-sync/">Performance & Dynamics</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Full-Field LED Visual Stimulator</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">4. Experimental Workflows</li>
+      <li class="breadcrumb-item active">Integration & Sync</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/SaleemLab/LEDStimulation/edit/master/docs/4-experimental-workflows/integration-and-sync.md">Edit on SaleemLab/LEDStimulation</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="integration-multi-modal-synchronization">Integration &amp; Multi-Modal Synchronization</h1>
+<p>Complex experiments often require synchronized acquisition across multiple data streams: visual stimulation timestamps, high-speed eye tracking, inertial motion measurements, and neural electrophysiology or imaging.</p>
+<div class="admonition note">
+<p class="admonition-title">Work in Progress</p>
+<p>This documentation section is currently a work in progress.</p>
+</div>
+<hr />
+<h2 id="synchronization-architecture">Synchronization Architecture</h2>
+<pre class="mermaid"><code>flowchart TD
+    subgraph Hardware["⚡ Hardware TTL Signals"]
+        direction LR
+        MCU_P4["&lt;b&gt;Microcontroller Pin 4&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Indicator / Frame Toggle&lt;/i&gt;"]
+        MCU_P5["&lt;b&gt;Microcontroller Pin 5&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Stimulus Active Gate&lt;/i&gt;"]
+    end
+
+    subgraph Software["💻 Software Acquisition (LabStreamingLayer)"]
+        direction LR
+        Bonsai["&lt;b&gt;Bonsai Stimulus Engine&lt;/b&gt;&lt;br/&gt;&lt;i&gt;LSL Outlet: Stimulus Events&lt;/i&gt;"]
+        Neon["&lt;b&gt;Pupil Labs Neon Tracker&lt;/b&gt;&lt;br/&gt;&lt;i&gt;LSL Outlet: Gaze and Video&lt;/i&gt;"]
+        IMU["&lt;b&gt;Motion / IMU Stream&lt;/b&gt;&lt;br/&gt;&lt;i&gt;LSL Outlet: 6-DOF Kinematics&lt;/i&gt;"]
+    end
+
+    SyncBox["&lt;b&gt;Hardware DAQ / Sync Box&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Open Ephys / Intan / NI-DAQ&lt;/i&gt;"]
+    LabRecorder["&lt;b&gt;LabRecorder Multi-Stream Host&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Synchronized XDF Output File&lt;/i&gt;"]
+
+    MCU_P4 --&gt; SyncBox
+    MCU_P5 --&gt; SyncBox
+    Bonsai --&gt; LabRecorder
+    Neon --&gt; LabRecorder
+    IMU --&gt; LabRecorder
+    SyncBox -.-&gt;|Hardware Clocks| LabRecorder</code></pre>
+<hr />
+<h2 id="1-hardware-ttl-synchronization-pins">1. Hardware TTL Synchronization Pins</h2>
+<p>The microcontroller outputs real-time TTL state flags to synchronize external acquisition systems (e.g. Open Ephys, Intan, National Instruments DAQ):
+* <strong>Pin 4 (Indicator Toggle):</strong> Inverts logic state on every stimulus update, frame transition, or trial onset.
+* <strong>Pin 5 (Stimulus Status):</strong> Drives <code>HIGH</code> throughout the active stimulus duration and returns to <code>LOW</code> during inter-trial intervals (ITIs).</p>
+<hr />
+<h2 id="2-pupil-labs-neon-eye-tracking-integration">2. Pupil Labs Neon Eye Tracking Integration</h2>
+<ul>
+<li><strong>Workflow:</strong> <a href="file:///d:/Code/LEDStimulation/BonsaiCode/streamNeonDev.bonsai"><code>BonsaiCode/streamNeonDev.bonsai</code></a></li>
+<li><strong>Description:</strong> Connects to the Pupil Labs Neon mobile eye-tracking stream over network API / RTSP / LSL to record:</li>
+<li>200 Hz binocular eye camera video and pupil diameter.</li>
+<li>Real-time gaze coordinates in pixel and visual angle coordinates.</li>
+<li>Scene camera video synchronized with optical stimulation onset.</li>
+</ul>
+<hr />
+<h2 id="3-inertial-measurement-unit-imu-tracking">3. Inertial Measurement Unit (IMU) Tracking</h2>
+<ul>
+<li><strong>Firmware:</strong> <a href="file:///d:/Code/LEDStimulation/ArduinoCode/IMUscript_Task/"><code>ArduinoCode/IMUscript_Task/</code></a></li>
+<li><strong>Analysis:</strong> <a href="file:///d:/Code/LEDStimulation/HumanExpAnalysis/imu_analysis_dev.m"><code>HumanExpAnalysis/imu_analysis_dev.m</code></a></li>
+<li><strong>Application:</strong> Records linear acceleration and angular velocity during mobile human or animal tasks to study vision during locomotion, head turns, or balance challenges.</li>
+</ul>
+<hr />
+<h2 id="4-labrecorder-labstreaminglayer-lsl">4. LabRecorder &amp; LabStreamingLayer (LSL)</h2>
+<ul>
+<li><strong>Directory:</strong> <a href="file:///d:/Code/LEDStimulation/LabRecorderFiles/"><code>LabRecorderFiles/</code></a></li>
+<li><strong>Format:</strong> Extensible Data Format (<code>.xdf</code>)</li>
+<li><strong>Benefit:</strong> Ensures sub-millisecond software synchronization across heterogeneous devices (Bonsai, Pupil Labs Neon, IMUs, BioSemi / EEG amplifiers) via automatic clock-offset correction.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../stimulation-paradigms/" class="btn btn-neutral float-left" title="Stimulation Paradigms"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../5-reference/performance-and-sync/" class="btn btn-neutral float-right" title="Performance & Dynamics">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/SaleemLab/LEDStimulation" class="fa fa-code-fork" style="color: #fcfcfc"> SaleemLab/LEDStimulation</a>
+        </span>
+    
+    
+      <span><a href="../stimulation-paradigms/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../5-reference/performance-and-sync/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="https://unpkg.com/katex@0/dist/katex.min.js"></script>
+      <script src="https://unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
+      <script src="../../javascripts/katex.js"></script>
+      <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      <script src="../../javascripts/mermaid.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

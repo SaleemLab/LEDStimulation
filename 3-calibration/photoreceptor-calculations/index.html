@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Saleem Lab" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Photoreceptor Calculations - Full-Field LED Visual Stimulator</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="https://unpkg.com/katex@0/dist/katex.min.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Photoreceptor Calculations";
+        var mkdocs_page_input_path = "3-calibration/photoreceptor-calculations.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Full-Field LED Visual Stimulator
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">1. Hardware</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/circuit-and-driver/">Circuit & Driver</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/custom-pcbs/">Custom PCBs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Enclosure & Optics</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../1-hardware/enclosure-and-optics/panel-enclosure/">Panel Enclosure</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../1-hardware/enclosure-and-optics/wearable-glasses/">Wearable Glasses</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/bill-of-materials/">Bill of Materials</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">2. Firmware</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/architecture-and-timers/">Architecture & Timers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/serial-api-reference/">Serial API Reference</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/firmware-variants/">Firmware Variants</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">3. Calibration</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../calibration-guide/">Calibration Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gamma-lut-pipeline/">Gamma LUT Pipeline</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Photoreceptor Calculations</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#calibration-logic-workflow">Calibration Logic &amp; Workflow</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-forward-calculation-data-analysis-in-matlab">1. Forward Calculation (Data Analysis in MATLAB)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-inverse-calculation-experimental-bench-calibration">2. Inverse Calculation (Experimental Bench Calibration)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-physical-constants-biological-parameters">1. Physical Constants &amp; Biological Parameters</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#physical-constants">Physical Constants</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#photoreceptor-parameters-mouse">Photoreceptor Parameters (Mouse)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ocular-anatomical-properties">Ocular &amp; Anatomical Properties</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#sensor-parameters">Sensor Parameters</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-forward-calculation-power-meter-to-r">2. Forward Calculation: Power Meter to \(R^*\)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#step-1-broad-band-sensor-responsivity-correction">Step 1: Broad-Band Sensor Responsivity Correction</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-2-pre-retinal-transmission-retinal-geometry">Step 2: Pre-Retinal Transmission &amp; Retinal Geometry</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-3-spectral-overlap-relative-co-excitation">Step 3: Spectral Overlap &amp; Relative Co-Excitation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-4-photon-energy-photon-flux-density-isomerisation-rate">Step 4: Photon Energy, Photon Flux Density &amp; Isomerisation Rate</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-working-backwards-from-target-r-to-measured-power">3. Working Backwards: From Target \(R^*\) to Measured Power</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#inverse-calibration-procedure">Inverse Calibration Procedure</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#concrete-worked-numerical-example">Concrete Worked Numerical Example</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#channel-a-green-led-lambda_textpeak-approx-525text-nm">Channel A: Green LED (\(\lambda_{\text{peak}} \approx 525\text{ nm}\))</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#channel-b-uv-led-lambda_textpeak-approx-370text-nm">Channel B: UV LED (\(\lambda_{\text{peak}} \approx 370\text{ nm}\))</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-photoreceptor-co-excitation-crosstalk-matrix">4. Photoreceptor Co-Excitation &amp; Crosstalk Matrix</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">4. Experimental Workflows</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/bonsai-overview/">Bonsai Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/stimulation-paradigms/">Stimulation Paradigms</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/integration-and-sync/">Integration & Sync</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">5. Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../5-reference/performance-and-sync/">Performance & Dynamics</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Full-Field LED Visual Stimulator</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">3. Calibration</li>
+      <li class="breadcrumb-item active">Photoreceptor Calculations</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/SaleemLab/LEDStimulation/edit/master/docs/3-calibration/photoreceptor-calculations.md">Edit on SaleemLab/LEDStimulation</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="photoreceptor-quantification-spectral-calculations">Photoreceptor Quantification &amp; Spectral Calculations</h1>
+<p>To achieve biologically meaningful visual stimulation in neuroscience and psychophysics, optical power emitted by the LEDs must be quantified in terms of <strong>photoisomerisation rates (<span class="arithmatex">\(R^*\)</span>)</strong> per photoreceptor type per second (<span class="arithmatex">\(\text{isomerisations}/\text{photoreceptor}/\text{s}\)</span>, or <span class="arithmatex">\(10^3\,R^*\)</span>).</p>
+<p>This page provides a complete walkthrough of the calibration script <a href="file:///d:/Code/LEDStimulation/Calibration/ganzfeldCalibration_v5.m"><code>Calibration/ganzfeldCalibration_v5.m</code></a>, which implements the biophysical framework developed by Euler Lab in the <a href="https://github.com/eulerlab/open-visual-stimulator">Open Visual Stimulator</a> project.</p>
+<hr />
+<h2 id="calibration-logic-workflow">Calibration Logic &amp; Workflow</h2>
+<p>The calibration mathematics connects biological target regimes to physical bench measurements through two directional flows:</p>
+<h3 id="1-forward-calculation-data-analysis-in-matlab">1. Forward Calculation (Data Analysis in MATLAB)</h3>
+<p>Converts an empirical optical power meter or photodiode reading into absolute photoisomerisation rates (<span class="arithmatex">\(R^*\)</span>):</p>
+<div class="arithmatex">\[\text{Power Meter Reading } P_{\text{meas}} \xrightarrow{C_{\text{factor}}} \text{True Radiant Power } P_{\text{true}} \xrightarrow{T_{\text{eye}}, \, \frac{A_{\text{pupil}}}{A_{\text{retina}}}} \text{Retinal Power } P_{\text{retina}} \xrightarrow{S_{\text{opsin}}, \, a_c} \text{Isomerisation Rate } R^*\]</div>
+<ul>
+<li><strong>Purpose:</strong> Quantifies exactly how many photoisomerisations per cone or rod per second are elicited by the current stimulator output.</li>
+<li><strong>Implementation:</strong> Executed automatically by <a href="file:///d:/Code/LEDStimulation/Calibration/ganzfeldCalibration_v5.m"><code>Calibration/ganzfeldCalibration_v5.m</code></a>.</li>
+</ul>
+<h3 id="2-inverse-calculation-experimental-bench-calibration">2. Inverse Calculation (Experimental Bench Calibration)</h3>
+<p>Works backwards from a desired physiological adaptation state to determine the required reading on the power meter console:</p>
+<div class="arithmatex">\[\text{Target Rate } R^*_{\text{target}} \longrightarrow \text{Required True Power } P_{\text{true}} \longrightarrow \text{Target Meter Reading } P_{\text{meas}} \longrightarrow \text{Hardware Trimpot Adjustment}\]</div>
+<ul>
+<li><strong>Purpose:</strong> Tells the experimenter the exact target reading (<span class="arithmatex">\(\mu\text{W}\)</span>) to set on the Thorlabs power meter console when adjusting the driver board potentiometers at 100% duty cycle.</li>
+<li><strong>Linear Scaling:</strong> Because the forward transfer function from radiant power to photoisomerisation rate is strictly linear, the inverse mapping is an exact scalar proportionality.</li>
+</ul>
+<hr />
+<h2 id="1-physical-constants-biological-parameters">1. Physical Constants &amp; Biological Parameters</h2>
+<p>The calculations in <a href="file:///d:/Code/LEDStimulation/Calibration/ganzfeldCalibration_v5.m"><code>ganzfeldCalibration_v5.m</code></a> rely on physical constants and experimentally verified mouse ocular properties:</p>
+<h3 id="physical-constants">Physical Constants</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Variable</th>
+<th style="text-align: left;">MATLAB Name</th>
+<th style="text-align: left;">Value</th>
+<th style="text-align: left;">Unit</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span class="arithmatex">\(h\)</span></td>
+<td style="text-align: left;"><code>h</code></td>
+<td style="text-align: left;"><span class="arithmatex">\(4.135667 \times 10^{-15}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\text{eV}\cdot\text{s}\)</span></td>
+<td style="text-align: left;">Planck's constant</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="arithmatex">\(c\)</span></td>
+<td style="text-align: left;"><code>c</code></td>
+<td style="text-align: left;"><span class="arithmatex">\(299,792,458\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\text{m/s}\)</span></td>
+<td style="text-align: left;">Speed of light in vacuum</td>
+</tr>
+<tr>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;"><code>eV_per_J</code></td>
+<td style="text-align: left;"><span class="arithmatex">\(6.242 \times 10^{18}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\text{eV/J}\)</span></td>
+<td style="text-align: left;">Conversion factor from Joules to electron-volts</td>
+</tr>
+</tbody>
+</table>
+<h3 id="photoreceptor-parameters-mouse">Photoreceptor Parameters (Mouse)</h3>
+<p>Photoreceptor opsin absorbance profiles are loaded from <a href="file:///d:/Code/LEDStimulation/Calibration/mouse_cone_opsins.txt"><code>Calibration/mouse_cone_opsins.txt</code></a>:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Photoreceptor</th>
+<th style="text-align: left;">MATLAB Name</th>
+<th style="text-align: center;">Peak Wavelength (<span class="arithmatex">\(\lambda_{\text{peak}}\)</span>)</th>
+<th style="text-align: center;">End-on Collection Area (<span class="arithmatex">\(a_c, a_r\)</span>)</th>
+<th style="text-align: left;">Sensitivity Profile (<span class="arithmatex">\(S_{\text{PR}}(\lambda)\)</span>)</th>
+<th style="text-align: left;">Reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>M-cone</strong></td>
+<td style="text-align: left;"><code>mouse_M_cone</code></td>
+<td style="text-align: center;"><span class="arithmatex">\(511\text{ nm}\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(0.2\,\mu\text{m}^2\)</span></td>
+<td style="text-align: left;"><code>mouse_opsins.Mopsin</code></td>
+<td style="text-align: left;">Nikonov et al., 2006</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>S-cone</strong></td>
+<td style="text-align: left;"><code>mouse_S_cone</code></td>
+<td style="text-align: center;"><span class="arithmatex">\(360\text{ nm}\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(0.2\,\mu\text{m}^2\)</span></td>
+<td style="text-align: left;"><code>mouse_opsins.Sopsin</code></td>
+<td style="text-align: left;">Nikonov et al., 2006</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Rod</strong></td>
+<td style="text-align: left;"><code>mouse_rod</code></td>
+<td style="text-align: center;"><span class="arithmatex">\(510\text{ nm}\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(0.5\,\mu\text{m}^2\)</span></td>
+<td style="text-align: left;"><code>mouse_opsins.Mopsin</code></td>
+<td style="text-align: left;">Nikonov et al., 2006</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Collection Area (<span class="arithmatex">\(a_c, a_r\)</span>)</p>
+<p>The end-on light collection area (<span class="arithmatex">\(a_c = 0.2\,\mu\text{m}^2\)</span> for dark-adapted wt mouse cones, <span class="arithmatex">\(a_r = 0.5\,\mu\text{m}^2\)</span> for rods) represents the effective physical cross-section through which incoming photons are captured and absorbed by outer segment opsin molecules.</p>
+</div>
+<figure style="max-width: 520px; margin: 1.5em auto; text-align: center;">
+  <img src="../../assets/images/photoreceptorsAndLEDs.png" alt="Photoreceptor Sensitivity and LED Emission Spectra" style="max-width: 100%; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+<br />
+<figcaption style="font-size: 0.85em; color: var(--md-default-fg-color--light); margin-top: 0.5em;"><strong>Figure 1:</strong> Relative spectral sensitivity of mouse M-cone (green solid) and S-cone (magenta solid) opsins alongside peak-normalized emission spectra of the Green LED (green dotted) and UV LED (magenta dotted).</figcaption>
+</figure>
+<h3 id="ocular-anatomical-properties">Ocular &amp; Anatomical Properties</h3>
+<ul>
+<li><strong>Pre-retinal Ocular Transmission (<span class="arithmatex">\(T_{\text{eye}}(\lambda)\)</span>):</strong> Loaded from <a href="file:///d:/Code/LEDStimulation/Calibration/Transmission_mouse_eye.txt"><code>Calibration/Transmission_mouse_eye.txt</code></a>, accounting for wavelength-dependent absorption by the cornea, crystalline lens, and vitreous humor (especially significant in the near-UV band <span class="arithmatex">\(&lt; 400\text{ nm}\)</span>).</li>
+<li><strong>Pupil Area (<span class="arithmatex">\(A_{\text{pupil}}\)</span>):</strong><ul>
+<li>Stationary state: <span class="arithmatex">\(A_{\text{pupil}} \approx 0.21\,\text{mm}^2\)</span></li>
+<li>Running / Dilated state: <span class="arithmatex">\(A_{\text{pupil}} \approx 1.91\,\text{mm}^2\)</span></li>
+</ul>
+</li>
+<li>
+<p><strong>Retinal Surface Area (<span class="arithmatex">\(A_{\text{retina}}\)</span>):</strong>
+    For an adult mouse eye with axial length <span class="arithmatex">\(d = 3.0\text{ mm}\)</span> (<span class="arithmatex">\(r = 1.5\text{ mm}\)</span>):</p>
+<div class="arithmatex">\[A_{\text{retina}} \approx 0.6 \cdot \pi \cdot d^2 = 0.6 \cdot \pi \cdot (3.0\,\text{mm})^2 \approx 16.96\,\text{mm}^2\]</div>
+</li>
+<li>
+<p><strong>Pupil-to-Retina Geometric Ratio:</strong></p>
+<div class="arithmatex">\[k_{\text{pupil}} = \frac{A_{\text{pupil}}}{A_{\text{retina}}} = \frac{1.91\,\text{mm}^2}{16.96\,\text{mm}^2} \approx 0.1126\]</div>
+</li>
+</ul>
+<h3 id="sensor-parameters">Sensor Parameters</h3>
+<ul>
+<li><strong>Thorlabs Photodiode Sensor (S121C, S120VC, S130VC):</strong><ul>
+<li>Active Sensor Area: <span class="arithmatex">\(A_{\text{detect}} = 9700\,\mu\text{m} \times 9700\,\mu\text{m} = 94.09 \times 10^6\,\mu\text{m}^2 = 94.09\,\text{mm}^2\)</span></li>
+<li>Calibrated responsivity curve <span class="arithmatex">\(R(\lambda)\)</span> loaded from <code>Calibration/PowerMeterCalibrationFiles/</code>.</li>
+</ul>
+</li>
+<li><strong>Thorlabs PDA100A2 Amplified Sensor:</strong><ul>
+<li>Active Sensor Area: <span class="arithmatex">\(A_{\text{detect}} = 75.4 \times 10^6\,\mu\text{m}^2 = 75.4\,\text{mm}^2\)</span></li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2-forward-calculation-power-meter-to-r">2. Forward Calculation: Power Meter to <span class="arithmatex">\(R^*\)</span></h2>
+<p>Here is the exact mathematical sequence executed in <a href="file:///d:/Code/LEDStimulation/Calibration/ganzfeldCalibration_v5.m"><code>Calibration/ganzfeldCalibration_v5.m</code></a>:</p>
+<h3 id="step-1-broad-band-sensor-responsivity-correction">Step 1: Broad-Band Sensor Responsivity Correction</h3>
+<p>Optical power meters (such as the Thorlabs PM100D) compute power by dividing the measured detector photocurrent by the sensor responsivity at a single user-entered calibration wavelength: <span class="arithmatex">\(R(\lambda_{\text{meas}})\)</span>. Because LEDs have a broad spectral emission <span class="arithmatex">\(S(\lambda)\)</span> (typically <span class="arithmatex">\(20-40\text{ nm}\)</span> FWHM), the raw meter reading <span class="arithmatex">\(P_{\text{meas}}\)</span> is biased.</p>
+<p>The true radiant power <span class="arithmatex">\(P_{\text{true}}\)</span> is recovered using <a href="file:///d:/Code/LEDStimulation/Calibration/getLEDSpectraFromPowerMeter.m"><code>Calibration/getLEDSpectraFromPowerMeter.m</code></a>:</p>
+<div class="arithmatex">\[C_{\text{factor}} = \frac{R(\lambda_{\text{meas}}) \int S(\lambda) \, d\lambda}{\int S(\lambda) R(\lambda) \, d\lambda}\]</div>
+<div class="arithmatex">\[P_{\text{true}} = P_{\text{meas}} \cdot C_{\text{factor}}\]</div>
+<p>The absolute spectral power distribution <span class="arithmatex">\(P(\lambda)\)</span> across 1-nm bins (<span class="arithmatex">\(\Delta\lambda = 1\text{ nm}\)</span>) from <span class="arithmatex">\(300\text{ nm}\)</span> to <span class="arithmatex">\(699\text{ nm}\)</span> is:</p>
+<div class="arithmatex">\[P(\lambda) = P_{\text{true}} \cdot \frac{S(\lambda)}{\int S(\lambda) \, d\lambda} \quad [\text{W/nm}]\]</div>
+<figure style="max-width: 500px; margin: 1.5em auto; text-align: center;">
+  <img src="../../assets/images/powerForLEDs.png" alt="Corrected Spectral Power of LEDs" style="max-width: 100%; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+<br />
+<figcaption style="font-size: 0.85em; color: var(--md-default-fg-color--light); margin-top: 0.5em;"><strong>Figure 2:</strong> Responsivity-corrected spectral radiant power ($P(\lambda)$ in $\text{nW}$) for the Green and UV channels.</figcaption>
+</figure>
+<div class="admonition tip">
+<p class="admonition-title">Alternative: PDA100A2 Amplified Photodiode</p>
+<p>If using the PDA100A2 transimpedance photodiode (<a href="file:///d:/Code/LEDStimulation/Calibration/getLEDSpectraFromPhotodiode.m"><code>Calibration/getLEDSpectraFromPhotodiode.m</code></a>):</p>
+<div class="arithmatex">\[I_p = \frac{V_{\text{measured}} - V_{\text{dark}}}{\text{Gain}_{\text{Hi-Z}}} \quad [\text{Amperes}]\]</div>
+<div class="arithmatex">\[R_{\text{eff}} = \frac{\int S(\lambda) R(\lambda) \, d\lambda}{\int S(\lambda) \, d\lambda} \quad [\text{A/W}]\]</div>
+<div class="arithmatex">\[P_{\text{true}} = \frac{I_p}{R_{\text{eff}}} \quad [\text{Watts}]\]</div>
+</div>
+<hr />
+<h3 id="step-2-pre-retinal-transmission-retinal-geometry">Step 2: Pre-Retinal Transmission &amp; Retinal Geometry</h3>
+<p>The spectral power reaching the photoreceptor outer segment layer inside the eye is attenuated by the ocular media <span class="arithmatex">\(T_{\text{eye}}(\lambda)\)</span> and scaled by the pupil-to-retina area ratio:</p>
+<div class="arithmatex">\[P_{\text{retina}}(\lambda) = P(\lambda) \cdot T_{\text{eye}}(\lambda) \cdot \left(\frac{A_{\text{pupil}}}{A_{\text{retina}}}\right)\]</div>
+<hr />
+<h3 id="step-3-spectral-overlap-relative-co-excitation">Step 3: Spectral Overlap &amp; Relative Co-Excitation</h3>
+<p>For LED <span class="arithmatex">\(i\)</span> and photoreceptor type <span class="arithmatex">\(j\)</span>, the relative spectral co-excitation fraction is calculated from the normalized spectral overlap:</p>
+<div class="arithmatex">\[\text{Co-excitation}_{i,j} = \frac{\int S_{\text{PR}, j}(\lambda) \cdot S_{\text{LED\_corr\_norm}, i}(\lambda) \, d\lambda}{\int S_{\text{LED\_corr\_norm}, i}(\lambda) \, d\lambda}\]</div>
+<p>Where <span class="arithmatex">\(S_{\text{LED\_corr\_norm}, i}(\lambda)\)</span> is the peak-normalized retinal LED spectrum.</p>
+<hr />
+<h3 id="step-4-photon-energy-photon-flux-density-isomerisation-rate">Step 4: Photon Energy, Photon Flux Density &amp; Isomerisation Rate</h3>
+<ol>
+<li>
+<p><strong>Wavelength-dependent photon energy (<span class="arithmatex">\(Q(\lambda)\)</span> in <span class="arithmatex">\(\text{eV}\)</span>):</strong></p>
+<div class="arithmatex">\[Q(\lambda) = \frac{h \cdot c}{\lambda \cdot 10^{-9}}\]</div>
+</li>
+<li>
+<p><strong>Spectral photon flux (<span class="arithmatex">\(\Phi_{\text{photon}}(\lambda)\)</span> in <span class="arithmatex">\(\text{photons/s}\)</span>):</strong></p>
+<div class="arithmatex">\[\Phi_{\text{photon}}(\lambda) = \frac{P_{\text{retina}}(\lambda) \cdot (\text{eV\_per\_J})}{Q(\lambda)}\]</div>
+</li>
+<li>
+<p><strong>Photon flux density arriving at the sensor detector plane (<span class="arithmatex">\(E(\lambda)\)</span> in <span class="arithmatex">\(\text{photons}/(\text{s}\cdot\mu\text{m}^2)\)</span>):</strong></p>
+<div class="arithmatex">\[E(\lambda) = \frac{\Phi_{\text{photon}}(\lambda)}{A_{\text{detect}}}\]</div>
+</li>
+<li>
+<p><strong>Total photoisomerisation rate (<span class="arithmatex">\(R^*\)</span> in <span class="arithmatex">\(\text{isomerisations}/\text{photoreceptor}/\text{s}\)</span>):</strong></p>
+<div class="arithmatex">\[R^*_{i,j} = a_{\text{collect}, j} \cdot \text{Co-excitation}_{i,j} \int E_i(\lambda) \, d\lambda\]</div>
+</li>
+</ol>
+<p>In <a href="file:///d:/Code/LEDStimulation/Calibration/ganzfeldCalibration_v5.m"><code>ganzfeldCalibration_v5.m</code></a>, rates are reported in units of <span class="arithmatex">\(10^3\,R^*/\text{s}\)</span> (<span class="arithmatex">\(10^3\,\text{photons/s}\)</span>).</p>
+<figure style="max-width: 540px; margin: 1.5em auto; text-align: center;">
+  <img src="../../assets/images/isomerisationsByWavelength.png" alt="Photoisomerisation Rates by Wavelength" style="max-width: 100%; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+<br />
+<figcaption style="font-size: 0.85em; color: var(--md-default-fg-color--light); margin-top: 0.5em;"><strong>Figure 3:</strong> Calculated spectral photoisomerisation rates ($R^*$ density, left axis shaded areas) across wavelengths for Green and UV channels on M-cones and S-cones, alongside normalized opsin sensitivities (solid lines) and LED emissions (dashed lines, right axis).</figcaption>
+</figure>
+<hr />
+<h2 id="3-working-backwards-from-target-r-to-measured-power">3. Working Backwards: From Target <span class="arithmatex">\(R^*\)</span> to Measured Power</h2>
+<p>In experimental design, you start with a target photoisomerisation rate <span class="arithmatex">\(R^*_{\text{target}}\)</span> (e.g. <span class="arithmatex">\(10^4\,R^*/\text{cone/s}\)</span>) and need to determine the <strong>exact power reading to calibrate the hardware to at 100% duty cycle</strong>.</p>
+<p>Because the forward pipeline from radiant power to <span class="arithmatex">\(R^*\)</span> is strictly linear:</p>
+<div class="arithmatex">\[\frac{R^*}{P_{\text{true}}} = k_{\text{iso}} = \text{constant}\]</div>
+<h3 id="inverse-calibration-procedure">Inverse Calibration Procedure</h3>
+<ol>
+<li><strong>Run a Reference Calibration in MATLAB:</strong>
+   Execute <code>ganzfeldCalibration_v5.m</code> with an arbitrary reference power <span class="arithmatex">\(P_{\text{ref}}\)</span> (e.g. <span class="arithmatex">\(P_{\text{meas, ref}} = 6.05\,\mu\text{W}\)</span>).
+   Record the resulting reference photoisomerisation rate <span class="arithmatex">\(R^*_{\text{ref}}\)</span>.</li>
+<li>
+<p><strong>Compute the Required True Power (<span class="arithmatex">\(P_{\text{true, target}}\)</span>):</strong></p>
+<div class="arithmatex">\[P_{\text{true, target}} = P_{\text{true, ref}} \cdot \left(\frac{R^*_{\text{target}}}{R^*_{\text{ref}}}\right)\]</div>
+</li>
+<li>
+<p><strong>Compute the Target Power Meter Reading (<span class="arithmatex">\(P_{\text{meas, target}}\)</span>):</strong>
+   For your power meter console set to wavelength <span class="arithmatex">\(\lambda_{\text{meas}}\)</span>:</p>
+<div class="arithmatex">\[P_{\text{meas, target}} = \frac{P_{\text{true, target}}}{C_{\text{factor}}}\]</div>
+</li>
+<li>
+<p><strong>Physical Adjustment at the Rig:</strong></p>
+</li>
+<li>Set the LED channel to 100% duty cycle (<code>sd, 100, 0</code> for Green, <code>sd, 0, 100</code> for UV).</li>
+<li>Turn the channel's multi-turn potentiometer on the driver PCB with an insulated trimmer tool until the console reads exactly <span class="arithmatex">\(P_{\text{meas, target}}\)</span>.</li>
+</ol>
+<hr />
+<h3 id="concrete-worked-numerical-example">Concrete Worked Numerical Example</h3>
+<p>Based on the actual calibration values from <a href="file:///d:/Code/LEDStimulation/Calibration/ganzfeldCalibration_v5.m"><code>Calibration/ganzfeldCalibration_v5.m</code></a> using a Thorlabs S121C sensor (<span class="arithmatex">\(A_{\text{detect}} = 94.09\,\text{mm}^2\)</span>) and running mouse eye geometry (<span class="arithmatex">\(A_{\text{pupil}} = 1.91\,\text{mm}^2\)</span>):</p>
+<h4 id="channel-a-green-led-lambda_textpeak-approx-525text-nm">Channel A: Green LED (<span class="arithmatex">\(\lambda_{\text{peak}} \approx 525\text{ nm}\)</span>)</h4>
+<ul>
+<li><strong>Measurement Wavelength Setting:</strong> <span class="arithmatex">\(\lambda_{\text{meas}} = 525\text{ nm}\)</span></li>
+<li><strong>Sensor Responsivity Correction:</strong> <span class="arithmatex">\(C_{\text{factor, Green}} \approx 1.018\)</span></li>
+<li><strong>Target Photoisomerisation Rate:</strong> <span class="arithmatex">\(R^*_{\text{target, M-cone}} = 25.0 \times 10^3 \, R^*/\text{cone/s}\)</span></li>
+<li>
+<p><strong>Calculation:</strong></p>
+<ul>
+<li>A power meter reading of <span class="arithmatex">\(P_{\text{meas}} = 6.05\,\mu\text{W}\)</span> yields <span class="arithmatex">\(P_{\text{true}} = 6.16\,\mu\text{W}\)</span>, producing an M-cone isomerisation rate of <span class="arithmatex">\(R^* = 25.32 \times 10^3\,R^*/\text{cone/s}\)</span>.</li>
+<li>
+<p>To set an exact target of <span class="arithmatex">\(25.0 \times 10^3\,R^*/\text{s}\)</span>:</p>
+<div class="arithmatex">\[P_{\text{meas, target}} = 6.05\,\mu\text{W} \cdot \left(\frac{25.0}{25.32}\right) = 5.97\,\mu\text{W}\]</div>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Action:</strong> Adjust the Green channel trimpot until the PM100D reads <strong><span class="arithmatex">\(5.97\,\mu\text{W}\)</span></strong>.</p>
+</li>
+</ul>
+<h4 id="channel-b-uv-led-lambda_textpeak-approx-370text-nm">Channel B: UV LED (<span class="arithmatex">\(\lambda_{\text{peak}} \approx 370\text{ nm}\)</span>)</h4>
+<ul>
+<li><strong>Measurement Wavelength Setting:</strong> <span class="arithmatex">\(\lambda_{\text{meas}} = 370\text{ nm}\)</span></li>
+<li><strong>Sensor Responsivity Correction:</strong> <span class="arithmatex">\(C_{\text{factor, UV}} \approx 1.042\)</span></li>
+<li><strong>Target Photoisomerisation Rate:</strong> <span class="arithmatex">\(R^*_{\text{target, S-cone}} = 25.0 \times 10^3 \, R^*/\text{cone/s}\)</span> (for iso-effective cone stimulation)</li>
+<li>
+<p><strong>Calculation:</strong></p>
+<ul>
+<li>A power meter reading of <span class="arithmatex">\(P_{\text{meas}} = 15.0\,\mu\text{W}\)</span> yields <span class="arithmatex">\(P_{\text{true}} = 15.63\,\mu\text{W}\)</span>, producing an S-cone isomerisation rate of <span class="arithmatex">\(R^* = 26.48 \times 10^3\,R^*/\text{cone/s}\)</span> (after accounting for corneal/lens UV absorption).</li>
+<li>
+<p>To achieve an exact match of <span class="arithmatex">\(25.0 \times 10^3\,R^*/\text{s}\)</span>:</p>
+<div class="arithmatex">\[P_{\text{meas, target}} = 15.0\,\mu\text{W} \cdot \left(\frac{25.0}{26.48}\right) = 14.16\,\mu\text{W}\]</div>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Action:</strong> Adjust the UV channel trimpot until the PM100D reads <strong><span class="arithmatex">\(14.16\,\mu\text{W}\)</span></strong>.</p>
+</li>
+</ul>
+<hr />
+<h2 id="4-photoreceptor-co-excitation-crosstalk-matrix">4. Photoreceptor Co-Excitation &amp; Crosstalk Matrix</h2>
+<p>Because the spectral emission profiles of the LEDs overlap with the absorption spectra of multiple photoreceptors, stimulation is rarely 100% opsin-isolated.</p>
+<p>The co-excitation matrix calculated by <a href="file:///d:/Code/LEDStimulation/Calibration/ganzfeldCalibration_v5.m"><code>Calibration/ganzfeldCalibration_v5.m</code></a> shows the relative activation:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Stimulus LED</th>
+<th style="text-align: center;">M-Cone (<span class="arithmatex">\(511\text{ nm}\)</span>) Activation</th>
+<th style="text-align: center;">S-Cone (<span class="arithmatex">\(360\text{ nm}\)</span>) Activation</th>
+<th style="text-align: center;">Rod (<span class="arithmatex">\(510\text{ nm}\)</span>) Activation</th>
+<th style="text-align: left;">Primary Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Green LED (<span class="arithmatex">\(525\text{ nm}\)</span>)</strong></td>
+<td style="text-align: center;"><strong><span class="arithmatex">\(88.4\%\)</span></strong></td>
+<td style="text-align: center;"><span class="arithmatex">\(&lt; 0.1\%\)</span></td>
+<td style="text-align: center;"><span class="arithmatex">\(87.1\%\)</span></td>
+<td style="text-align: left;"><strong>M-cone / Rod</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>UV LED (<span class="arithmatex">\(370\text{ nm}\)</span>)</strong></td>
+<td style="text-align: center;"><span class="arithmatex">\(4.2\%\)</span></td>
+<td style="text-align: center;"><strong><span class="arithmatex">\(91.6\%\)</span></strong></td>
+<td style="text-align: center;"><span class="arithmatex">\(3.9\%\)</span></td>
+<td style="text-align: left;"><strong>S-cone</strong></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Opsin-Isolating Contrasts / Silent Substitution</p>
+<p>Because the Green LED causes negligible excitation of S-cones (<span class="arithmatex">\(&lt;0.1\%\)</span>), green modulation provides clean M-cone and rod stimulation without activating S-cones.
+Conversely, the UV LED exhibits minor co-excitation on M-cones (<span class="arithmatex">\(\approx 4.2\%\)</span>). For strict silent substitution experiments, this crosstalk can be cancelled by driving a small antiphase compensation signal on the Green channel.</p>
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../gamma-lut-pipeline/" class="btn btn-neutral float-left" title="Gamma LUT Pipeline"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../4-experimental-workflows/bonsai-overview/" class="btn btn-neutral float-right" title="Bonsai Overview">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/SaleemLab/LEDStimulation" class="fa fa-code-fork" style="color: #fcfcfc"> SaleemLab/LEDStimulation</a>
+        </span>
+    
+    
+      <span><a href="../gamma-lut-pipeline/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../4-experimental-workflows/bonsai-overview/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="https://unpkg.com/katex@0/dist/katex.min.js"></script>
+      <script src="https://unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
+      <script src="../../javascripts/katex.js"></script>
+      <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      <script src="../../javascripts/mermaid.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

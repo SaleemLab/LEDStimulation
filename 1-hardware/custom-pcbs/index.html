@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Saleem Lab" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Custom PCBs - Full-Field LED Visual Stimulator</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="https://unpkg.com/katex@0/dist/katex.min.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Custom PCBs";
+        var mkdocs_page_input_path = "1-hardware/custom-pcbs.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Full-Field LED Visual Stimulator
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">1. Hardware</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../circuit-and-driver/">Circuit & Driver</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Custom PCBs</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-standard-led-array-board-led_board">1. Standard LED Array Board (LED_board)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#design-current-implementation">Design &amp; Current Implementation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#future-improvements">Future Improvements</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-experimental-in-development-boards">2. Experimental &amp; In-Development Boards</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#3-colour-led-array-board-led_board_humans">3-Colour LED Array Board (LED_board_humans)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#constant-current-driver-board-constant_current_driver">Constant Current Driver Board (Constant_current_driver)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-fabrication">3. Fabrication</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Enclosure & Optics</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../enclosure-and-optics/panel-enclosure/">Panel Enclosure</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../enclosure-and-optics/wearable-glasses/">Wearable Glasses</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bill-of-materials/">Bill of Materials</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">2. Firmware</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/architecture-and-timers/">Architecture & Timers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/serial-api-reference/">Serial API Reference</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/firmware-variants/">Firmware Variants</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">3. Calibration</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/calibration-guide/">Calibration Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/gamma-lut-pipeline/">Gamma LUT Pipeline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/photoreceptor-calculations/">Photoreceptor Calculations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">4. Experimental Workflows</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/bonsai-overview/">Bonsai Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/stimulation-paradigms/">Stimulation Paradigms</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/integration-and-sync/">Integration & Sync</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">5. Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../5-reference/performance-and-sync/">Performance & Dynamics</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Full-Field LED Visual Stimulator</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">1. Hardware</li>
+      <li class="breadcrumb-item active">Custom PCBs</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/SaleemLab/LEDStimulation/edit/master/docs/1-hardware/custom-pcbs.md">Edit on SaleemLab/LEDStimulation</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="custom-pcbs">Custom PCBs</h1>
+<p>This page documents the custom PCBs designed in KiCad for multi-wavelength LED stimulation and driver interfacing.</p>
+<hr />
+<h2 id="1-standard-led-array-board-led_board">1. Standard LED Array Board (<code>LED_board</code>)</h2>
+<ul>
+<li><strong>Location:</strong> <a href="file:///d:/Code/LEDStimulation/Hardware/LED_board/"><code>Hardware/LED_board/</code></a> | <strong>Status:</strong> <strong>Active</strong></li>
+<li><strong>Files:</strong> <code>LED_board.kicad_sch</code>, <code>LED_board.kicad_pcb</code>, <code>LED_board.step</code>, <code>production/</code></li>
+<li><strong>Acknowledgements:</strong> Board is based on an earlier prototype designed by Andre Maia Chagas.</li>
+</ul>
+<p><img alt="Standard LED Array Board Render" src="../../assets/images/LED_board.png" />
+<em>Figure: KiCad 3D layout of standard dual-channel LED array board with dimensions and grid pitch.</em></p>
+<p><img alt="Single Assembled PCB" src="../../assets/images/photo-singlePanel.jpg" />
+<em>Figure: Assembled dual-channel LED array PCB showing the 4 LED lines, solder pads for J1–J4, and mounting holes H1–H4.</em></p>
+<p><img alt="Multiple Tiled Panels in Operation" src="../../assets/images/photo-multiplePanels.jpg" />
+<em>Figure: Multiple tiled LED boards mounted inside the panel enclosure and illuminated beneath the optical diffuser sheet.</em></p>
+<h3 id="design-current-implementation">Design &amp; Current Implementation</h3>
+<p>The board provides wide-field visual stimulation using multiple equally-spaced LED lines:</p>
+<ul>
+<li><strong>Layout:</strong> 4 lines of LEDs (2 lines per colour, interleaved), with 3 series LEDs per line (12 LEDs total, running at <span class="arithmatex">\(+12\,\text{V}\)</span>).</li>
+<li><strong>Spacing:</strong> <span class="arithmatex">\(3\,\text{cm}\)</span> (<span class="arithmatex">\(30\,\text{mm}\)</span>) pitch between lines, matching the spacing across adjacent tiled boards.</li>
+<li><strong>Mounting:</strong> Through-holes for M3 standoffs to attach securely to the aluminium backplate / heatsink.</li>
+<li><strong>Connectors:</strong> 4 separate 2-pin (<span class="arithmatex">\(2.54\,\text{mm}\)</span>) headers — one dedicated connector per LED line (8 wires total per board back to the driver). Headers can be straight or right-angled, and can be mounted on the <strong>front or reverse side</strong> of the PCB to route cables cleanly out the back of the backplate.</li>
+<li><strong>Current Limiting:</strong> External (requires off-board resistors on the driver board).</li>
+</ul>
+<h3 id="future-improvements">Future Improvements</h3>
+<ul>
+<li><strong>On-Board SMD Resistors:</strong> Add dedicated surface-mount ballast resistors (1206 footprint) on each line to balance branch currents directly on the PCB and eliminate off-board resistors.</li>
+<li><strong>Single Consolidated Connector:</strong> Replace the 4 separate 2-pin headers with a single multi-pin connector (e.g. 4-pin JST-XH). A common <span class="arithmatex">\(+12\,\text{V}\)</span> anode rail powers all lines, branching into separate low-side return paths per colour for independent PWM modulation (reducing wiring from 8 to 3–4 wires).</li>
+<li><strong>Modular Daisy-Chaining:</strong> Add pass-through edge connectors so arbitrary boards can be tiled together with parallel electrical connections, preserving the <span class="arithmatex">\(3\,\text{cm}\)</span> pitch without extra cable runs.</li>
+</ul>
+<hr />
+<h2 id="2-experimental-in-development-boards">2. Experimental &amp; In-Development Boards</h2>
+<h3 id="3-colour-led-array-board-led_board_humans">3-Colour LED Array Board (<code>LED_board_humans</code>)</h3>
+<ul>
+<li><strong>Location:</strong> <a href="file:///d:/Code/LEDStimulation/Hardware/LED_board_humans/"><code>Hardware/LED_board_humans/</code></a> | <strong>Status:</strong> ⚠️ <strong>WIP</strong></li>
+<li>Experimental 3-channel (3-colour) panel redesign with optimized routing. <em>(Note: Unrelated to the wearable glasses setup).</em></li>
+</ul>
+<h3 id="constant-current-driver-board-constant_current_driver">Constant Current Driver Board (<code>Constant_current_driver</code>)</h3>
+<ul>
+<li><strong>Location:</strong> <a href="file:///d:/Code/LEDStimulation/Hardware/Constant_current_driver/"><code>Hardware/Constant_current_driver/</code></a> | <strong>Status:</strong> ⚠️ <strong>WIP (Inactive)</strong></li>
+<li>Prototype driver board. Current setups use the low-side transistor circuit described in <a href="file:///d:/Code/LEDStimulation/docs/1-hardware/circuit-and-driver.md">Circuit &amp; Driver Design</a>.</li>
+</ul>
+<hr />
+<h2 id="3-fabrication">3. Fabrication</h2>
+<p>Gerber files and drill maps are in the respective <code>production/</code> directories, ready for fabrication (e.g. JLCPCB, PCBWay).</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../circuit-and-driver/" class="btn btn-neutral float-left" title="Circuit & Driver"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../enclosure-and-optics/panel-enclosure/" class="btn btn-neutral float-right" title="Panel Enclosure">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/SaleemLab/LEDStimulation" class="fa fa-code-fork" style="color: #fcfcfc"> SaleemLab/LEDStimulation</a>
+        </span>
+    
+    
+      <span><a href="../circuit-and-driver/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../enclosure-and-optics/panel-enclosure/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="https://unpkg.com/katex@0/dist/katex.min.js"></script>
+      <script src="https://unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
+      <script src="../../javascripts/katex.js"></script>
+      <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      <script src="../../javascripts/mermaid.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

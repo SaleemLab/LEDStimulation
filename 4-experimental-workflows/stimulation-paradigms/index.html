@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Saleem Lab" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Stimulation Paradigms - Full-Field LED Visual Stimulator</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="https://unpkg.com/katex@0/dist/katex.min.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Stimulation Paradigms";
+        var mkdocs_page_input_path = "4-experimental-workflows/stimulation-paradigms.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Full-Field LED Visual Stimulator
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">1. Hardware</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/circuit-and-driver/">Circuit & Driver</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/custom-pcbs/">Custom PCBs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Enclosure & Optics</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../1-hardware/enclosure-and-optics/panel-enclosure/">Panel Enclosure</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../1-hardware/enclosure-and-optics/wearable-glasses/">Wearable Glasses</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/bill-of-materials/">Bill of Materials</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">2. Firmware</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/architecture-and-timers/">Architecture & Timers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/serial-api-reference/">Serial API Reference</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/firmware-variants/">Firmware Variants</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">3. Calibration</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/calibration-guide/">Calibration Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/gamma-lut-pipeline/">Gamma LUT Pipeline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/photoreceptor-calculations/">Photoreceptor Calculations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">4. Experimental Workflows</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bonsai-overview/">Bonsai Overview</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Stimulation Paradigms</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#paradigm-summary">Paradigm Summary</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-standard-characterization-battery-ledstimulation_normalbonsai">1. Standard Characterization Battery (LEDstimulation_normal.bonsai)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-adaptive-psychometric-staircase-ledstimulation_staircasebonsai">2. Adaptive Psychometric Staircase (LEDstimulation_staircase.bonsai)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-state-dependent-closed-loop-stimulation-ledstimulation_statedependentbonsai">3. State-Dependent / Closed-Loop Stimulation (LEDstimulation_StateDependent.bonsai)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-manual-method-of-adjustment-manualmethodofadjustmentbonsai">4. Manual Method of Adjustment (ManualMethodOfAdjustment.bonsai)</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../integration-and-sync/">Integration & Sync</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">5. Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../5-reference/performance-and-sync/">Performance & Dynamics</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Full-Field LED Visual Stimulator</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">4. Experimental Workflows</li>
+      <li class="breadcrumb-item active">Stimulation Paradigms</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/SaleemLab/LEDStimulation/edit/master/docs/4-experimental-workflows/stimulation-paradigms.md">Edit on SaleemLab/LEDStimulation</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="visual-stimulation-paradigms">Visual Stimulation Paradigms</h1>
+<p>This section documents the primary visual stimulation paradigms implemented in the Bonsai workflows. These protocols are adaptable for both animal physiology and human psychophysics setups.</p>
+<div class="admonition note">
+<p class="admonition-title">Work in Progress</p>
+<p>This documentation section is currently a work in progress.</p>
+</div>
+<hr />
+<h2 id="paradigm-summary">Paradigm Summary</h2>
+<pre class="mermaid"><code>flowchart TD
+    Paradigms["&lt;b&gt;Visual Stimulation Paradigms&lt;/b&gt;"]
+
+    Paradigms --&gt; OpenLoop["&lt;b&gt;1. Open-Loop Characterization&lt;/b&gt;&lt;br/&gt;Sinewave flicker, chirps, Gaussian and frozen white noise"]
+    Paradigms --&gt; Adaptive["&lt;b&gt;2. Adaptive Psychophysics&lt;/b&gt;&lt;br/&gt;1-up / 3-down staircase detection thresholds"]
+    Paradigms --&gt; ClosedLoop["&lt;b&gt;3. Closed-Loop / State-Gated&lt;/b&gt;&lt;br/&gt;Locomotion, eye-position, or pupil-triggered"]</code></pre>
+<hr />
+<h2 id="1-standard-characterization-battery-ledstimulation_normalbonsai">1. Standard Characterization Battery (<code>LEDstimulation_normal.bonsai</code>)</h2>
+<ul>
+<li><strong>Workflow:</strong> <a href="file:///d:/Code/LEDStimulation/BonsaiCode/LEDstimulation_normal.bonsai"><code>BonsaiCode/LEDstimulation_normal.bonsai</code></a></li>
+<li><strong>Description:</strong> Sequentially presents a randomized block of standard stimuli (sinewave flickers, frequency chirps, Gaussian white noise, and contrast-switching adaptation sequences) defined in a trial parameter CSV.</li>
+<li><strong>Outputs:</strong> Automatically logs stimulus metadata, trial onset timestamps, and digital marker pulses.</li>
+</ul>
+<hr />
+<h2 id="2-adaptive-psychometric-staircase-ledstimulation_staircasebonsai">2. Adaptive Psychometric Staircase (<code>LEDstimulation_staircase.bonsai</code>)</h2>
+<ul>
+<li><strong>Workflows:</strong></li>
+<li><a href="file:///d:/Code/LEDStimulation/BonsaiCode/LEDstimulation_staircase.bonsai"><code>LEDstimulation_staircase.bonsai</code></a> (Single condition)</li>
+<li><a href="file:///d:/Code/LEDStimulation/BonsaiCode/LEDstimulation_staircase_multiCond.bonsai"><code>LEDstimulation_staircase_multiCond.bonsai</code></a> (Interleaved multi-condition)</li>
+<li><strong>Description:</strong> Implements adaptive staircase procedures (e.g. 1-up / 3-down, accelerated stochastic approximation) to rapidly estimate visual detection or discrimination thresholds.</li>
+<li><strong>Usage:</strong> Interleaves contrast or frequency parameters dynamically based on behavioural responses (e.g., lick detection, key presses, or eye movements).</li>
+</ul>
+<hr />
+<h2 id="3-state-dependent-closed-loop-stimulation-ledstimulation_statedependentbonsai">3. State-Dependent / Closed-Loop Stimulation (<code>LEDstimulation_StateDependent.bonsai</code>)</h2>
+<ul>
+<li><strong>Workflow:</strong> <a href="file:///d:/Code/LEDStimulation/BonsaiCode/LEDstimulation_StateDependent.bonsai"><code>BonsaiCode/LEDstimulation_StateDependent.bonsai</code></a></li>
+<li><strong>Description:</strong> Monitors live subject state (e.g., treadmill running speed, pupil diameter, or IMU motion) and dynamically triggers visual stimulation when specific behavioral thresholds are met.</li>
+</ul>
+<hr />
+<h2 id="4-manual-method-of-adjustment-manualmethodofadjustmentbonsai">4. Manual Method of Adjustment (<code>ManualMethodOfAdjustment.bonsai</code>)</h2>
+<ul>
+<li><strong>Workflow:</strong> <a href="file:///d:/Code/LEDStimulation/BonsaiCode/ManualMethodOfAdjustment.bonsai"><code>BonsaiCode/ManualMethodOfAdjustment.bonsai</code></a></li>
+<li><strong>Description:</strong> Enables continuous, real-time subject control of luminance or chromatic contrast balance via a keyboard or rotary knob to determine subjective equivalence or perceptual nulling points.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../bonsai-overview/" class="btn btn-neutral float-left" title="Bonsai Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../integration-and-sync/" class="btn btn-neutral float-right" title="Integration & Sync">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/SaleemLab/LEDStimulation" class="fa fa-code-fork" style="color: #fcfcfc"> SaleemLab/LEDStimulation</a>
+        </span>
+    
+    
+      <span><a href="../bonsai-overview/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../integration-and-sync/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="https://unpkg.com/katex@0/dist/katex.min.js"></script>
+      <script src="https://unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
+      <script src="../../javascripts/katex.js"></script>
+      <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      <script src="../../javascripts/mermaid.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

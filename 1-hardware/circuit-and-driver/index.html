@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Saleem Lab" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Circuit & Driver - Full-Field LED Visual Stimulator</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="https://unpkg.com/katex@0/dist/katex.min.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Circuit \u0026 Driver";
+        var mkdocs_page_input_path = "1-hardware/circuit-and-driver.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Full-Field LED Visual Stimulator
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">1. Hardware</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Circuit & Driver</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-direct-microcontroller-pwm-drive-base-configuration">1. Direct Microcontroller PWM Drive (Base Configuration)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-low-side-npn-transistor-switching-drive-12v-multi-led-arrays">2. Low-Side NPN Transistor Switching Drive (12V / Multi-LED Arrays)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-physical-circuit-bench-implementation">3. Physical Circuit &amp; Bench Implementation</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-pcbs/">Custom PCBs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Enclosure & Optics</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../enclosure-and-optics/panel-enclosure/">Panel Enclosure</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../enclosure-and-optics/wearable-glasses/">Wearable Glasses</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bill-of-materials/">Bill of Materials</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">2. Firmware</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/architecture-and-timers/">Architecture & Timers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/serial-api-reference/">Serial API Reference</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/firmware-variants/">Firmware Variants</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">3. Calibration</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/calibration-guide/">Calibration Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/gamma-lut-pipeline/">Gamma LUT Pipeline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/photoreceptor-calculations/">Photoreceptor Calculations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">4. Experimental Workflows</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/bonsai-overview/">Bonsai Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/stimulation-paradigms/">Stimulation Paradigms</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/integration-and-sync/">Integration & Sync</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">5. Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../5-reference/performance-and-sync/">Performance & Dynamics</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Full-Field LED Visual Stimulator</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">1. Hardware</li>
+      <li class="breadcrumb-item active">Circuit & Driver</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/SaleemLab/LEDStimulation/edit/master/docs/1-hardware/circuit-and-driver.md">Edit on SaleemLab/LEDStimulation</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="circuit-driver-design">Circuit &amp; Driver Design</h1>
+<p>This section describes the electronic drive circuitry used to power and modulate the optical LED loads in the stimulator.</p>
+<div class="admonition note">
+<p class="admonition-title">Single-Channel vs. Multi-Channel Scaling</p>
+<p>The schematics below illustrate the driver circuit for <strong>a single optical channel / colour</strong>. To drive multi-channel systems (e.g., dual-colour or 3-colour arrays), <strong>replicate the circuit for each channel</strong>, connecting each to an independent microcontroller PWM pin (e.g., separate timer outputs). All channels share the common power rails (<span class="arithmatex">\(+12\,\text{V}\)</span> and GND), while their switching paths and PWM control lines remain independent.</p>
+</div>
+<hr />
+<h2 id="1-direct-microcontroller-pwm-drive-base-configuration">1. Direct Microcontroller PWM Drive (Base Configuration)</h2>
+<p>The simplest driving topology connects a single microcontroller PWM output pin directly to an LED load through a series combination of a fixed current-limiting resistor and a multi-turn cermet variable resistor. This direct-drive topology works when the LED load has voltage (<span class="arithmatex">\(V_f\)</span>) and current (<span class="arithmatex">\(I_{\text{LED}}\)</span>) requirements that fall <em>well</em> within the direct drive capability of the microcontroller GPIO pins (typically <span class="arithmatex">\(V_{\text{pin}} \le 5\text{V}\)</span>, <span class="arithmatex">\(I_{\text{max}} \le 20\text{--}40\text{ mA}\)</span>).</p>
+<p><img alt="Simple Direct PWM LED Circuit" src="../../assets/images/simple_led_circuit.svg" /></p>
+<ul>
+<li><strong><code>PWM Source</code>:</strong> Outputs a high-frequency PWM carrier providing temporal stimulus patterns for one channel (replicate circuit and use additional PWM pins for multi-colour setups).</li>
+<li><strong><span class="arithmatex">\(R_{\text{fixed}}\)</span> (Current Limiter):</strong> Sets the absolute maximum current ceiling to protect both the microcontroller output pin and LED load from overcurrent when <span class="arithmatex">\(R_{\text{var}} = 0\,\Omega\)</span>.</li>
+<li><strong><span class="arithmatex">\(R_{\text{var}}\)</span> (Cermet Trimpot):</strong> Allows manual analog adjustment of maximum forward current and luminance. Using a <strong>cermet</strong> (ceramic-metal thick-film) trimpot is critical for high-frequency PWM visual stimulation. Alternative potentiometer constructions will degrade or disrupt the stimulus.</li>
+</ul>
+<hr />
+<h2 id="2-low-side-npn-transistor-switching-drive-12v-multi-led-arrays">2. Low-Side NPN Transistor Switching Drive (12V / Multi-LED Arrays)</h2>
+<p>When driving multi-LED series strings or larger arrays that exceed microcontroller GPIO limits (<span class="arithmatex">\(5\,\text{V}\)</span> and <span class="arithmatex">\(20\text{--}40\,\text{mA}\)</span>), an external DC power supply (typically <span class="arithmatex">\(+12\,\text{V}\)</span>) is used with a low-side NPN bipolar junction transistor (BJT) switch.</p>
+<p><img alt="Low-Side Transistor LED Circuit" src="../../assets/images/transistor_led_circuit.svg" /></p>
+<p><em>Figure: Low-side switching circuit for a single colour channel. For multi-channel arrays, replicate the transistor, base resistor, trimpot, and LED strings for each channel while sharing the <span class="arithmatex">\(+12\,\text{V}\)</span> rail and Common Ground.</em></p>
+<ul>
+<li><strong><code>+12V Supply</code> &amp; Multiple LED Lines:</strong> Powers one or more parallel lines of 3 series LEDs (<span class="arithmatex">\(V_f \approx 6.3\text{--}9.9\,\text{V}\)</span> per string), leaving optimal voltage headroom from the <span class="arithmatex">\(12\,\text{V}\)</span> rail.</li>
+<li><strong><span class="arithmatex">\(R_{\text{fixed}}\)</span> (Per-Line Current Limiter):</strong> Each parallel LED line includes its own fixed series resistor to limit and balance current across individual branches.</li>
+<li><strong><span class="arithmatex">\(R_{\text{var}}\)</span> (Master Cermet Trimpot):</strong> A single shared cermet trimpot on the merged return path controls the maximum current and luminance for all parallel lines belonging to <strong>this channel</strong>.</li>
+<li><strong>NPN Transistor (Low-Side Switch):</strong> General-purpose small-signal NPN transistor (e.g., <strong>onsemi 2N3904</strong>, rated for <span class="arithmatex">\(40\,\text{V}\)</span>, <span class="arithmatex">\(200\,\text{mA}\)</span>, 3-pin TO-92 package). Sinks the combined load current for this channel to ground when switched ON by the PWM signal (ensure total channel current across parallel strings remains <span class="arithmatex">\(\le 200\,\text{mA}\)</span>).</li>
+<li><strong><code>PWM Source</code>, <span class="arithmatex">\(R_{\text{base}}\)</span> &amp; <span class="arithmatex">\(R_{\text{pull-down}}\)</span>:</strong> An MCU PWM pin switches the transistor through a base resistor (<span class="arithmatex">\(R_{\text{base}} \approx 100\,\Omega\)</span>). A pull-down resistor (<span class="arithmatex">\(R_{\text{pull-down}} = 10\,\text{k}\Omega\)</span>) keeps the base pulled to <span class="arithmatex">\(0\,\text{V}\)</span> during microcontroller startup or floating states.</li>
+<li><strong>Common Ground:</strong> The Arduino ground and the external <span class="arithmatex">\(12\,\text{V}\)</span> power supply ground <strong>must be connected together</strong> to establish the shared <span class="arithmatex">\(0\,\text{V}\)</span> reference required for the base-emitter voltage (<span class="arithmatex">\(V_{BE} \approx 0.7\,\text{V}\)</span>) to switch the transistor reliably.</li>
+<li><strong>Multi-Channel Operation:</strong> To drive a 2nd or 3rd colour channel independently, duplicate the transistor stage (<span class="arithmatex">\(Q_1, R_{\text{base}}, R_{\text{var}}\)</span>) and connect its base to a 2nd MCU PWM pin (e.g. Pin 9 and Pin 10 on Arduino Uno / Nano). All channels share the <span class="arithmatex">\(+12\,\text{V}\)</span> power rail and system Ground.</li>
+</ul>
+<hr />
+<h2 id="3-physical-circuit-bench-implementation">3. Physical Circuit &amp; Bench Implementation</h2>
+<p><img alt="Physical Circuit Bench Setup" src="../../assets/images/placeholder_circuit_bench_setup.svg" />
+<em>Figure: Benchtop driver circuit implementation showing Arduino microcontroller, multi-turn cermet trimpot, transistor switching stage, and wiring harness connected to LED array.</em></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../.." class="btn btn-neutral float-left" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../custom-pcbs/" class="btn btn-neutral float-right" title="Custom PCBs">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/SaleemLab/LEDStimulation" class="fa fa-code-fork" style="color: #fcfcfc"> SaleemLab/LEDStimulation</a>
+        </span>
+    
+    
+      <span><a href="../.." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../custom-pcbs/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="https://unpkg.com/katex@0/dist/katex.min.js"></script>
+      <script src="https://unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
+      <script src="../../javascripts/katex.js"></script>
+      <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      <script src="../../javascripts/mermaid.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

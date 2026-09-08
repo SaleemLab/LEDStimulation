@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Saleem Lab" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Calibration Guide - Full-Field LED Visual Stimulator</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="https://unpkg.com/katex@0/dist/katex.min.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Calibration Guide";
+        var mkdocs_page_input_path = "3-calibration/calibration-guide.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Full-Field LED Visual Stimulator
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">1. Hardware</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/circuit-and-driver/">Circuit & Driver</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/custom-pcbs/">Custom PCBs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Enclosure & Optics</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../1-hardware/enclosure-and-optics/panel-enclosure/">Panel Enclosure</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../1-hardware/enclosure-and-optics/wearable-glasses/">Wearable Glasses</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/bill-of-materials/">Bill of Materials</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">2. Firmware</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/architecture-and-timers/">Architecture & Timers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/serial-api-reference/">Serial API Reference</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../2-firmware/firmware-variants/">Firmware Variants</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">3. Calibration</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Calibration Guide</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#the-two-core-pillars-of-calibration">The Two Core Pillars of Calibration</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-max-luminance-configuration-channel-matching">1. Max Luminance Configuration &amp; Channel Matching</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-gamma-correction-output-linearization">2. Gamma Correction &amp; Output Linearization</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#calibration-metric-why-photoisomerisation-rates">Calibration Metric: Why Photoisomerisation Rates?</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#calibration-equipment-setup">Calibration Equipment &amp; Setup</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#sensor-options">Sensor Options</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#physical-alignment">Physical Alignment</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#step-by-step-calibration-procedure">Step-by-Step Calibration Procedure</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#phase-1-max-luminance-matching-trimpot-adjustment-at-100-duty-cycle">Phase 1: Max Luminance Matching (Trimpot Adjustment at 100% Duty Cycle)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#phase-2-automated-gamma-sweep-temporal-averaging">Phase 2: Automated Gamma Sweep &amp; Temporal Averaging</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#phase-3-lut-generation-firmware-deployment">Phase 3: LUT Generation &amp; Firmware Deployment</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../gamma-lut-pipeline/">Gamma LUT Pipeline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../photoreceptor-calculations/">Photoreceptor Calculations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">4. Experimental Workflows</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/bonsai-overview/">Bonsai Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/stimulation-paradigms/">Stimulation Paradigms</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/integration-and-sync/">Integration & Sync</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">5. Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../5-reference/performance-and-sync/">Performance & Dynamics</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Full-Field LED Visual Stimulator</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">3. Calibration</li>
+      <li class="breadcrumb-item active">Calibration Guide</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/SaleemLab/LEDStimulation/edit/master/docs/3-calibration/calibration-guide.md">Edit on SaleemLab/LEDStimulation</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="optical-calibration-guide">Optical Calibration Guide</h1>
+<p>Quantitative visual neuroscience and psychophysics require precise radiometric and photometric calibration. Because LEDs and driver electronics exhibit physical non-linearities, and because biological photoreceptors respond to absorbed photons rather than raw electrical or human-photopic metrics, calibration is divided into two distinct, essential pillars:</p>
+<pre class="mermaid"><code>flowchart LR
+    subgraph Aspect1["1. Max Luminance &amp; Channel Matching"]
+        direction TB
+        A1["&lt;b&gt;Define Target Regime&lt;/b&gt;&lt;br/&gt;Scotopic / Mesopic / Photopic"]
+        A2["&lt;b&gt;Calculate Target R*&lt;/b&gt;&lt;br/&gt;e.g. 10⁴ R*/cone/s"]
+        A3["&lt;b&gt;Target Power P_meas&lt;/b&gt;&lt;br/&gt;Ocular media &amp; sensor calibration"]
+        A4["&lt;b&gt;Hardware Adjustment&lt;/b&gt;&lt;br/&gt;Trimpots set 100% DC to match P_meas"]
+        A1 --&gt; A2 --&gt; A3 --&gt; A4
+    end
+
+    subgraph Aspect2["2. Gamma Correction &amp; Linearization"]
+        direction TB
+        B1["&lt;b&gt;Automated Duty Sweep&lt;/b&gt;&lt;br/&gt;'gc, stepSize, waitTime, nReps'"]
+        B2["&lt;b&gt;Temporal Power Averaging&lt;/b&gt;&lt;br/&gt;Avoid PWM carrier aliasing"]
+        B3["&lt;b&gt;MATLAB Inversion Pipeline&lt;/b&gt;&lt;br/&gt;cummax() filter &amp; interp1()"]
+        B4["&lt;b&gt;Deploy Gamma LUT&lt;/b&gt;&lt;br/&gt;Linear stimulus transfer (R² &gt; 0.999)"]
+        B1 --&gt; B2 --&gt; B3 --&gt; B4
+    end
+
+    Aspect1 ==&gt;|Calibrated Baseline| Aspect2</code></pre>
+<hr />
+<h2 id="the-two-core-pillars-of-calibration">The Two Core Pillars of Calibration</h2>
+<h3 id="1-max-luminance-configuration-channel-matching">1. Max Luminance Configuration &amp; Channel Matching</h3>
+<p>The first aspect of calibration establishes the <strong>absolute dynamic range</strong> of the stimulator:</p>
+<ul>
+<li><strong>Biologically Meaningful Channel Matching:</strong> Rather than matching channels by electrical power (<span class="arithmatex">\(\text{mW}\)</span>) or radiometric flux (<span class="arithmatex">\(\mu\text{W}\)</span>), we balance channels according to their biological effect—specifically, their <strong>photoisomerisation rates (<span class="arithmatex">\(R^*\)</span>)</strong> in target photoreceptors (e.g. matching Green LED activation of M-cones with UV LED activation of S-cones).</li>
+<li><strong>Adaptation Level Control:</strong> By setting the maximum luminance ceiling (100% duty cycle), you place the subject's retina into the desired physiological regime:<ul>
+<li><strong>Scotopic (Rod-dominated):</strong> <span class="arithmatex">\(&lt; 10^1 \, R^*/\text{rod/s}\)</span></li>
+<li><strong>Mesopic (Rod &amp; Cone active):</strong> <span class="arithmatex">\(10^1 - 10^3 \, R^*/\text{photoreceptor/s}\)</span></li>
+<li><strong>Photopic (Cone-dominated, rods saturated):</strong> <span class="arithmatex">\(10^3 - 10^5+ \, R^*/\text{cone/s}\)</span></li>
+</ul>
+</li>
+<li><strong>Hardware Execution:</strong> Because the LEDs operate at constant continuous DC at 100% duty cycle during this step, max luminance calibration can be measured cleanly with a standard optical power meter or photodiode. The operator turns the multi-turn trimpots (analog gate potentiometers on the driver board) or selects series current-limiting resistors until the exact target power level is measured.</li>
+</ul>
+<hr />
+<h3 id="2-gamma-correction-output-linearization">2. Gamma Correction &amp; Output Linearization</h3>
+<p>The second aspect of calibration ensures that <strong>commanded stimulus intensities scale linearly</strong>:</p>
+<ul>
+<li><strong>Sources of Non-Linearity:</strong> Microcontroller PWM duty cycle does not produce a perfectly linear optical output. Non-linearities arise from:<ul>
+<li>Transistor switching characteristics (base-emitter <span class="arithmatex">\(V_{\text{BE}}\)</span> or gate threshold voltages, junction capacitance, charge storage time, and turn-on delays).</li>
+<li>LED dynamic forward resistance (<span class="arithmatex">\(V_f - I_f\)</span>) near the turn-on knee.</li>
+<li>Switching rise and fall transition times at high PWM frequencies (<span class="arithmatex">\(10-31\text{ kHz}\)</span>).</li>
+<li>Optical diffusion and back-reflections in the ganzfeld dome or goggles.</li>
+</ul>
+</li>
+<li><strong>Automated Stepping (<code>gc</code>):</strong> The microcontroller firmware provides a dedicated serial command (<code>gc</code>) that automatically steps sequentially through duty cycles (e.g., from 0% to 100% in 2% steps) with programmable dwell times and repetitions. (A pseudorandom duty cycle order is planned for future firmware versions to eliminate junction heating hysteresis).</li>
+<li><strong>Temporal Averaging (Anti-Aliasing):</strong> When operating at <span class="arithmatex">\(&lt;100\%\)</span> duty cycle, the light output is pulsed at the PWM carrier frequency. Instantaneous sampling can alias into the PWM waveform, introducing severe noise. The measurement device (optical power meter or photodiode DAQ) must perform <strong>temporal averaging</strong> over a steady window (e.g., 2–3 seconds per step) to capture the true time-averaged optical power.</li>
+<li><strong>Look-Up Table (LUT) Inversion:</strong> The measured power-vs-duty-cycle curve is monotonically filtered and inverted in MATLAB to produce a Look-Up Table (LUT) stored in microcontroller flash memory (<code>PROGMEM</code>) or uploaded dynamically.</li>
+</ul>
+<hr />
+<h2 id="calibration-metric-why-photoisomerisation-rates">Calibration Metric: Why Photoisomerisation Rates?</h2>
+<p>When choosing a calibration target, several metrics exist:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Calibration Metric</th>
+<th style="text-align: left;">Units</th>
+<th style="text-align: left;">Limitations in Visual Neuroscience</th>
+<th style="text-align: center;">Used Here?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Radiometric Power / Irradiance</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(\mu\text{W}\)</span>, <span class="arithmatex">\(\mu\text{W}/\text{cm}^2\)</span></td>
+<td style="text-align: left;">Treats all wavelengths equally. Ignores opsin spectral sensitivity, ocular transmission, and photoreceptor geometry.</td>
+<td style="text-align: center;">❌ (Raw measurement only)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Photometric Illuminance / Luminance</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(\text{lux}\)</span>, <span class="arithmatex">\(\text{cd}/\text{m}^2\)</span></td>
+<td style="text-align: left;">Weighted exclusively by the <em>human photopic luminous efficiency curve</em> (<span class="arithmatex">\(V(\lambda)\)</span>, peaking at 555 nm). Completely invalid for mouse vision and UV stimulation (<span class="arithmatex">\(365-400\text{ nm}\)</span>).</td>
+<td style="text-align: center;">❌</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Estimated Photoisomerisation Rate (<span class="arithmatex">\(R^*\)</span>)</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(R^*/\text{photoreceptor/s}\)</span></td>
+<td style="text-align: left;">Quantifies the actual rate at which opsin photopigment molecules absorb photons and isomerise, accounting for pre-retinal ocular transmission, pupil size, detector responsivity, and outer segment collection area.</td>
+<td style="text-align: center;"><strong>✔️ YES (Euler Lab OVS Framework)</strong></td>
+</tr>
+</tbody>
+</table>
+<p>We follow the biophysical formulation developed by Euler Lab in the <a href="https://github.com/eulerlab/open-visual-stimulator">Open Visual Stimulator</a> project. See the <a href="../photoreceptor-calculations/">Photoreceptor Calculations Guide</a> for the complete mathematical derivation and script walkthrough of <a href="file:///d:/Code/LEDStimulation/Calibration/ganzfeldCalibration_v5.m"><code>Calibration/ganzfeldCalibration_v5.m</code></a>.</p>
+<hr />
+<h2 id="calibration-equipment-setup">Calibration Equipment &amp; Setup</h2>
+<pre class="mermaid"><code>flowchart TD
+    subgraph Hardware["⚡ Stimulation Hardware"]
+        direction LR
+        Arduino["&lt;b&gt;Microcontroller&lt;/b&gt;&lt;br/&gt;&lt;i&gt;ATmega32U4 / Teensy&lt;/i&gt;"]
+        Driver["&lt;b&gt;Driver Board&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Multi-Turn Trimpots&lt;/i&gt;"]
+        LEDs["&lt;b&gt;Calibrated LEDs&lt;/b&gt;&lt;br/&gt;&lt;i&gt;UV (365nm) &amp; Green (525nm)&lt;/i&gt;"]
+        Enclosure["&lt;b&gt;Ganzfeld / Goggles&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Diffusion Optics&lt;/i&gt;"]
+        Arduino --&gt; Driver --&gt; LEDs --&gt; Enclosure
+    end
+
+    subgraph Detection["🔬 Optical Detection (Pupil Plane)"]
+        direction LR
+        Sensor["&lt;b&gt;Optical Sensor&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Photodiode / S121C Sensor&lt;/i&gt;"]
+        Meter["&lt;b&gt;Power Meter Console / DAQ&lt;/b&gt;&lt;br/&gt;&lt;i&gt;PM100D / PM400&lt;/i&gt;"]
+        Sensor --&gt; Meter
+    end
+
+    subgraph Software["💻 Automated Calibration Software"]
+        direction LR
+        MATLAB["&lt;b&gt;MATLAB Calibration Suite&lt;/b&gt;&lt;br/&gt;&lt;i&gt;ganzfeldCalibration_v5.m&lt;/i&gt;"]
+        Serial["&lt;b&gt;Serial Protocol&lt;/b&gt;&lt;br/&gt;&lt;i&gt;'gc' / 'ana' / 'dac'&lt;/i&gt;"]
+        MATLAB --&gt; Serial
+    end
+
+    Enclosure --&gt; Sensor
+    Meter --&gt; MATLAB
+    Serial --&gt; Arduino</code></pre>
+<h3 id="sensor-options">Sensor Options</h3>
+<ol>
+<li><strong>Option 1 (Standard): Optical Power Meter Console + Calibrated Sensor</strong><ul>
+<li><strong>Console:</strong> Thorlabs PM100D, PM100USB, or PM400.</li>
+<li><strong>Sensor:</strong> Calibrated photodiode sensor covering UV and Visible wavelengths (e.g., <strong>Thorlabs S121C</strong>, <strong>S120VC</strong>, or <strong>S130VC</strong>).</li>
+<li><em>Advantage:</em> Built-in power calibration, internal integration/averaging, direct USB/serial communication with MATLAB.</li>
+</ul>
+</li>
+<li><strong>Option 2 (High-Speed / DAQ): Amplified Si Photodiode</strong><ul>
+<li><strong>Sensor:</strong> Thorlabs <strong>PDA100A2</strong> switchable-gain amplified photodiode connected to a National Instruments DAQ or oscilloscope.</li>
+<li><em>Gain Setting:</em> Set transimpedance gain (e.g., <span class="arithmatex">\(70\text{ dB}\)</span>, <span class="arithmatex">\(2.38 \times 10^6\text{ V/A}\)</span>).</li>
+<li><em>Averaging:</em> Apply software low-pass filtering or window averaging to eliminate PWM carrier ripple.</li>
+</ul>
+</li>
+</ol>
+<h3 id="physical-alignment">Physical Alignment</h3>
+<ul>
+<li>Mount the sensor active area at the <strong>exact spatial plane of the subject's eye / retina</strong> relative to the diffuser surface.</li>
+<li>Seal the enclosure against ambient room light. Perform a <strong>dark baseline measurement</strong> (<span class="arithmatex">\(V_{\text{dark}}\)</span> or <span class="arithmatex">\(P_{\text{dark}}\)</span>) with all LEDs powered off before proceeding.</li>
+</ul>
+<hr />
+<h2 id="step-by-step-calibration-procedure">Step-by-Step Calibration Procedure</h2>
+<h3 id="phase-1-max-luminance-matching-trimpot-adjustment-at-100-duty-cycle">Phase 1: Max Luminance Matching (Trimpot Adjustment at 100% Duty Cycle)</h3>
+<ol>
+<li><strong>Calculate Target Power:</strong>
+   Open <a href="file:///d:/Code/LEDStimulation/Calibration/ganzfeldCalibration_v5.m"><code>Calibration/ganzfeldCalibration_v5.m</code></a>. Enter your target photoisomerisation rates <span class="arithmatex">\(R^*_{\text{target}}\)</span> (e.g. <span class="arithmatex">\(10^4\,R^*/\text{cone/s}\)</span>). The script works backwards to compute the target power meter reading <span class="arithmatex">\(P_{\text{meas}}\)</span> in <span class="arithmatex">\(\mu\text{W}\)</span> at your chosen meter wavelength setting <span class="arithmatex">\(\lambda_{\text{meas}}\)</span> (e.g. <span class="arithmatex">\(525\text{ nm}\)</span> for Green, <span class="arithmatex">\(370\text{ nm}\)</span> for UV).</li>
+<li><strong>Isolate Channel A:</strong>
+   Enable Channel A at 100% duty cycle:
+   <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>sd, 100, 0
+</span></code></pre></div>
+   <em>(or use <code>useChB 0</code> followed by <code>sd, 100, 0</code>).</em></li>
+<li><strong>Tune Channel A Trimpot:</strong>
+   Using an insulated ceramic screwdriver, adjust the multi-turn trimpot for Channel A on the driver PCB until the power meter reads the exact target <span class="arithmatex">\(P_{\text{meas}}\)</span> calculated in Step 1.</li>
+<li><strong>Isolate Channel B:</strong>
+   Enable Channel B at 100% duty cycle:
+   <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sd, 0, 100
+</span></code></pre></div>
+   <em>(or use <code>useChA 0</code> followed by <code>sd, 0, 100</code>).</em></li>
+<li><strong>Tune Channel B Trimpot:</strong>
+   Adjust the multi-turn trimpot for Channel B until the power meter reads the exact target <span class="arithmatex">\(P_{\text{meas}}\)</span> for Channel B.</li>
+<li><strong>Record Potentiometer Settings:</strong>
+   Optionally send the <code>ana</code> command to stream analog monitor voltages on pins <code>A0</code>/<code>A1</code>, and record the final values in <a href="file:///d:/Code/LEDStimulation/PotentiometerSettingsNotes.txt"><code>PotentiometerSettingsNotes.txt</code></a>.</li>
+</ol>
+<hr />
+<h3 id="phase-2-automated-gamma-sweep-temporal-averaging">Phase 2: Automated Gamma Sweep &amp; Temporal Averaging</h3>
+<ol>
+<li><strong>Initialize Sensor Logging:</strong>
+   Configure your power meter or DAQ to record time-series power measurements at <span class="arithmatex">\(\ge 10-100\text{ Hz}\)</span>.</li>
+<li><strong>Execute Automated Gamma Sweep (<code>gc</code>):</strong>
+   Send the gamma calibration command via serial:
+   <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>gc, 0.02, 5000, 3
+</span></code></pre></div>
+   <em>Parameters:</em></li>
+<li><code>stepSize = 0.02</code>: Steps duty cycle in 2% increments (51 levels from 0.0 to 1.0).</li>
+<li><code>waitTime = 5000</code>: Dwells at each duty cycle for <span class="arithmatex">\(5000\text{ ms}\)</span> (5 seconds).</li>
+<li><code>nReps = 3</code>: Repeats the full sweep 3 times for averaging.</li>
+<li><strong>Temporal Averaging Window:</strong>
+   In MATLAB (<a href="file:///d:/Code/LEDStimulation/Calibration/generateGammaCorrectionLUT.m"><code>Calibration/generateGammaCorrectionLUT.m</code></a>), segment each 5-second step:</li>
+<li>Discard the first <span class="arithmatex">\(1000\text{ ms}\)</span> (transient/settling time).</li>
+<li>Compute the <strong>median power</strong> over the remaining <span class="arithmatex">\(3000-4000\text{ ms}\)</span> window to reject instantaneous PWM fluctuations.</li>
+</ol>
+<hr />
+<h3 id="phase-3-lut-generation-firmware-deployment">Phase 3: LUT Generation &amp; Firmware Deployment</h3>
+<ol>
+<li><strong>Compute Monotonic Inverse in MATLAB:</strong>
+   Run <a href="file:///d:/Code/LEDStimulation/Calibration/generateGammaCorrectionLUT.m"><code>Calibration/generateGammaCorrectionLUT.m</code></a>. The script:</li>
+<li>Normalizes brightness to <span class="arithmatex">\([0, 1]\)</span>.</li>
+<li>Enforces strict monotonicity using <code>cummax()</code>.</li>
+<li>Inverts the transfer function using <code>interp1()</code> onto an ideal linear grid (<span class="arithmatex">\(0 \dots 1040\)</span> for Leonardo DDS or <span class="arithmatex">\(0 \dots 255\)</span> for 8-bit registers).</li>
+<li><strong>Export C Array:</strong>
+   The script exports a formatted C code array header (e.g., <code>const uint16_t PROGMEM LUT[1041] = { ... };</code>).</li>
+<li><strong>Embed in Firmware:</strong></li>
+<li>Copy the generated array into your firmware sketch (e.g. <a href="file:///d:/Code/LEDStimulation/ArduinoCode/StimulusControlViaSerial_Leonardo_DDS_8bit_2freq/"><code>ArduinoCode/StimulusControlViaSerial_Leonardo_DDS_8bit_2freq/</code></a>).</li>
+<li>Flash the updated firmware to the microcontroller.</li>
+<li>If using Teensy 4.1, use the <code>loadlut</code> command to upload the table dynamically over serial.</li>
+<li><strong>Verification:</strong>
+   Repeat a brief duty-cycle sweep with gamma correction enabled (<code>agc, 1</code>) and verify that measured optical power scales with <span class="arithmatex">\(R^2 &gt; 0.999\)</span> linearity against requested stimulus intensity.</li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../2-firmware/firmware-variants/" class="btn btn-neutral float-left" title="Firmware Variants"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../gamma-lut-pipeline/" class="btn btn-neutral float-right" title="Gamma LUT Pipeline">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/SaleemLab/LEDStimulation" class="fa fa-code-fork" style="color: #fcfcfc"> SaleemLab/LEDStimulation</a>
+        </span>
+    
+    
+      <span><a href="../../2-firmware/firmware-variants/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../gamma-lut-pipeline/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="https://unpkg.com/katex@0/dist/katex.min.js"></script>
+      <script src="https://unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
+      <script src="../../javascripts/katex.js"></script>
+      <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      <script src="../../javascripts/mermaid.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

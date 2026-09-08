@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Saleem Lab" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Firmware Variants - Full-Field LED Visual Stimulator</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="https://unpkg.com/katex@0/dist/katex.min.css" rel="stylesheet" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Firmware Variants";
+        var mkdocs_page_input_path = "2-firmware/firmware-variants.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Full-Field LED Visual Stimulator
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">1. Hardware</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/circuit-and-driver/">Circuit & Driver</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/custom-pcbs/">Custom PCBs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" >Enclosure & Optics</a>
+    <ul>
+                <li class="toctree-l2"><a class="reference internal" href="../../1-hardware/enclosure-and-optics/panel-enclosure/">Panel Enclosure</a>
+                </li>
+                <li class="toctree-l2"><a class="reference internal" href="../../1-hardware/enclosure-and-optics/wearable-glasses/">Wearable Glasses</a>
+                </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../1-hardware/bill-of-materials/">Bill of Materials</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">2. Firmware</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../architecture-and-timers/">Architecture & Timers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../serial-api-reference/">Serial API Reference</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Firmware Variants</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#firmware-variant-matrix">Firmware Variant Matrix</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-canonical-firmware-stimuluscontrolviaserial_leonardo_dds_8bit_2freq">1. Canonical Firmware: StimulusControlViaSerial_Leonardo_DDS_8bit_2freq</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-stochastic-discrete-stimuli-stimuluscontrolviaserial_leonardo_v8">2. Stochastic &amp; Discrete Stimuli: StimulusControlViaSerial_Leonardo_v8</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-mouse-rig-firmware-stimuluscontrolviaserial_leonardo_dds_8bit_mouserig">3. Mouse Rig Firmware: StimulusControlViaSerial_Leonardo_DDS_8bit_mouseRig</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-32-bit-arm-alternative-ledstimcontroller_teensy41_dds">4. 32-bit ARM Alternative: LEDStimController_Teensy41_DDS</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-auxiliary-tracking-imuscript_task">5. Auxiliary Tracking: IMUscript_Task</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#paradigm-selection-guide">Paradigm Selection Guide</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">3. Calibration</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/calibration-guide/">Calibration Guide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/gamma-lut-pipeline/">Gamma LUT Pipeline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../3-calibration/photoreceptor-calculations/">Photoreceptor Calculations</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">4. Experimental Workflows</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/bonsai-overview/">Bonsai Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/stimulation-paradigms/">Stimulation Paradigms</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../4-experimental-workflows/integration-and-sync/">Integration & Sync</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">5. Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../5-reference/performance-and-sync/">Performance & Dynamics</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Full-Field LED Visual Stimulator</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">2. Firmware</li>
+      <li class="breadcrumb-item active">Firmware Variants</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/SaleemLab/LEDStimulation/edit/master/docs/2-firmware/firmware-variants.md">Edit on SaleemLab/LEDStimulation</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="firmware-variants-selection-guide">Firmware Variants &amp; Selection Guide</h1>
+<p>The repository includes several firmware variants developed for different microcontrollers, experimental paradigms, and rig configurations.</p>
+<hr />
+<h2 id="firmware-variant-matrix">Firmware Variant Matrix</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Sketch Directory</th>
+<th style="text-align: left;">Target MCU</th>
+<th style="text-align: left;">Core Engine</th>
+<th style="text-align: left;">Key Features</th>
+<th style="text-align: left;">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong><a href="file:///d:/Code/LEDStimulation/ArduinoCode/StimulusControlViaSerial_Leonardo_DDS_8bit_2freq/"><code>StimulusControlViaSerial_Leonardo_DDS_8bit_2freq</code></a></strong></td>
+<td style="text-align: left;">Arduino Leonardo (ATmega32U4)</td>
+<td style="text-align: left;">Direct Digital Synthesis (DDS) @ 31.25 kHz</td>
+<td style="text-align: left;">Dual independent channel frequencies (<code>freqA</code>, <code>freqB</code>), raised cosine onset/offset envelopes, contrast envelope modulation (<code>se</code>), continuous/stepped sweeps</td>
+<td style="text-align: left;"><strong>Canonical / Primary</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><a href="file:///d:/Code/LEDStimulation/ArduinoCode/StimulusControlViaSerial_Leonardo_v8/"><code>StimulusControlViaSerial_Leonardo_v8</code></a></strong></td>
+<td style="text-align: left;">Arduino Leonardo (ATmega32U4)</td>
+<td style="text-align: left;">Dual Timer (Timer1 PWM + Timer3 CTC ISR)</td>
+<td style="text-align: left;">Stochastic stimuli suite: Gaussian white noise (<code>wn</code>), frozen noise (<code>fwn</code>), contrast-switching adaptation noise (<code>cs</code>)</td>
+<td style="text-align: left;"><strong>Specialized / Extra Stimuli</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><a href="file:///d:/Code/LEDStimulation/ArduinoCode/StimulusControlViaSerial_Leonardo_DDS_8bit_mouseRig/"><code>StimulusControlViaSerial_Leonardo_DDS_8bit_mouseRig</code></a></strong></td>
+<td style="text-align: left;">Arduino Leonardo (ATmega32U4)</td>
+<td style="text-align: left;">Direct Digital Synthesis (DDS) @ 31.25 kHz</td>
+<td style="text-align: left;">Single-frequency DDS variant configured with calibrated gamma LUTs for the mouse physiology rig</td>
+<td style="text-align: left;"><strong>Active / Rig-Specific</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><a href="file:///d:/Code/LEDStimulation/ArduinoCode/LEDStimController_Teensy41_DDS/"><code>LEDStimController_Teensy41_DDS</code></a></strong></td>
+<td style="text-align: left;">Teensy 4.1 (ARM Cortex-M7 @ 600MHz)</td>
+<td style="text-align: left;">FlexPWM (12-bit @ 36.6 kHz) + IntervalTimer DDS</td>
+<td style="text-align: left;">4096-entry sine table, runtime gamma LUT streaming (<code>loadlut</code>), post-LUT brightness scaling (<code>bright</code>)</td>
+<td style="text-align: left;"><strong>High-Performance Alternative</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><a href="file:///d:/Code/LEDStimulation/ArduinoCode/IMUscript_Task/"><code>IMUscript_Task</code></a></strong></td>
+<td style="text-align: left;">Arduino Leonardo / Compatible</td>
+<td style="text-align: left;">Serial IMU Data Acquisition</td>
+<td style="text-align: left;">Real-time 6-DOF IMU streaming for movement and gait synchronization in human psychophysics</td>
+<td style="text-align: left;"><strong>Auxiliary / Motion Tracking</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="1-canonical-firmware-stimuluscontrolviaserial_leonardo_dds_8bit_2freq">1. Canonical Firmware: <code>StimulusControlViaSerial_Leonardo_DDS_8bit_2freq</code></h2>
+<p>This is the <strong>primary, recommended firmware</strong> for general visual stimulation experiments.</p>
+<ul>
+<li><strong>Target Hardware:</strong> Arduino Leonardo (ATmega32U4 @ 16 MHz).</li>
+<li><strong>PWM Carrier:</strong> 31.25 kHz (Timer1 Phase Correct PWM, Mode 10, TOP = 256).</li>
+<li><strong>Waveform Synthesis:</strong> 32-bit Direct Digital Synthesis (DDS) phase accumulator updated synchronously on every PWM cycle via <code>TIMER1_OVF_vect</code>.</li>
+<li><strong>Key Capabilities:</strong><ul>
+<li><strong>Dual-Frequency Control:</strong> Channel A and Channel B can run at distinct temporal frequencies (<code>freqA</code>, <code>freqB</code>), phases, and contrasts.</li>
+<li><strong>Smooth Envelopes:</strong> 100 ms modular raised cosine window (<code>raisedCosineLUT[64]</code>) prevents startle transients on trial onset and offset.</li>
+<li><strong>Contrast Modulation (<code>se</code>):</strong> Sinusoidal flicker modulated by a dynamic sinusoidal contrast envelope.</li>
+<li><strong>Continuous (<code>fs</code>) &amp; Stepped (<code>sfs</code>) Sweeps:</strong> Frequency chirps and discrete cycle-counted frequency staircases.</li>
+<li><strong>USB SOF Suppression:</strong> Disables Timer0 and USB Start-of-Frame interrupts during stimulation to eliminate trial timing drift.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="2-stochastic-discrete-stimuli-stimuluscontrolviaserial_leonardo_v8">2. Stochastic &amp; Discrete Stimuli: <code>StimulusControlViaSerial_Leonardo_v8</code></h2>
+<p>This sketch contains additional stochastic and discrete noise stimulus patterns that are not present in the DDS version:</p>
+<ul>
+<li><strong>Target Hardware:</strong> Arduino Leonardo (ATmega32U4 @ 16 MHz).</li>
+<li><strong>Architecture:</strong> Uses a dual-timer scheme where <code>Timer1</code> generates the carrier PWM and <code>Timer3</code> fires discrete CTC interrupts (<code>TIMER3_COMPA_vect</code>) at the frame update rate (e.g., 100 Hz).</li>
+<li><strong>Additional Stimuli Provided:</strong><ul>
+<li><strong>Gaussian White Noise (<code>wn</code>):</strong> Real-time Gaussian pseudo-random luminance frames using <code>xorshift32</code> + Central Limit Theorem (<span class="arithmatex">\(N=10\)</span>).</li>
+<li><strong>Frozen White Noise (<code>fwn</code>):</strong> Deterministic, repeatable pseudo-random sequence with a defined PRNG seed for trial-averaging.</li>
+<li><strong>Contrast-Switching White Noise (<code>cs</code>):</strong> 2-state adaptation noise alternating between two contrast and mean states.</li>
+<li><strong>16-bit PWM Resolution:</strong> Configurable dynamic prescaler/TOP up to 16 bits.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="3-mouse-rig-firmware-stimuluscontrolviaserial_leonardo_dds_8bit_mouserig">3. Mouse Rig Firmware: <code>StimulusControlViaSerial_Leonardo_DDS_8bit_mouseRig</code></h2>
+<ul>
+<li><strong>Target Hardware:</strong> Arduino Leonardo (ATmega32U4 @ 16 MHz).</li>
+<li><strong>Architecture:</strong> Direct Digital Synthesis (DDS) identical to the canonical engine, with pre-configured empirical gamma calibration tables embedded directly in <code>PROGMEM</code> for the mouse experimental rig.</li>
+</ul>
+<hr />
+<h2 id="4-32-bit-arm-alternative-ledstimcontroller_teensy41_dds">4. 32-bit ARM Alternative: <code>LEDStimController_Teensy41_DDS</code></h2>
+<ul>
+<li><strong>Target Hardware:</strong> PJRC Teensy 4.1 (600 MHz ARM Cortex-M7).</li>
+<li><strong>Architecture:</strong> Hardware <code>FlexPWM</code> running at <strong>36.62 kHz</strong> (12-bit resolution, 4096 steps) with 32-bit DDS driven by an <code>IntervalTimer</code> (PIT).</li>
+<li><strong>Key Capabilities:</strong><ul>
+<li><strong>12-bit Dynamic Range:</strong> 4096 discrete luminance levels per channel.</li>
+<li><strong>Serial LUT Streaming (<code>loadlut</code>):</strong> Allows uploading empirical gamma calibration curves dynamically over USB without re-flashing firmware.</li>
+<li><strong>Dynamic Brightness Scaling (<code>bright</code>):</strong> Post-LUT master attenuation (<span class="arithmatex">\(0-100\%\)</span>) for rapid adaptation without rebuilding LUTs.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="5-auxiliary-tracking-imuscript_task">5. Auxiliary Tracking: <code>IMUscript_Task</code></h2>
+<ul>
+<li><strong>Target Hardware:</strong> Arduino Leonardo or compatible board with an I2C/SPI IMU sensor (e.g., MPU-6050 / BNO055).</li>
+<li><strong>Purpose:</strong> Streams 6-DOF acceleration and angular velocity over serial to synchronize visual stimulation with subject movement or head kinematics in human experiments.</li>
+</ul>
+<hr />
+<h2 id="paradigm-selection-guide">Paradigm Selection Guide</h2>
+<pre class="mermaid"><code>flowchart TD
+    Start{"&lt;b&gt;What stimulus paradigm is required?&lt;/b&gt;"}
+
+    Start --&gt;|"Sinewaves, Chirps, Contrast Envelopes"| Canonical["&lt;b&gt;Canonical DDS Firmware&lt;/b&gt;&lt;br/&gt;&lt;code&gt;DDS_8bit_2freq.ino&lt;/code&gt;"]
+    Start --&gt;|"Gaussian Noise, Frozen Noise, Adaptation"| v8["&lt;b&gt;Stochastic Noise Suite&lt;/b&gt;&lt;br/&gt;&lt;code&gt;Leonardo_v8.ino&lt;/code&gt;"]
+    Start --&gt;|"12-bit Resolution / Dynamic LUT Upload"| Teensy["&lt;b&gt;High-Resolution ARM Cortex-M7&lt;/b&gt;&lt;br/&gt;&lt;code&gt;Teensy41_DDS.ino&lt;/code&gt;"]
+    Start --&gt;|"Head Kinematics &amp; Motion Capture"| IMU["&lt;b&gt;Motion Telemetry&lt;/b&gt;&lt;br/&gt;&lt;code&gt;IMUscript_Task.ino&lt;/code&gt;"]</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../serial-api-reference/" class="btn btn-neutral float-left" title="Serial API Reference"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../3-calibration/calibration-guide/" class="btn btn-neutral float-right" title="Calibration Guide">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/SaleemLab/LEDStimulation" class="fa fa-code-fork" style="color: #fcfcfc"> SaleemLab/LEDStimulation</a>
+        </span>
+    
+    
+      <span><a href="../serial-api-reference/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../3-calibration/calibration-guide/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="https://unpkg.com/katex@0/dist/katex.min.js"></script>
+      <script src="https://unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
+      <script src="../../javascripts/katex.js"></script>
+      <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      <script src="../../javascripts/mermaid.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
