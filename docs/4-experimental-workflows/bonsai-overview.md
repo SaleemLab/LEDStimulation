@@ -33,14 +33,25 @@ Located in [`BonsaiCode/`](file:///d:/Code/LEDStimulation/BonsaiCode/):
 ## 3. Core Workflow Architecture
 
 ```mermaid
-graph LR
-    Timer[Trial Timer / Trigger] --> SelectRow[Select Trial Parameters from CSV]
-    SelectRow --> FormatCmd[Format Serial ASCII String]
-    FormatCmd --> SerialWrite[Bonsai SerialPort Node]
-    SerialWrite --> USB[USB Serial / Microcontroller]
-    
-    USB --> SerialRead[Serial Response / Status Feedback]
-    SerialRead --> Logger[CSV / LSL Data Logger]
+flowchart TD
+    subgraph TX["1. Stimulus Command Generation & Dispatch"]
+        direction LR
+        Timer["<b>Trial Trigger</b><br/>Timer or Sync Pulse"]
+        Select["<b>Trial Matrix</b><br/>Row from CSV Table"]
+        Format["<b>ASCII Formatter</b><br/>Format Serial String"]
+        Write["<b>Bonsai SerialPort</b><br/>Non-blocking Dispatch"]
+        Timer --> Select --> Format --> Write
+    end
+
+    subgraph RX["2. Device Execution & Data Recording"]
+        direction LR
+        USB["<b>MCU Execution</b><br/>ATmega32U4 / Teensy"]
+        Read["<b>Serial Feedback</b><br/>Status / Confirmation"]
+        Log["<b>Data Acquisition</b><br/>CSV / LSL Log Streams"]
+        USB --> Read --> Log
+    end
+
+    Write ==>|Serial ASCII (115200)| USB
 ```
 
 * **Serial Communication Node:** Configured for the microcontroller's COM port at `115200` baud.

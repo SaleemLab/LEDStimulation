@@ -1,4 +1,4 @@
-# Preset 4: ReadTheDocs Classic Theme
+# Preset 5: Bootswatch Flatly Theme
 site_name: Full-Field LED Visual Stimulator
 site_description: High-precision temporal visual stimulation platform for neuroscience and psychophysics.
 site_author: Saleem Lab
@@ -6,31 +6,12 @@ repo_url: https://github.com/SaleemLab/LEDStimulation
 repo_name: SaleemLab/LEDStimulation
 
 theme:
-  name: readthedocs
-  highlightjs: true
+  name: flatly
 
 markdown_extensions:
   - admonition
-  - pymdownx.details
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.highlight:
-      anchor_linenums: true
-      line_spans: __span
-      pygments_lang_class: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - pymdownx.keys
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.arithmatex:
-      generic: true
   - tables
   - attr_list
-  - md_in_html
 
 extra_css:
   - https://unpkg.com/katex@0/dist/katex.min.css
@@ -40,8 +21,6 @@ extra_javascript:
   - https://unpkg.com/katex@0/dist/katex.min.js
   - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
   - javascripts/katex.js
-  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
-  - javascripts/mermaid.js
 
 nav:
   - Overview: index.md

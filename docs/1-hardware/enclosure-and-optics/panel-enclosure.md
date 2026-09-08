@@ -7,12 +7,24 @@ The full-field visual stimulator utilizes a modular MakerBeam XL frame, precisio
 ## Mechanical Assembly
 
 ```mermaid
-graph TD
-    Frame[MakerBeam XL 15x15 Frame] --> Baseplate[CNC Aluminium Baseplate]
-    Baseplate --> PCBs[LED Array PCBs]
-    Frame --> DiffuserBase[3D Printed Diffusion Base with Screws & Magnets]
-    DiffuserBase --> Sheet[Diffusion Film / Optical Filters]
-    Sheet --> Clamp[3D Printed Magnetic Clamp Frame]
+flowchart TD
+    subgraph Structure["1. Structural Chassis & Heat Dissipation"]
+        direction LR
+        Frame["<b>MakerBeam XL Frame</b>"]
+        Baseplate["<b>Aluminium Baseplate</b>"]
+        PCBs["<b>LED Array PCBs</b>"]
+        Frame --> Baseplate --> PCBs
+    end
+
+    subgraph Optical["2. Optical Diffusion Stack"]
+        direction LR
+        DiffBase["<b>Magnetic Diffusion Base</b>"]
+        Film["<b>Diffusion Film / Filters</b>"]
+        Clamp["<b>Magnetic Top Clamp</b>"]
+        DiffBase --> Film --> Clamp
+    end
+
+    Structure ==> Optical
 ```
 
 ![Full-Field Panel Enclosure Assembly](../../assets/images/placeholder_panel_enclosure.svg)

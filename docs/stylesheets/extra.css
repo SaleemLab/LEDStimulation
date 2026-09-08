@@ -1,39 +1,176 @@
 /* Custom styles for Full-Field LED Visual Stimulator documentation */
 
-/* Mermaid Diagrams: Ensure clear scaling, readable fonts, and responsive layout */
+:root {
+    --md-text-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --md-code-font: "JetBrains Mono", "Fira Code", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ==========================================================================
+   ReadTheDocs (RTD) Theme Enhancements - Modern Slate & Clean UI
+   ========================================================================== */
+
+/* Increase readable content width for wide code snippets, math, and tables */
+.wy-nav-content {
+    max-width: 1100px !important;
+    padding: 2rem 3rem !important;
+}
+
+/* Modern Slate Sidebar */
+.wy-side-nav-search {
+    background-color: #0f172a !important; /* Deep slate */
+    padding: 1.5rem 1rem !important;
+}
+
+.wy-side-nav-search > a,
+.wy-side-nav-search .wy-dropdown > a {
+    color: #f8fafc !important;
+    font-weight: 700 !important;
+    font-size: 1.05rem !important;
+    letter-spacing: -0.01em !important;
+}
+
+.wy-side-nav-search input[type="text"] {
+    border-radius: 6px !important;
+    border: 1px solid #334155 !important;
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    padding: 6px 12px !important;
+    box-shadow: none !important;
+}
+
+.wy-side-nav-search input[type="text"]::placeholder {
+    color: #94a3b8 !important;
+}
+
+.wy-nav-side {
+    background-color: #1e293b !important; /* Slate-800 */
+}
+
+.wy-menu-vertical a {
+    color: #cbd5e1 !important;
+    font-size: 0.92rem !important;
+    padding: 0.65rem 1.2rem !important;
+    transition: all 0.15s ease !important;
+}
+
+.wy-menu-vertical a:hover {
+    background-color: #334155 !important;
+    color: #ffffff !important;
+}
+
+.wy-menu-vertical li.current > a,
+.wy-menu-vertical li.on a {
+    color: #ffffff !important;
+    background: #0284c7 !important; /* Ocean blue active highlight */
+    font-weight: 600 !important;
+}
+
+.wy-menu-vertical li.current li.current > a {
+    background: #0369a1 !important;
+    color: #ffffff !important;
+}
+
+/* Modern Content Typography */
+.rst-content h1 {
+    font-size: 2.1rem !important;
+    color: #0f172a !important;
+    margin-bottom: 1.2rem !important;
+}
+
+.rst-content h2 {
+    font-size: 1.5rem !important;
+    color: #1e293b !important;
+    margin-top: 2rem !important;
+    margin-bottom: 0.8rem !important;
+    padding-bottom: 0.4rem !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.rst-content h3 {
+    font-size: 1.2rem !important;
+    color: #334155 !important;
+}
+
+.rst-content p, .rst-content li {
+    font-size: 0.96rem !important;
+    line-height: 1.7 !important;
+    color: #334155 !important;
+}
+
+.rst-content code, .rst-content tt {
+    font-family: "JetBrains Mono", "Fira Code", monospace !important;
+    font-size: 85% !important;
+    padding: 2px 6px !important;
+    border-radius: 5px !important;
+    background-color: #f1f5f9 !important;
+    color: #0369a1 !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+.rst-content pre.literal-block, .rst-content div[class^='highlight'] {
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+    background: #0f172a !important;
+}
+
+/* Admonitions styling */
+.rst-content .admonition {
+    border-radius: 8px !important;
+    border-left-width: 4px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    margin: 1.5rem 0 !important;
+}
+
+/* ==========================================================================
+   Mermaid, Admonitions & Math (Universal)
+   ========================================================================== */
+
+/* Mermaid Diagrams: Balanced sizing and clean centering */
 .mermaid {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 1.5rem 0;
+    margin: 1.5rem auto !important;
+    max-width: 960px !important;
+    width: 100% !important;
+    padding: 1rem 1.25rem !important;
+    background: #ffffff !important;
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    box-sizing: border-box !important;
     overflow-x: auto;
-    padding: 1rem;
-    background: var(--md-code-bg-color, rgba(0, 0, 0, 0.03));
-    border-radius: 8px;
-    border: 1px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.08));
 }
 
 .mermaid svg {
     max-width: 100% !important;
     height: auto !important;
-    min-width: 320px;
-    font-family: inherit !important;
+    display: block;
+    margin: 0 auto;
 }
 
-/* List spacing and hierarchy */
-.md-typeset ul {
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
+/* KaTeX Math formulas display */
+.katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.5rem 0;
 }
 
-.md-typeset li {
-    margin-top: 0.25rem;
-    margin-bottom: 0.25rem;
-}
-
-/* Tables styling enhancement */
+/* Table formatting */
+.rst-content table.docutils,
 .md-typeset table:not([class]) {
-    font-size: 0.85rem;
-    border-radius: 6px;
+    font-size: 0.88rem;
+    border-radius: 8px;
     overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    width: 100%;
 }
+
+

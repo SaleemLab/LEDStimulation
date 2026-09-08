@@ -10,15 +10,12 @@ This section documents the primary visual stimulation paradigms implemented in t
 ## Paradigm Summary
 
 ```mermaid
-graph TD
-    Paradigms[Stimulation Paradigms] --> OpenLoop[Open-Loop Characterization]
-    Paradigms --> Adaptive[Psychometric Staircases]
-    Paradigms --> ClosedLoop[State-Dependent Stimulation]
+flowchart TD
+    Paradigms["<b>Visual Stimulation Paradigms</b>"]
     
-    OpenLoop --> Flicker[Sinusoidal & Chirp Sweeps]
-    OpenLoop --> Noise[Gaussian & Switching White Noise]
-    Adaptive --> Staircase[1-Up / 3-Down Detection Thresholds]
-    ClosedLoop --> Running[Locomotion / Movement Gated]
+    Paradigms --> OpenLoop["<b>1. Open-Loop Characterization</b><br/>Sinewave flicker, chirps, Gaussian and frozen white noise"]
+    Paradigms --> Adaptive["<b>2. Adaptive Psychophysics</b><br/>1-up / 3-down staircase detection thresholds"]
+    Paradigms --> ClosedLoop["<b>3. Closed-Loop / State-Gated</b><br/>Locomotion, eye-position, or pupil-triggered"]
 ```
 
 ---

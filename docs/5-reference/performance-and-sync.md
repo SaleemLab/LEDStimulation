@@ -23,10 +23,18 @@ The system uses high-frequency switching to achieve granular intensity modulatio
 ## 2. Dynamic Range & Linearity
 
 ```mermaid
-graph LR
-    Sub2[Duty Cycle < 2%] -->|MOSFET Transition Zone| NonLinear[Non-Linear / Dead Zone]
-    Sub2 -. Linearized via .-> GammaLUT[Calibrated Gamma LUT]
-    Over2[Duty Cycle 2% - 100%] --> HighLinearity[Highly Linear Regime]
+flowchart TD
+    subgraph NonLin["Low Duty Cycle Zone (&lt; 2% DC)"]
+        direction TB
+        Sub2["<b>MOSFET Slew Delay (&lt; 1 µs)</b><br/>Non-linear switching transition"]
+        LUT["<b>Calibrated Gamma LUT</b><br/>Linearized via PROGMEM LUT"]
+        Sub2 -.->|Pre-distortion Inversion| LUT
+    end
+
+    subgraph Lin["Linear Operating Regime (2% – 100% DC)"]
+        direction TB
+        Over2["<b>High Fidelity Dynamic Range</b><br/>Direct linear optical scaling"]
+    end
 ```
 
 * **Dead Zone:** For pulse widths shorter than the MOSFET slew time ($< 1\ \mu\text{s}$), the channel does not fully turn on, leading to non-monotonic luminance drop-offs.

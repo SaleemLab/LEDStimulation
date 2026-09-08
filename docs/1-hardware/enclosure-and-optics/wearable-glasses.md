@@ -27,12 +27,24 @@ For human visual psychophysics, mobile experiments, and simultaneous eye-trackin
 ## Assembly & Alignment
 
 ```mermaid
-graph LR
-    NeonFrame[Pupil Labs Neon Frame] --> BoomArm[Custom 3D Printed Boom Arm]
-    BoomArm --> DiffuserHousing[Miniature Diffuser Housing]
-    DiffuserHousing --> LEDAssembly[Miniature LED Assembly]
-    DiffuserHousing --> Eye[Subject Visual Field]
-    NeonFrame -.-> GazeTracking[Unobstructed Eye-Tracking Cameras]
+flowchart TD
+    subgraph Mechanical["Mechanical Mounting"]
+        direction LR
+        NeonFrame["<b>Pupil Labs Neon Frame</b>"]
+        BoomArm["<b>Custom Boom Arm</b>"]
+        DiffuserHousing["<b>Miniature Diffuser Housing</b>"]
+        LEDAssembly["<b>Dual-LED Sub-Assembly</b>"]
+        NeonFrame --> BoomArm --> DiffuserHousing --> LEDAssembly
+    end
+
+    subgraph Optical["Optical Delivery & Tracking"]
+        direction LR
+        Eye["<b>Subject Visual Field</b><br/>Diffuse retinal illumination"]
+        Gaze["<b>Eye-Tracking Cameras</b><br/>Unobstructed pupil tracking"]
+    end
+
+    LEDAssembly --> Eye
+    NeonFrame -.-> Gaze
 ```
 
 1. **Boom Arm Attachment:** The boom arm securely clips/fastens to the Neon eye-tracker frame without altering gaze-calibration geometry.

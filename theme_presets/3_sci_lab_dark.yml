@@ -1,4 +1,5 @@
-# Preset 4: ReadTheDocs Classic Theme
+# Preset 3: Cyber / Neuro-Lab Dark Aesthetic
+# Features: Deep dark mode default, vibrant neon cyan & emerald, Lexend typography
 site_name: Full-Field LED Visual Stimulator
 site_description: High-precision temporal visual stimulation platform for neuroscience and psychophysics.
 site_author: Saleem Lab
@@ -6,8 +7,35 @@ repo_url: https://github.com/SaleemLab/LEDStimulation
 repo_name: SaleemLab/LEDStimulation
 
 theme:
-  name: readthedocs
-  highlightjs: true
+  name: material
+  language: en
+  font:
+    text: Lexend
+    code: JetBrains Mono
+  palette:
+    # Slate dark default
+    - scheme: slate
+      primary: cyan
+      accent: light green
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    # Light mode
+    - scheme: default
+      primary: cyan
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.path
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
 
 markdown_extensions:
   - admonition
@@ -40,8 +68,6 @@ extra_javascript:
   - https://unpkg.com/katex@0/dist/katex.min.js
   - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
   - javascripts/katex.js
-  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
-  - javascripts/mermaid.js
 
 nav:
   - Overview: index.md

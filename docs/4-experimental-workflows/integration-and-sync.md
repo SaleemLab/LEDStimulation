@@ -10,21 +10,29 @@ Complex experiments often require synchronized acquisition across multiple data 
 ## Synchronization Architecture
 
 ```mermaid
-graph TD
-    subgraph Hardware Signals
-        MCU[Microcontroller Pin 4: Indicator Pin] --> SyncBox[Hardware Sync / DAQ]
-        MCU[Microcontroller Pin 5: Active Status] --> SyncBox
+flowchart TD
+    subgraph Hardware["⚡ Hardware TTL Signals"]
+        direction LR
+        MCU_P4["<b>Microcontroller Pin 4</b><br/><i>Indicator / Frame Toggle</i>"]
+        MCU_P5["<b>Microcontroller Pin 5</b><br/><i>Stimulus Active Gate</i>"]
     end
 
-    subgraph Software Synchronization - LabStreamingLayer
-        Bonsai[Bonsai Stimulus Orchestrator] -- LSL Outlet: Stimulus Events --> LSL_Router[LSL Network Router]
-        Neon[Pupil Labs Neon Eye Tracker] -- LSL Outlet: Gaze & Pupil Video --> LSL_Router
-        IMU[IMU / Motion Sensor Stream] -- LSL Outlet: Accelerometer/Gyro --> LSL_Router
-        
-        LSL_Router --> LabRecorder["LabRecorder (XDF Multi-Stream File)"]
+    subgraph Software["💻 Software Acquisition (LabStreamingLayer)"]
+        direction LR
+        Bonsai["<b>Bonsai Stimulus Engine</b><br/><i>LSL Outlet: Stimulus Events</i>"]
+        Neon["<b>Pupil Labs Neon Tracker</b><br/><i>LSL Outlet: Gaze and Video</i>"]
+        IMU["<b>Motion / IMU Stream</b><br/><i>LSL Outlet: 6-DOF Kinematics</i>"]
     end
-    
-    SyncBox -. Hardware Clocks .-> LabRecorder
+
+    SyncBox["<b>Hardware DAQ / Sync Box</b><br/><i>Open Ephys / Intan / NI-DAQ</i>"]
+    LabRecorder["<b>LabRecorder Multi-Stream Host</b><br/><i>Synchronized XDF Output File</i>"]
+
+    MCU_P4 --> SyncBox
+    MCU_P5 --> SyncBox
+    Bonsai --> LabRecorder
+    Neon --> LabRecorder
+    IMU --> LabRecorder
+    SyncBox -.->|Hardware Clocks| LabRecorder
 ```
 
 ---

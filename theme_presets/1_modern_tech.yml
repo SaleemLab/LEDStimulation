@@ -1,4 +1,5 @@
-# Preset 4: ReadTheDocs Classic Theme
+# Preset 1: Modern Tech / Stripe-Vercel Developer Style
+# Features: Top navigation tabs, Inter font, JetBrains Mono, Sleek Teal/Emerald palette
 site_name: Full-Field LED Visual Stimulator
 site_description: High-precision temporal visual stimulation platform for neuroscience and psychophysics.
 site_author: Saleem Lab
@@ -6,8 +7,37 @@ repo_url: https://github.com/SaleemLab/LEDStimulation
 repo_name: SaleemLab/LEDStimulation
 
 theme:
-  name: readthedocs
-  highlightjs: true
+  name: material
+  language: en
+  font:
+    text: Inter
+    code: JetBrains Mono
+  palette:
+    # Light mode
+    - scheme: default
+      primary: teal
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: teal
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.path
+    - navigation.top
+    - navigation.instant
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
 
 markdown_extensions:
   - admonition
@@ -40,8 +70,6 @@ extra_javascript:
   - https://unpkg.com/katex@0/dist/katex.min.js
   - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
   - javascripts/katex.js
-  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
-  - javascripts/mermaid.js
 
 nav:
   - Overview: index.md

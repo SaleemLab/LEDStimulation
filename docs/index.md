@@ -10,41 +10,22 @@ An open-source, high-precision visual stimulation platform designed for visual n
 - **Rich Stimulus Battery:** Dual-frequency sinusoidal flicker, raised cosine temporal onset/offset envelopes, dynamic contrast envelopes, continuous chirps, stepped frequency sweeps, Gaussian white noise (with Central Limit Theorem PRNG), and contrast-switching adaptation sequences.
 - **Quantitative Radiometric Calibration:** End-to-end MATLAB calibration pipeline mapping raw duty cycles to linearized lookup tables (LUTs) and calculating exact photoreceptor isomerisation rates ($R^*/\text{photoreceptor/s}$).
 - **Flexible Form Factors:** Supports both 200mm full-field panel enclosures (with magnetic diffusion clamping) and miniature wearable mounts for Pupil Labs Neon eye-tracking glasses.
-- **Reactive Experiment Orchestration:** Full integration with [Bonsai](https://bonsai-rx.org/) for closed-loop, state-dependent, adaptive psychometric staircase, and LabStreamingLayer (LSL) multi-modal recording.
+- **Reactive Experiment Orchestration:** Full integration with [Bonsai](https://bonsai-rx.org/) for closed-loop, state-dependent, and adaptive psychometric staircase stimulation.
 
 ---
 
 ## System Architecture
 
 ```mermaid
-graph LR
-    subgraph Host Software
-        Bonsai[Bonsai Reactive Workflows]
-        LSL[LabStreamingLayer / LabRecorder]
-        MATLAB[MATLAB Calibration Suite]
-    end
+flowchart LR
+    Host["<b>Host Control (PC)</b><br/>• Bonsai Workflows<br/>• MATLAB Calibration<br/>• Serial ASCII Protocol"]
+    MCU["<b>Microcontroller Engine</b><br/>• 32-bit DDS Waveforms<br/>• Flash Gamma LUT<br/>• 31.25 kHz Timer1 PWM"]
+    HW["<b>Driver and LEDs</b><br/>• Driver Board and Bias<br/>• Dual LED Arrays<br/>• TTL Sync Pins 4 and 5"]
+    Optics["<b>Optics and Delivery</b><br/>• Diffusion Enclosure<br/>• Wearable Frame<br/>• Homogeneous Field"]
 
-    subgraph Microcontroller Firmware
-        MCU[Arduino Leonardo / Teensy 4.1]
-        T1[Timer1: 31.25 kHz PWM]
-        DDS[32-bit DDS Engine & ISR]
-        LUT[PROGMEM Gamma LUT]
-    end
-
-    subgraph Hardware & Optics
-        Driver[Multi-Channel Driver Stage]
-        LEDs[Dual-Channel LED Arrays]
-        Enclosure[Magnetic Diffusion Enclosure / Glasses]
-        Sensors[Photodiode / Power Meter / Eye Tracker]
-    end
-
-    Bonsai -- Serial ASCII (115200) --> MCU
-    MATLAB -. Offline Calibration .-> LUT
-    MCU --> T1 & DDS
-    DDS --> LUT --> T1
-    T1 --> Driver --> LEDs --> Enclosure
-    Enclosure -. Optical Feedback .-> Sensors
-    Sensors --> LSL
+    Host -->|Serial ASCII 115200| MCU
+    MCU -->|PWM Carrier| HW
+    HW -->|Linear Photons| Optics
 ```
 
 ---

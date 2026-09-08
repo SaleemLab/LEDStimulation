@@ -74,11 +74,11 @@ This sketch contains additional stochastic and discrete noise stimulus patterns 
 ## Paradigm Selection Guide
 
 ```mermaid
-graph TD
-    Start{"What stimulus paradigm do you need?"}
+flowchart TD
+    Start{"<b>What stimulus paradigm is required?</b>"}
     
-    Start -->|"Sinewaves, Chirps, Envelopes, Stepped Sweeps"| Canonical["Flash DDS_8bit_2freq<br><b>Canonical Firmware</b>"]
-    Start -->|"Gaussian White Noise, Frozen Noise, Adaptation"| v8["Flash Leonardo_v8<br><b>Stochastic Noise Suite</b>"]
-    Start -->|"12-bit Resolution or Dynamic LUT Uploads"| Teensy["Flash Teensy41_DDS<br><b>ARM Cortex-M7</b>"]
-    Start -->|"Head Kinematics / Motion Synchronization"| IMU["Flash IMUscript_Task<br><b>Motion Tracking</b>"]
+    Start -->|"Sinewaves, Chirps, Contrast Envelopes"| Canonical["<b>Canonical DDS Firmware</b><br/><code>DDS_8bit_2freq.ino</code>"]
+    Start -->|"Gaussian Noise, Frozen Noise, Adaptation"| v8["<b>Stochastic Noise Suite</b><br/><code>Leonardo_v8.ino</code>"]
+    Start -->|"12-bit Resolution / Dynamic LUT Upload"| Teensy["<b>High-Resolution ARM Cortex-M7</b><br/><code>Teensy41_DDS.ino</code>"]
+    Start -->|"Head Kinematics & Motion Capture"| IMU["<b>Motion Telemetry</b><br/><code>IMUscript_Task.ino</code>"]
 ```
